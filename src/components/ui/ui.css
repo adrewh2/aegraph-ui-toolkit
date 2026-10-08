@@ -1,0 +1,504 @@
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn:hover {
+  background: var(--surface-hover);
+}
+a.btn {
+  text-decoration: none;
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+.btn--primary:hover {
+  background: #33312d;
+}
+.btn--ghost {
+  border-color: transparent;
+  background: transparent;
+}
+.btn--danger {
+  color: var(--danger);
+}
+.btn--danger:hover {
+  background: var(--danger-bg);
+}
+.btn--danger-solid,
+.btn--danger-solid:hover {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+.btn--sm {
+  height: 28px;
+  padding: 0 8px;
+  font-size: 12px;
+}
+
+/* A button that reads as a link: the weight of the sentence it sits in, the colour of a link. */
+.linkish {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--accent, #2563eb);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.linkish:hover {
+  text-decoration-thickness: 2px;
+}
+
+.btn--icon {
+  width: 32px;
+  padding: 0;
+  justify-content: center;
+}
+.btn--icon.btn--sm {
+  width: 28px;
+}
+
+/* Inputs */
+.input {
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-size: 13px;
+  outline: none;
+}
+.input:focus {
+  border-color: var(--text-faint);
+  box-shadow: 0 0 0 3px rgba(31, 30, 27, 0.06);
+}
+textarea.input {
+  height: auto;
+  padding: 8px 10px;
+  resize: vertical;
+  min-height: 72px;
+}
+select.input {
+  padding-right: 24px;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.field > label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.error-text {
+  color: var(--danger);
+  font-size: 12px;
+}
+
+/* Chips & badges */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  padding: 1px 7px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 18px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+.badge--ok {
+  background: var(--ok-bg);
+  color: var(--ok-text);
+}
+.badge--warn {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+}
+.badge--info {
+  background: var(--info-bg);
+  color: var(--info-text);
+}
+.badge--danger {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+.count {
+  display: inline-flex;
+  min-width: 18px;
+  justify-content: center;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 18px;
+}
+
+/* Menus (context + dropdown) */
+.menu {
+  position: fixed;
+  z-index: 1000;
+  min-width: 180px;
+  max-width: min(560px, 92vw);
+  max-height: min(70vh, 480px);
+  overflow-y: auto;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.menu__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 30px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  text-align: left;
+  font-size: 13px;
+  cursor: pointer;
+}
+.menu__item:hover,
+.menu__item:focus-visible {
+  background: var(--surface-hover);
+  outline: none;
+}
+/* An item's label ellipsises rather than widening the menu past the screen. */
+.menu__item {
+  white-space: nowrap;
+}
+.menu__item > .menu__text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.menu__item--danger {
+  color: var(--danger);
+}
+.menu__item--danger:hover {
+  background: var(--danger-bg);
+}
+.menu__item:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+/* A dropdown from a button: as narrow as the button allows, and a hairline between items so a long list reads as
+   rows. The line is inset and drawn above each item after the first; the hovered item's own background covers it. */
+.menu--dropdown {
+  min-width: 0;
+  padding: 3px;
+}
+.menu--dropdown .menu__item {
+  position: relative;
+  /* Room after the text: the tick column on the left otherwise leaves the right edge looking tight. */
+  padding-right: 16px;
+}
+.menu--dropdown .menu__item + .menu__item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 8px;
+  left: 8px;
+  height: 1px;
+  background: var(--border);
+  pointer-events: none;
+}
+.menu--dropdown .menu__item:hover::before,
+.menu--dropdown .menu__item:focus-visible::before,
+.menu--dropdown .menu__item:hover + .menu__item::before,
+.menu--dropdown .menu__item:focus-visible + .menu__item::before {
+  opacity: 0;
+}
+.menu__sep {
+  height: 1px;
+  margin: 4px 0;
+  background: var(--border);
+}
+.menu__label {
+  padding: 4px 8px 2px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.menu__item .shortcut {
+  margin-left: auto;
+  color: var(--text-faint);
+  font-size: 11px;
+}
+
+/* Select: our dropdown in place of the browser's. A button showing the choice and a chevron; the choices open in a
+   Menu. It is as wide as its widest choice, as a native select is, so the field does not move as the value changes. */
+.select-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.select-trigger:disabled {
+  cursor: default;
+}
+.select-trigger__label {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+.select-trigger__label > span {
+  grid-area: 1 / 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.select-trigger__ghost {
+  visibility: hidden;
+  height: 0;
+}
+.select-trigger__chev {
+  flex-shrink: 0;
+  color: var(--text-faint);
+}
+
+/* Dialog */
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(31, 30, 27, 0.35);
+}
+.dialog {
+  width: 100%;
+  max-width: 480px;
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.dialog--wide {
+  max-width: 720px;
+}
+.dialog__title {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 600;
+}
+.dialog__desc {
+  margin: 0 0 16px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.dialog__body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.dialog__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+/* Popover (inline editors) */
+.popover {
+  position: fixed;
+  z-index: 1000;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+/* Misc */
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 5px;
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  background: var(--surface);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.mono {
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.muted {
+  color: var(--text-muted);
+}
+.faint {
+  color: var(--text-faint);
+}
+.swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  vertical-align: middle;
+}
+.toast {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 1100;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--accent-text);
+  font-size: 13px;
+  box-shadow: var(--shadow);
+}
+
+/* Required / optional markers on form fields */
+.field__req,
+.field__opt {
+  margin-left: 6px;
+  padding: 0 5px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.field__req {
+  color: #b45309;
+  background: #fef3c7;
+}
+.field__opt {
+  color: var(--text-muted);
+  background: var(--surface-2);
+}
+.field.is-invalid > .input,
+.field.is-invalid > textarea,
+.field.is-invalid > select {
+  border-color: var(--danger);
+}
+.cd__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+.cd__fields-head {
+  font-size: 12px;
+}
+
+/* The colour a type or a tag is drawn in: the swatch is the control, wherever the swatch already appears. */
+.colorpick {
+  padding: 0;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 50%;
+  cursor: pointer;
+  flex: none;
+}
+.colorpick:hover {
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+}
+.colorpick:focus-visible {
+  outline: 2px solid var(--accent, #8a4b2a);
+  outline-offset: 2px;
+}
+.colorpick__pop {
+  position: fixed;
+  z-index: 80;
+  width: 208px;
+  padding: 8px;
+  border: 1px solid var(--border, #e0ded7);
+  border-radius: 10px;
+  background: var(--surface, #fff);
+  box-shadow: 0 10px 28px rgba(31, 30, 27, 0.16);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.colorpick__head {
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.colorpick__grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+}
+.colorpick__swatch {
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.colorpick__swatch.is-on {
+  outline: 2px solid var(--text, #1f1e1b);
+  outline-offset: 1px;
+}
+.colorpick__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.colorpick__row input[type='color'] {
+  width: 36px;
+  height: 26px;
+  padding: 2px;
+}

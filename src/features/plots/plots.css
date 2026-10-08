@@ -1,0 +1,341 @@
+.plot__stage {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  padding: 8px;
+}
+.plot {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+  display: flex;
+}
+.plot__canvas {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+.plot__error,
+.plotp__error {
+  font-size: 12px;
+  color: var(--danger, #b91c1c);
+  padding: 6px 8px;
+  border: 1px solid color-mix(in srgb, var(--danger, #b91c1c) 30%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--danger, #b91c1c) 6%, transparent);
+}
+.plot__error {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+}
+.plot__empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.plot__side {
+  overflow-y: auto;
+  padding: 8px 8px 8px 0 !important;
+}
+
+/* The spec editor */
+.plotp {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 12.5px;
+}
+.plotp__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.plotp__stats {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.plotp__section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.plotp__section h3 {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.plotp__types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.plotp__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  user-select: none;
+  background: var(--surface-2);
+}
+.plotp__chip input {
+  display: none;
+}
+.plotp__chip.is-on {
+  border-color: var(--text);
+  background: var(--surface);
+}
+.plotp__swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.plotp__source {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 6px;
+  color: var(--text-muted);
+  font-size: 11.5px;
+}
+.plotp__source .input {
+  width: 100%;
+  min-width: 0;
+  font-size: 12.5px;
+}
+.plotp__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 6px 8px;
+}
+.plotp__grid label,
+.plotp__inline {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  color: var(--text-muted);
+  font-size: 11.5px;
+}
+.plotp__inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+.plotp__grid .input,
+.plotp__grid .gx-select {
+  width: 100%;
+  min-width: 0;
+  font-size: 12.5px;
+}
+.plotp__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.plotp__name {
+  flex: 1;
+  min-width: 0;
+}
+.plotp__trace {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+}
+.plotp__hint {
+  margin: 0;
+  font-size: 11.5px;
+}
+/* The step number before a section title. */
+.plotp__step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+  border-radius: 50%;
+  background: var(--text);
+  color: var(--surface);
+  font-size: 10px;
+  letter-spacing: 0;
+}
+/* The kind of chart: a row of icons, the chosen one filled. */
+.plotp__kinds {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+.plotp__kind {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 2px 5px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+.plotp__kind:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+.plotp__kind.is-on {
+  border-color: var(--text);
+  background: var(--surface-2);
+  color: var(--text);
+  font-weight: 500;
+}
+.plotp__bucket {
+  display: flex;
+  gap: 4px;
+}
+.plotp__bucket .input {
+  width: 70px;
+  flex-shrink: 0;
+}
+.plotp__trace-foot {
+  min-height: 24px;
+}
+/* Ready-made charts for the rows at hand. */
+.plotp__ideas h3 {
+  display: flex;
+}
+.plotp__fold {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+.plotp__idea-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.plotp__idea {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px 4px 7px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.plotp__idea:hover {
+  background: var(--surface-hover);
+  border-color: var(--text-faint);
+}
+.plotp__json {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.plotp__textarea {
+  min-height: 360px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  resize: vertical;
+}
+/* Selects, styled here so plot mode doesn't depend on the explorer's stylesheet being loaded. */
+.plotp .gx-select {
+  height: 28px;
+  padding: 0 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+}
+
+.plot__inspect {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.plot__inspect .insp {
+  border: 0;
+}
+
+.plot__stage {
+  position: relative;
+  outline: none;
+}
+.plot__stage:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--accent, #3b7ddd);
+}
+.plot__drag {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface-2);
+}
+.plot__drag .btn.is-on {
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+.plot__legend-hint {
+  position: absolute;
+  left: 16px;
+  bottom: 12px;
+  font-size: 11px;
+  color: var(--text-muted);
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+/* Ref pickers: a menu of what the rows carry; typing is one click away. */
+.refpick {
+  width: 100%;
+  max-width: 100%;
+}
+.refpick--typing {
+  display: flex;
+  gap: 4px;
+}
+.refpick--typing .input {
+  flex: 1;
+  min-width: 0;
+}
+.refpick__back {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: 0 6px;
+  cursor: pointer;
+  color: var(--text-muted);
+}

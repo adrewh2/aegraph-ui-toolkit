@@ -1,0 +1,60 @@
+.spotify-import .dialog__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.spotify-import__now {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+}
+.spotify-import__now .muted {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.spotify-import__bar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.spotify-import__fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 120ms linear;
+}
+.spotify-import__bar--busy .spotify-import__fill {
+  animation: spotify-import-busy 1.2s ease-in-out infinite alternate;
+}
+@keyframes spotify-import-busy {
+  from {
+    margin-left: 0;
+  }
+  to {
+    margin-left: 70%;
+  }
+}
+.spotify-import__steps {
+  margin: 0;
+  padding: 0 0 0 18px;
+  max-height: 180px;
+  overflow-y: auto;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.spotify-import__result {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.spotify-import__wait {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #92400e;
+  background: #fef3c7;
+  border-radius: 6px;
+  padding: 6px 8px;
+}

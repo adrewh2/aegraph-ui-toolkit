@@ -1,0 +1,340 @@
+/* Audio page: Spotify embed on top, range timeline beneath. Shares dp/vp/anns chrome with Documents/Videos. */
+.mp__main {
+  overflow: auto;
+}
+.mp__stage {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 18px 24px 32px;
+}
+.mp__player-wrap {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface-2);
+}
+.mp__player iframe {
+  display: block;
+  border: 0;
+  width: 100%;
+}
+.mp__io {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+.mp__hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+}
+.mp__hint .kbd {
+  margin: 0 1px;
+}
+.mp__range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 1px solid #1db95455;
+  border-radius: 10px;
+  background: #1db9540f;
+  font-size: 13px;
+}
+.mp__range-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1db954;
+}
+.mp__range-hint {
+  font-size: 12px;
+}
+
+/* ── Range timeline ─────────────────────────────────────────────────── */
+.mt {
+  position: relative;
+  margin: 14px 0 0;
+  user-select: none;
+  touch-action: none;
+  cursor: pointer;
+}
+.mt.is-dragging {
+  cursor: grabbing;
+}
+.mt__track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 9px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border-strong);
+}
+.mt__progress {
+  position: absolute;
+  left: 0;
+  top: 9px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--text);
+  pointer-events: none;
+}
+.mt__playhead {
+  position: absolute;
+  top: 3px;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--text);
+  pointer-events: none;
+  z-index: 3;
+}
+.mt__hover {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  margin-left: -0.5px;
+  background: var(--text-faint);
+  pointer-events: none;
+  z-index: 2;
+}
+.mt__hover span {
+  position: absolute;
+  top: -20px;
+  left: 4px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--text);
+  color: var(--accent-text);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+.mt__point {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  padding: 0;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(31, 30, 27, 0.25);
+  z-index: 1;
+}
+.mt__span {
+  position: absolute;
+  height: 12px;
+  min-width: 6px;
+  border-radius: 6px;
+  opacity: 0.85;
+  cursor: pointer;
+  z-index: 1;
+}
+.mt__span-n {
+  position: absolute;
+  left: 5px;
+  top: 0;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 12px;
+  pointer-events: none;
+}
+.mt__point.is-selected,
+.mt__span.is-selected {
+  outline: 2px solid var(--text);
+  outline-offset: 1px;
+  opacity: 1;
+  z-index: 2;
+  cursor: grab;
+}
+.mt__handle {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 8px;
+  border-radius: 4px;
+  background: var(--text);
+  cursor: ew-resize;
+  z-index: 4;
+  box-shadow: 0 0 0 2px var(--surface);
+}
+.mt__handle:focus-visible {
+  outline: 2px solid var(--info-text);
+  outline-offset: 1px;
+}
+.mt__handle--l {
+  left: -4px;
+}
+.mt__handle--r {
+  right: -4px;
+}
+.mt__pending {
+  position: absolute;
+  top: 2px;
+  bottom: 0;
+  min-width: 2px;
+  border-left: 2px solid;
+  border-right: 2px solid;
+  border-radius: 4px;
+  cursor: grab;
+  z-index: 2;
+}
+.mt__pending-chip {
+  position: absolute;
+  top: -22px;
+  left: 0;
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.mt__pending .mt__handle {
+  top: 6px;
+  bottom: 2px;
+}
+
+/* ── Range editor (dialog) ──────────────────────────────────────────── */
+.re {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.re__slider {
+  position: relative;
+  height: 28px;
+}
+.re__rail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 12px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border-strong);
+}
+.re__fill {
+  position: absolute;
+  top: 12px;
+  height: 4px;
+  border-radius: 2px;
+  background: #1db954;
+  pointer-events: none;
+}
+.re__playhead {
+  position: absolute;
+  top: 6px;
+  width: 2px;
+  height: 16px;
+  margin-left: -1px;
+  background: var(--text-faint);
+  pointer-events: none;
+}
+.re__thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  margin: 0;
+  background: transparent;
+  pointer-events: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.re__thumb::-webkit-slider-runnable-track {
+  background: transparent;
+}
+.re__thumb::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  pointer-events: auto;
+  width: 16px;
+  height: 16px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--text);
+  cursor: ew-resize;
+}
+.re__thumb::-moz-range-track {
+  background: transparent;
+}
+.re__thumb::-moz-range-thumb {
+  pointer-events: auto;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--text);
+  cursor: ew-resize;
+}
+.re__fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.re__fields .field > span:first-child {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.re__input {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.re__input .input {
+  width: 100%;
+}
+.re__len {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+/* ── Index cards ────────────────────────────────────────────────────── */
+.mg__thumb {
+  background: var(--surface-2);
+}
+.mg__art-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--text-faint);
+}
+.mg__kind {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(31, 30, 27, 0.75);
+  color: #fff;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Embedded in the Library inspector */
+.ae {
+  padding: 12px;
+}

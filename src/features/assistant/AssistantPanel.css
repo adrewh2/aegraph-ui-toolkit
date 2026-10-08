@@ -1,0 +1,894 @@
+/* The dock's width transitions from 0 to the panel width, so the page slides along with the panel. The
+   panel keeps a fixed width and is pinned to the dock's *left* edge — the edge that moves — so it travels
+   with the page and is clipped at the viewport, rather than sitting still while the page grows over it.
+   Heavy views (3D graph, plots) settle their canvas size once the transition ends rather than per frame. */
+.ai-dock {
+  --ai-w: 400px;
+  flex-shrink: 0;
+  width: 0;
+  height: 100vh;
+  overflow: clip; /* not `hidden`: that is still a scroll container, and focusing a field would scroll the panel out of alignment */
+  transition: width 200ms cubic-bezier(0.4, 0, 1, 1);
+}
+.ai-dock.is-open {
+  width: var(--ai-w);
+  transition: width 260ms cubic-bezier(0.2, 0, 0, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ai-dock,
+  .ai-dock.is-open {
+    transition-duration: 1ms;
+  }
+}
+.ai {
+  display: flex;
+  flex-direction: column;
+  width: var(--ai-w, 400px);
+  flex-shrink: 0;
+  height: 100vh;
+  border-left: 1px solid var(--border);
+  background: var(--surface);
+}
+.ai .spacer {
+  flex: 1;
+}
+.ai__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 10px 0 14px;
+  border-bottom: 1px solid var(--border);
+}
+.ai__head .btn.is-active {
+  background: var(--surface-2);
+}
+.ai__spark {
+  color: #b45309;
+}
+.ai__title {
+  font-weight: 600;
+  font-size: 13.5px;
+}
+.ai__model {
+  font-size: 11.5px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--surface-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.ai__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 14px;
+}
+.ai__welcome {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+.ai__welcome p {
+  margin: 0;
+}
+.ai__suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ai__suggestion {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12.5px;
+  text-align: left;
+  cursor: pointer;
+}
+.ai__suggestion strong {
+  display: block;
+  font-weight: 550;
+}
+.ai__suggestion-hint {
+  display: block;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.ai__suggestion:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
+}
+.ai__items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ai__msg {
+  font-size: 13.5px;
+  line-height: 1.55;
+  word-wrap: break-word;
+}
+.ai__msg--user {
+  align-self: flex-end;
+  max-width: 88%;
+  padding: 8px 12px;
+  border-radius: 12px 12px 4px 12px;
+  background: var(--surface-2);
+  white-space: pre-wrap;
+}
+.ai__msg--assistant {
+  padding: 2px 2px 2px 0;
+}
+.ai__md.md {
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+.ai__md.md h1,
+.ai__md.md h2,
+.ai__md.md h3 {
+  font-size: 1.1em;
+  margin: 1em 0 0.4em;
+  padding: 0;
+  border: 0;
+}
+.ai__md.md p,
+.ai__md.md ul,
+.ai__md.md ol,
+.ai__md.md pre,
+.ai__md.md blockquote,
+.ai__md.md .md-table {
+  margin-bottom: 0.6em;
+}
+.ai__msg.is-streaming .ai__md > :last-child::after {
+  content: '▍';
+  color: var(--text-faint);
+  animation: ai-blink 1s steps(2) infinite;
+}
+@keyframes ai-blink {
+  50% {
+    opacity: 0;
+  }
+}
+.ai__thinking {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  padding: 2px 0;
+}
+.ai__spin {
+  animation: ai-spin 0.9s linear infinite;
+}
+@keyframes ai-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Tool calls */
+.ai__tool {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  font-size: 12px;
+  overflow: hidden;
+}
+.ai__tool--error {
+  border-color: color-mix(in srgb, var(--danger) 40%, var(--border));
+}
+.ai__tool-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 8px;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  text-align: left;
+  cursor: pointer;
+}
+.ai__tool-head:hover {
+  background: var(--surface-hover);
+}
+/* On the Chats page: show what a call made in the artifacts panel. Sits on the head, left of the chevron. */
+.ai__tool-show {
+  position: absolute;
+  top: 3px;
+  right: 26px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+}
+.ai__tool-show:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.ai__tool--running .ai__tool-head {
+  color: var(--text);
+}
+.ai__tool--error .ai__tool-head > svg:first-child {
+  color: var(--danger);
+}
+.ai__tool--unknown {
+  border-color: color-mix(in srgb, var(--warn-text) 35%, var(--border));
+}
+.ai__tool--unknown .ai__tool-head > svg:first-child {
+  color: var(--warn-text);
+}
+.ai__tool--done .ai__tool-head > svg:first-child {
+  color: var(--ok-text);
+}
+.ai__tool-label {
+  font-weight: 500;
+}
+.ai__tool-hint {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.ai__tool-body {
+  padding: 4px 8px 8px;
+  border-top: 1px solid var(--border);
+}
+.ai__tool-k {
+  margin: 6px 0 2px;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+}
+.ai__tool-body pre {
+  margin: 0;
+  max-height: 220px;
+  overflow: auto;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: var(--surface);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Confirmations: orange — careful, not wrong — and red only for one that loses something (`danger`: a delete, work
+   discarded). The card keeps its colour once answered: it is the record of what was allowed. */
+.ai__confirm {
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--caution) 40%, var(--border));
+  border-radius: var(--radius);
+  background: var(--caution-bg);
+  font-size: 13px;
+  line-height: 1.5;
+  /* A confirmation often names a whole URL — a signed storage link is hundreds of characters without a space. */
+  overflow-wrap: anywhere;
+}
+.ai__confirm--danger {
+  border-color: color-mix(in srgb, var(--danger) 40%, var(--border));
+  background: var(--danger-bg);
+}
+.ai__confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 8px;
+}
+.ai__confirm-answer {
+  margin-top: 4px;
+  font-size: 12px;
+}
+/* A question with options (ask_user): neutral, unlike a confirmation; the options wrap, one button each. */
+.ai__question {
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+}
+.ai__question-options {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+.ai__error {
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  background: var(--danger-bg);
+  color: var(--danger);
+  font-size: 12.5px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+/* Inline settings (replaces the transcript while open) */
+.ai__settings {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 4px;
+}
+.ai__settings-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ai__settings-title {
+  font-weight: 600;
+  font-size: 13.5px;
+}
+.ai__settings-note {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.ai__settings-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+/* Local Claude Code bridge, offered next to the API key */
+.ai__connect {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+.ai__bridge {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.ai__bridge--compact {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 8px;
+  align-self: stretch;
+}
+.ai__bridge--compact > svg {
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.ai__bridge--compact > span {
+  flex: 1;
+  min-width: 0;
+}
+.ai__bridge--compact .ai__bridge-state {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.ai__link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.ai__bridge-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: pointer;
+}
+.ai__bridge-toggle input {
+  margin-top: 3px;
+}
+.ai__bridge-toggle > span {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+.ai__bridge-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+  color: var(--text);
+}
+.ai__bridge-state {
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+.ai__bridge-state--connecting {
+  color: #d97706;
+}
+.ai__bridge-state--connected {
+  color: var(--ok-text);
+}
+.ai__bridge .ai__settings-note {
+  font-size: 12px;
+}
+
+/* Composer */
+.ai__composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--border);
+}
+.ai__input {
+  flex: 1;
+  /* Three lines to start with (a question is rarely one), growing with the text up to a good chunk of the pane. */
+  min-height: 74px;
+  max-height: 280px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  font-size: 13.5px;
+  line-height: 1.45;
+  resize: none;
+  outline: none;
+}
+.ai__input:focus {
+  border-color: var(--text-faint);
+  box-shadow: 0 0 0 3px rgba(31, 30, 27, 0.06);
+}
+.ai__input:disabled {
+  opacity: 0.6;
+}
+.ai__send {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+/* The microphone: voice control on/off; filled while on. */
+.ai__mic {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.ai__mic.is-on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+.ai__usage {
+  padding: 0 14px 8px;
+  font-size: 11px;
+  text-align: right;
+}
+
+/* Floating opener when the panel is closed */
+.ai-fab {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 50;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px 0 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12.5px;
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(31, 30, 27, 0.08);
+  cursor: pointer;
+}
+.ai-fab:hover {
+  background: var(--surface-hover);
+}
+.ai-fab kbd {
+  font-size: 10.5px;
+  color: var(--text-faint);
+}
+
+@media (max-width: 1100px) {
+  .ai-dock {
+    --ai-w: 340px;
+  }
+}
+
+/* The "prefer Claude Code" line under the bridge toggle in settings. */
+.ai__bridge-prefer {
+  margin-top: 6px;
+}
+.ai__bridge-hint {
+  display: block;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+/* The voice section of settings: its own heading below the Claude fields. */
+.ai__voice-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+/* A question the assistant is waiting on: docked above the composer, with a pulse so it cannot be missed. */
+.ai__pending {
+  margin: 0 12px 4px;
+  padding: 8px 10px 10px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
+  animation: ai-pending-in 200ms ease-out;
+}
+.ai__pending .ai__confirm,
+.ai__pending .ai__question {
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+.ai__pending-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+.ai__pending-hint {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.ai__pending-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: ai-pending-pulse 1.2s ease-in-out infinite;
+}
+@keyframes ai-pending-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.6);
+    opacity: 0.35;
+  }
+}
+@keyframes ai-pending-in {
+  from {
+    transform: translateY(6px);
+    opacity: 0;
+  }
+}
+
+/* Chat tabs: one per open chat, the active one raised; they scroll sideways when there are many. */
+.ai__tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  padding: 4px 8px 0;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.ai__tabs::-webkit-scrollbar {
+  display: none;
+}
+.ai__tab {
+  display: flex;
+  align-items: center;
+  flex: 0 1 160px;
+  min-width: 64px;
+  height: 28px;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.ai__tab:hover {
+  background: var(--surface-hover);
+}
+.ai__tab.is-active {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+  margin-bottom: -1px;
+  padding-bottom: 1px;
+}
+.ai__tab-open {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px 0 10px;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+.ai__tab-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* A green dot (the Claude Code connected dot's) while the chat works: it pulses to 1.6× its size, so it keeps room on its right and centres on the title's line. */
+.ai__tab-busy {
+  flex-shrink: 0;
+  align-self: center;
+  width: 7px;
+  height: 7px;
+  margin: 0 4px 0 1px;
+  border-radius: 50%;
+  background: var(--ok-text);
+  animation: ai-pending-pulse 1.2s ease-in-out infinite;
+}
+.ai__tab-close {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-right: 4px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-faint);
+  cursor: pointer;
+  opacity: 0;
+}
+.ai__tab:hover .ai__tab-close,
+.ai__tab.is-active .ai__tab-close {
+  opacity: 1;
+}
+.ai__tab-close:hover {
+  background: var(--border);
+  color: var(--text);
+}
+.ai__tab-add {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  margin-bottom: 1px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.ai__tab-add:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+.ai__tab-edit {
+  flex: 0 1 160px;
+  height: 26px;
+  margin-bottom: 1px;
+  padding: 0 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  font-size: 12px;
+  outline: none;
+}
+/* A call whose input the model is still writing: how far it has got. */
+.ai__tool-writing {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Attachments: files picked, dropped or pasted into the composer, and the ones a sent message carried. */
+.ai__field {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ai__field .ai__input {
+  flex: none;
+  width: 100%;
+}
+.ai__attach {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.ai__composer.is-dropping .ai__input {
+  border-style: dashed;
+  border-color: var(--accent);
+}
+.ai__scroll.is-dropping {
+  outline: 2px dashed var(--accent);
+  outline-offset: -6px;
+}
+.ai__attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ai__attachments--sent {
+  margin-bottom: 6px;
+}
+.ai__attachment {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 220px;
+  padding: 3px 6px 3px 3px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  font: inherit;
+  font-size: 12px;
+  color: inherit;
+}
+.ai__attachment:has(> svg:first-child) {
+  padding-left: 7px;
+}
+button.ai__attachment {
+  cursor: pointer;
+}
+button.ai__attachment:hover:not(:disabled) {
+  background: var(--surface-hover);
+}
+.ai__attachment.is-gone {
+  opacity: 0.55;
+  text-decoration: line-through;
+  cursor: default;
+}
+.ai__attachment img {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  border-radius: 5px;
+  flex-shrink: 0;
+}
+.ai__attachment-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ai__attachment-x {
+  display: inline-flex;
+  padding: 2px;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  color: var(--text-faint);
+  cursor: pointer;
+}
+.ai__attachment-x:hover {
+  background: var(--surface-hover);
+  color: inherit;
+}
+.ai__attach-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--danger);
+}
+.ai__attach-note > span {
+  flex: 1;
+  padding-top: 4px;
+}
+/* A text file's question as it is attached: document or dataset, and for a dataset its separator, with a preview. */
+.ai__textq {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  font-size: 12px;
+}
+.ai__textq-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.ai__textq-row .btn svg {
+  margin-right: 2px;
+}
+.ai__textq-name {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+.ai__textq-custom {
+  width: 72px;
+  height: 26px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+.ai__textq-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+.ai__textq-preview {
+  max-height: 150px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.ai__textq-preview table {
+  border-collapse: collapse;
+  font-size: 11.5px;
+}
+.ai__textq-preview th,
+.ai__textq-preview td {
+  max-width: 140px;
+  padding: 2px 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.ai__textq-preview th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-2);
+  font-weight: 600;
+}
+/* The Chats landing's composer, while files are dragged over the page. */
+.chome__composer.is-dropping {
+  border-style: dashed;
+  border-color: var(--accent);
+}
+.chome__composer .ai__attach {
+  width: 30px;
+  height: 30px;
+}
+
+/* Where the user stopped a turn: a quiet line, not an error. */
+.ai__stopped {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+.ai__stopped svg {
+  fill: currentColor;
+}

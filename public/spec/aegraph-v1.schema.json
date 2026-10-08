@@ -1,0 +1,580 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "aegraph document (aegraph/v1, .ae)",
+  "description": "One aegraph document: the entities (and relationships, which are entities too) that make up a workspace or a part of one, with optional tag metadata. This is what a .ae file holds and what aegraph loads directly. Readers merge by id and ignore unknown keys; writers should emit only what is described here.",
+  "type": "object",
+  "required": [
+    "$schema",
+    "entities"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "$schema": {
+      "const": "aegraph/v1",
+      "description": "Format marker. Always the string aegraph/v1."
+    },
+    "exportedAt": {
+      "$ref": "#/$defs/isoDate",
+      "description": "When the document was written."
+    },
+    "entities": {
+      "type": "array",
+      "description": "Entities and relationships, in any order; a relationship may precede the entities it links.",
+      "items": {
+        "$ref": "#/$defs/anyEntity"
+      }
+    },
+    "tags": {
+      "type": "array",
+      "description": "Presentation and metadata for tags used in `entities`. Tags themselves are plain strings on entities; a tag needs no entry here.",
+      "items": {
+        "$ref": "#/$defs/tagInfo"
+      }
+    },
+    "project": {
+      "$ref": "#/$defs/entityId",
+      "description": "Bundle key: the id (in `entities`) of the `project` entity this file is. Absent for a plain document."
+    },
+    "state": {
+      "type": "object",
+      "description": "Bundle key: how to reopen the file on the same screen.",
+      "additionalProperties": false,
+      "properties": {
+        "route": {
+          "type": "string",
+          "description": "An app route, e.g. /unigraph/2d or /scenes?id=…"
+        },
+        "ui": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Per-project UI state keyed by storage key."
+        }
+      }
+    }
+  },
+  "$defs": {
+    "entityId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Any non-empty string; unique within the workspace. Deterministic ids (e.g. a slug of the source id) let re-imports update instead of duplicate."
+    },
+    "isoDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp, e.g. 2026-09-13T12:00:00.000Z."
+    },
+    "tag": {
+      "type": "string",
+      "minLength": 1
+    },
+    "entityBase": {
+      "type": "object",
+      "required": [
+        "id",
+        "type",
+        "tags",
+        "data",
+        "meta"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/entityId"
+        },
+        "kind": {
+          "enum": [
+            "entity",
+            "relationship"
+          ],
+          "description": "Structural role. Semantic meaning lives in `type`."
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Single-valued semantic type: a registered type (document, webpage, image, person, …), a type defined by a schema:type entity in the same document, or any new word (it lands in the Knowledge category)."
+        },
+        "label": {
+          "type": "string",
+          "description": "Display name. Optional; the id is shown when absent."
+        },
+        "description": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/tag"
+          },
+          "uniqueItems": true,
+          "description": "Flat, many-to-many labels. Use [] when there are none."
+        },
+        "data": {
+          "type": "object",
+          "description": "Application-defined attributes. Registered types expect particular keys here (see the specification); anything else is kept and shown as-is."
+        },
+        "meta": {
+          "$ref": "#/$defs/meta"
+        }
+      }
+    },
+    "meta": {
+      "type": "object",
+      "required": [
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "createdAt": {
+          "$ref": "#/$defs/isoDate"
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/isoDate"
+        },
+        "accessedAt": {
+          "$ref": "#/$defs/isoDate"
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "A person or agent name."
+        },
+        "source": {
+          "type": "string",
+          "description": "Origin of the information: user, extension, import:<system>, an agent name, …"
+        },
+        "derivedFrom": {
+          "$ref": "#/$defs/entityRef",
+          "description": "Lineage: the entity this one was derived from."
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/entityId"
+          },
+          "description": "Ids of `project` entities this entity belongs to. Absent = Library only."
+        }
+      }
+    },
+    "entity": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/entityBase"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "entity"
+            }
+          },
+          "not": {
+            "required": [
+              "source",
+              "target"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "schema:type"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^type:.+"
+              },
+              "data": {
+                "$ref": "#/$defs/schemaTypeData"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "relationship": {
+      "description": "A link between two entities (or parts of them). A relationship is an entity: it has its own id, type, tags, data and meta, and can itself be annotated or linked.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/entityBase"
+        },
+        {
+          "required": [
+            "kind",
+            "source",
+            "target"
+          ],
+          "properties": {
+            "kind": {
+              "const": "relationship"
+            },
+            "source": {
+              "$ref": "#/$defs/entityRef"
+            },
+            "target": {
+              "$ref": "#/$defs/entityRef"
+            },
+            "directed": {
+              "type": "boolean",
+              "default": true,
+              "description": "false when the relationship reads the same in both directions."
+            }
+          }
+        }
+      ]
+    },
+    "anyEntity": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/entity"
+        },
+        {
+          "$ref": "#/$defs/relationship"
+        }
+      ]
+    },
+    "entityRef": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/entityId"
+        },
+        "selector": {
+          "$ref": "#/$defs/selector",
+          "description": "Narrows the reference to a part of the entity."
+        }
+      }
+    },
+    "selector": {
+      "description": "Addresses a region inside an entity: a quote, a character range, an image region, a moment or span in timed media, a place, or a fragment id.",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "exact"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "text"
+            },
+            "exact": {
+              "type": "string"
+            },
+            "prefix": {
+              "type": "string"
+            },
+            "suffix": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "start",
+            "end"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "range"
+            },
+            "start": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "end": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "x",
+            "y",
+            "width",
+            "height"
+          ],
+          "additionalProperties": false,
+          "description": "Pixel rectangle in the image's natural size.",
+          "properties": {
+            "kind": {
+              "const": "region"
+            },
+            "x": {
+              "type": "number"
+            },
+            "y": {
+              "type": "number"
+            },
+            "width": {
+              "type": "number"
+            },
+            "height": {
+              "type": "number"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "start"
+          ],
+          "additionalProperties": false,
+          "description": "Seconds into a timed medium; `region` narrows it to part of the frame in fractions (0–1) of width and height.",
+          "properties": {
+            "kind": {
+              "const": "time"
+            },
+            "start": {
+              "type": "number",
+              "minimum": 0
+            },
+            "end": {
+              "type": "number",
+              "minimum": 0
+            },
+            "region": {
+              "type": "object",
+              "required": [
+                "x",
+                "y",
+                "width",
+                "height"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                },
+                "width": {
+                  "type": "number"
+                },
+                "height": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "lat",
+            "lng"
+          ],
+          "additionalProperties": false,
+          "description": "A point on a map (WGS84), optionally with a radius in metres and a moment or span in time.",
+          "properties": {
+            "kind": {
+              "const": "geo"
+            },
+            "lat": {
+              "type": "number",
+              "minimum": -90,
+              "maximum": 90
+            },
+            "lng": {
+              "type": "number",
+              "minimum": -180,
+              "maximum": 180
+            },
+            "radius": {
+              "type": "number",
+              "minimum": 0
+            },
+            "at": {
+              "$ref": "#/$defs/isoDate"
+            },
+            "until": {
+              "$ref": "#/$defs/isoDate"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "value"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "fragment"
+            },
+            "value": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "tagInfo": {
+      "type": "object",
+      "required": [
+        "tag"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tag": {
+          "$ref": "#/$defs/tag"
+        },
+        "color": {
+          "type": "string",
+          "description": "CSS colour, e.g. #f59e0b."
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "schemaTypeData": {
+      "description": "The `data` of a type definition: an entity of type schema:type with id type:<name>. Lets a document bring its own vocabulary — label, category, parent, colour and the properties entities of the type carry.",
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The type name entities use in their `type`."
+        },
+        "category": {
+          "enum": [
+            "resource",
+            "knowledge",
+            "project",
+            "schema",
+            "graph"
+          ],
+          "description": "`graph` is the old name of `project`; readers map it.",
+          "default": "knowledge"
+        },
+        "parent": {
+          "type": "string",
+          "description": "A parent type name; the type inherits its properties."
+        },
+        "color": {
+          "type": "string"
+        },
+        "pluralLabel": {
+          "type": "string"
+        },
+        "kind": {
+          "const": "relationship",
+          "description": "Set when the name is relationship vocabulary rather than a kind of entity: a definition on its own would otherwise read as an entity type with no instances."
+        },
+        "properties": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "key"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "A `data` key."
+              },
+              "label": {
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "text",
+                  "longtext",
+                  "number",
+                  "boolean",
+                  "date",
+                  "datetime",
+                  "url",
+                  "image",
+                  "color",
+                  "tags",
+                  "ref",
+                  "json",
+                  "availability"
+                ]
+              },
+              "description": {
+                "type": "string"
+              },
+              "options": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Fixed set of allowed values."
+              },
+              "required": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "table": {
+          "type": "object",
+          "description": "How the type's entities are laid out in tables: `columns` come first in this order (and are shown even if hidden by default), `hidden` are hidden by default, `sort` is the order rows open in. A subtype inherits its parent's layout unless it sets its own. A map entity's `data.table` takes the same keys plus `types`: the kinds or types its All tab shows by default.",
+          "additionalProperties": false,
+          "properties": {
+            "columns": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "hidden": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "sort": {
+              "type": "object",
+              "required": [
+                "key"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "dir": {
+                  "type": "string",
+                  "enum": [
+                    "asc",
+                    "desc"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

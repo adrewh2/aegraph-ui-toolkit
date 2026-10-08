@@ -1,0 +1,1048 @@
+.onto__search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  min-width: 360px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.onto__search input {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+}
+.onto__focus {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.onto__stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.onto__graph {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  background: linear-gradient(0deg, rgba(31, 30, 27, 0.02), rgba(31, 30, 27, 0.02)), var(--surface);
+  user-select: none;
+}
+.onto__link line,
+.onto__link path,
+path.onto__link {
+  stroke: rgba(31, 30, 27, 0.28);
+  stroke-linecap: round;
+  transition: opacity 120ms ease;
+}
+.onto__link.is-dim {
+  opacity: 0.12;
+}
+.onto__link.is-hot path,
+.onto__link.is-hot line {
+  opacity: 0.85;
+}
+.onto__arc path {
+  stroke: var(--border-strong);
+  stroke-width: 2px;
+  stroke-linecap: round;
+}
+.onto__arc text {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  fill: var(--text-muted);
+}
+.onto__label-n {
+  fill: var(--text-muted);
+  font-weight: 400;
+  font-size: 11px;
+}
+.onto__link-count {
+  font-size: 10px;
+  fill: var(--text-muted);
+  text-anchor: middle;
+  paint-order: stroke;
+  stroke: var(--surface);
+  stroke-width: 3px;
+}
+.onto__node {
+  cursor: pointer;
+  transition: opacity 120ms ease;
+}
+.onto__node.is-dim {
+  opacity: 0.18;
+}
+.onto__node circle {
+  stroke: var(--surface);
+  stroke-width: 2px;
+}
+.onto__node.is-hover circle,
+.onto__node.is-focus circle {
+  stroke: var(--text);
+  stroke-width: 2.5px;
+}
+.onto__label {
+  font-size: 12px;
+  font-weight: 500;
+  fill: var(--text);
+  paint-order: stroke;
+  stroke: var(--surface);
+  stroke-width: 3px;
+  pointer-events: none;
+}
+.onto__count {
+  fill: #fff;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.onto__empty {
+  fill: var(--text-muted);
+  font-size: 14px;
+}
+.onto__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  padding: 8px 10px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-2);
+  font-size: 12px;
+}
+.onto__pred {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.onto__pred:hover {
+  background: var(--surface-hover);
+}
+.onto__pred .count,
+.onto__prop .count {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.onto__side {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.onto__type {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+}
+.onto__type-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+}
+.onto__type-head .spacer {
+  flex: 1;
+}
+.onto__props {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+.onto__prop {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 11.5px;
+}
+.onto__table-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+.onto__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.onto__table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 8px 10px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.onto__table td {
+  padding: 5px 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.onto__table .num {
+  text-align: right;
+  white-space: nowrap;
+}
+.onto__tcell,
+.onto__rel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 6px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.onto__tcell:hover,
+.onto__rel:hover {
+  background: var(--surface-hover);
+}
+.onto__tcell.is-focus {
+  background: var(--surface-2);
+  font-weight: 600;
+}
+.onto__rel {
+  color: var(--text-muted);
+}
+.onto__none {
+  padding: 16px 10px;
+}
+
+/* ── Tags tab: the type × tag matrix ─────────────────────────────────── */
+.onto__tabs {
+  margin-right: 4px;
+}
+.onto__cats-bar {
+  padding-bottom: 0;
+}
+.tm {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: 10px;
+}
+.tm__bar {
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+.tm__search {
+  min-width: 220px;
+  flex: 0 1 300px;
+}
+.tm__facets {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.tm__facet {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+}
+.tm__facet:hover {
+  border-color: var(--border-strong);
+}
+.tm__facet.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+.tm__facet .count {
+  font-size: 10.5px;
+  color: inherit;
+  opacity: 0.7;
+}
+.tm__opt {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+.tm__opt .input {
+  height: 28px;
+  padding: 0 6px;
+  font-size: 12.5px;
+}
+.tm__min {
+  width: 56px;
+}
+.tm__check {
+  gap: 4px;
+}
+.tm__totals {
+  font-size: 12px;
+  white-space: nowrap;
+}
+.tm__empty {
+  padding: 32px;
+  text-align: center;
+}
+
+/* The grid: first column and header row stick; the header holds a small bar for the column's own count. */
+.tm__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.tm__grid {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12px;
+}
+.tm__grid th,
+.tm__grid td {
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+.tm__grid thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--surface-2);
+}
+.tm__grid thead .tm__groups th {
+  top: 0;
+  z-index: 3;
+}
+.tm__grid thead .tm__groups ~ tr th,
+.tm__grid thead tr:nth-child(2) th {
+  top: 28px;
+}
+.tm__corner {
+  position: sticky;
+  left: 0;
+  z-index: 4 !important;
+  min-width: 200px;
+  padding: 0 10px;
+  text-align: left;
+  font-weight: 500;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+.tm__group {
+  height: 28px;
+  padding: 0 8px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  border-left: 2px solid var(--border-strong);
+}
+.tm__col {
+  position: relative;
+  height: 96px;
+  min-width: 44px;
+  max-width: 44px;
+  padding: 0;
+  vertical-align: bottom;
+  font-weight: 500;
+}
+.tm__col-bar {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  bottom: 0;
+  border-radius: 2px 2px 0 0;
+  background: color-mix(in srgb, var(--text) 12%, transparent);
+  pointer-events: none;
+}
+.tm__col-label {
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  transform: rotate(-60deg) translateX(0);
+  transform-origin: left bottom;
+  white-space: nowrap;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1;
+}
+.tm__col-count {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4px;
+  font-size: 10px;
+  font-weight: 400;
+  text-align: center;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+.tm__row {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  min-width: 200px;
+  max-width: 260px;
+  padding: 0 10px;
+  background: var(--surface);
+  text-align: left;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.tm__row-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  opacity: 0.1;
+  pointer-events: none;
+}
+.tm__row-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tm__row-count {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+.tm__cell {
+  height: 30px;
+  min-width: 44px;
+  padding: 0 4px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+  font-size: 11.5px;
+}
+.tm__cell.has-value {
+  color: var(--text);
+  cursor: pointer;
+}
+.tm__cell.is-strong {
+  color: #fff;
+  font-weight: 500;
+}
+.tm__cell.has-value:hover {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* 3D bars */
+.tm__bars {
+  position: relative;
+  flex: 1;
+  min-height: 320px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  overflow: hidden;
+}
+.tm__bars-canvas {
+  position: absolute;
+  inset: 0;
+}
+.tm__hint {
+  position: absolute;
+  left: 10px;
+  bottom: 8px;
+  font-size: 11px;
+  pointer-events: none;
+}
+.tm__sqrt {
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+/* ── The type page (a type in focus) ─────────────────────────────────────
+   Built for big ontologies: a sticky head, folding sections with their own search and a window of rows, and
+   descriptions edited in place. */
+.onto__detail {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+.onto__detail-head {
+  padding: 10px 14px 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.onto__detail-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.onto__detail-title .chip {
+  font-size: 14px;
+  padding: 3px 10px;
+}
+.onto__detail-title .spacer {
+  flex: 1;
+}
+.onto__detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.onto__detail-meta strong {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.onto__warn {
+  color: #b45309;
+}
+.onto__lineage {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+.onto__tchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 1px 8px 1px 5px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  font: inherit;
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+}
+.onto__tchip:hover {
+  border-color: var(--text-muted);
+}
+.onto__detail-actions {
+  display: flex;
+  gap: 6px;
+}
+.onto__detail-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 4px 0 24px;
+}
+.onto__section {
+  padding: 6px 14px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.onto__section h4 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.onto__fold {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 0;
+  background: none;
+  padding: 4px 0;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.onto__count {
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.onto__hint {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: #b45309;
+}
+.onto__list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.onto__search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  height: 26px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+}
+.onto__search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--text);
+  outline: none;
+}
+.onto__search-x {
+  display: inline-flex;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.onto__rows {
+  display: flex;
+  flex-direction: column;
+}
+.onto__wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.onto__more {
+  align-self: flex-start;
+}
+/* Properties: a grid that keeps its columns whatever the width; the description gets what is left. */
+.onto__cols {
+  display: grid;
+  grid-template-columns: minmax(120px, 1.2fr) minmax(70px, 0.8fr) 92px minmax(90px, 1.2fr) minmax(120px, 1.6fr);
+  gap: 10px;
+  align-items: center;
+  font-size: 12.5px;
+}
+.onto__cols--head {
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.onto__col-btn {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+.onto__col-btn.is-on {
+  color: var(--text);
+}
+.onto__prow {
+  padding: 4px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  min-height: 28px;
+}
+.onto__prow:hover {
+  background: var(--surface-2);
+}
+.onto__pkey {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.onto__req {
+  font-size: 10px;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: #fde68a;
+  color: #78350f;
+}
+.onto__pkind {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+.onto__kind {
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 11px;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+.onto__kind--observed {
+  border-style: dashed;
+  color: var(--text-muted);
+}
+.onto__observed {
+  font-size: 11px;
+}
+.onto__pcov {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+}
+.onto__bar {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.onto__bar > span {
+  display: block;
+  height: 100%;
+  background: var(--accent, #2563eb);
+  opacity: 0.7;
+}
+.onto__pvals {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 11.5px;
+}
+.onto__topvals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+.onto__val {
+  padding: 0 5px;
+  border-radius: 4px;
+  background: var(--surface-2);
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 11px;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.onto__pdesc {
+  min-width: 0;
+}
+.onto__unused {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 12px;
+}
+.onto__unused-key {
+  padding: 0 5px;
+  border-radius: 4px;
+  border: 1px dashed var(--border);
+}
+/* Relationships */
+.onto__group {
+  margin: 8px 0 2px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.onto__rrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 3px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  font-size: 12.5px;
+}
+.onto__rrow:hover {
+  background: var(--surface-2);
+}
+.onto__rshape {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+.onto__self {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--surface);
+  font-size: 11px;
+}
+.onto__rnums {
+  display: flex;
+  gap: 12px;
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+.onto__rnums > span:first-child {
+  min-width: 48px;
+  text-align: right;
+}
+/* Tags and recent */
+.onto__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 1px 7px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  font: inherit;
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+}
+.onto__recent {
+  display: flex;
+  flex-direction: column;
+}
+.onto__recent-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 4px 2px;
+  border: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  background: none;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+.onto__recent-row:hover {
+  background: var(--surface-2);
+}
+.onto__recent-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.onto__span {
+  padding-top: 6px;
+  font-size: 11.5px;
+}
+/* Editing in place */
+.onto__editable {
+  display: block;
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 2px 6px;
+  background: none;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--text);
+  text-align: left;
+  cursor: text;
+  white-space: pre-wrap;
+}
+.onto__editable.is-empty {
+  color: var(--text-faint, var(--text-muted));
+  font-style: italic;
+}
+.onto__editable:hover {
+  border-color: var(--border);
+  background: var(--surface);
+}
+.onto__editing {
+  width: 100%;
+  font-size: 12.5px;
+}
+.onto__desc {
+  font-size: 13px;
+}
+
+/* ── The type page at full width ────────────────────────────────────────── */
+.onto--page {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  gap: 8px;
+}
+.onto__crumbs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.onto__crumb {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.onto__crumb:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+.onto__crumb--current {
+  color: var(--text);
+  cursor: default;
+}
+.onto__page-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.onto__page-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+.onto__page-id {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-muted);
+  letter-spacing: 0;
+}
+.onto__detail--page {
+  max-width: 1400px;
+}
+.onto__detail--page .page-head {
+  padding-bottom: 4px;
+}
+.onto__detail--page .page-head__text {
+  max-width: none;
+}
+.onto__detail--page .page-subtitle .onto__detail-meta {
+  font-size: 13.5px;
+}
+.onto__detail--page .onto__desc {
+  margin-top: 10px;
+  font-size: 14.5px;
+  max-width: 80ch;
+  margin-left: -6px;
+}
+.onto__detail--page .onto__lineage {
+  margin-top: 8px;
+  font-size: 13px;
+}
+.onto__detail--page .onto__detail-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 10px 0 40px;
+  overflow: visible;
+  flex: initial;
+}
+/* Each section is a card, the way the Datasets and Projects pages lay out their parts. */
+.onto__detail--page .onto__section {
+  padding: 12px 18px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.onto__detail--page .onto__section h4 {
+  margin-bottom: 8px;
+}
+.onto__detail--page .onto__section.is-folded h4 {
+  margin-bottom: 0;
+}
+.onto__detail--page .onto__fold {
+  font-size: 12px;
+}
+.onto__detail--page .onto__cols {
+  grid-template-columns: minmax(160px, 1.1fr) minmax(90px, 0.7fr) 120px minmax(160px, 1.4fr) minmax(220px, 2fr);
+  font-size: 13px;
+}
+.onto__detail--page .onto__prow {
+  padding: 6px 0;
+}
+.onto__detail--page .onto__rrow {
+  font-size: 13px;
+  padding: 5px 0;
+}
+.onto__detail--page .onto__val {
+  max-width: 220px;
+}
+.onto__rrow--head {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+.onto__rrow--head:hover {
+  background: none;
+}
+.onto__rrow--head .onto__rnums > span {
+  min-width: 0;
+  text-align: right;
+}

@@ -1,0 +1,39 @@
+/* The settings menu (a Popover from the sidebar's foot). */
+.acct {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+}
+.acct__toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.acct__toggle-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  line-height: 1.3;
+}
+.acct__sep {
+  height: 1px;
+  background: var(--border);
+}
+.acct__label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+}
+.acct__toggle {
+  cursor: pointer;
+}
+.acct__toggle input {
+  margin: 2px 0 0;
+}
+.acct__browser {
+  align-self: flex-start;
+  text-decoration: none;
+}

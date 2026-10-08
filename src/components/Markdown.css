@@ -1,0 +1,171 @@
+/* Rendered Markdown. Reading-oriented: serif headings, generous measure. */
+.md {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text);
+  word-wrap: break-word;
+}
+.md > :first-child {
+  margin-top: 0;
+}
+.md > :last-child {
+  margin-bottom: 0;
+}
+.md h1,
+.md h2,
+.md h3,
+.md h4,
+.md h5,
+.md h6 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  margin: 1.6em 0 0.5em;
+  scroll-margin-top: 16px;
+}
+.md h1 {
+  font-size: 2em;
+  margin-top: 0.4em;
+}
+.md h2 {
+  font-size: 1.5em;
+  padding-bottom: 0.25em;
+  border-bottom: 1px solid var(--border);
+}
+.md h3 {
+  font-size: 1.25em;
+}
+.md h4 {
+  font-size: 1.05em;
+}
+.md h5,
+.md h6 {
+  font-size: 1em;
+  color: var(--text-muted);
+}
+.md p,
+.md ul,
+.md ol,
+.md blockquote,
+.md pre,
+.md .md-table {
+  margin: 0 0 1em;
+}
+.md ul,
+.md ol {
+  padding-left: 1.6em;
+}
+.md li + li {
+  margin-top: 0.2em;
+}
+.md li > p {
+  margin-bottom: 0.5em;
+}
+.md li > ul,
+.md li > ol {
+  margin: 0.25em 0 0;
+}
+/* Task items drop their marker and put the checkbox where the bullet was. */
+.md .md-task {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  list-style: none;
+  margin-left: -1.25em;
+}
+.md .md-task input {
+  margin: 0;
+  position: relative;
+  top: 2px;
+  flex-shrink: 0;
+}
+.md blockquote {
+  padding: 0.1em 1em;
+  border-left: 3px solid var(--border-strong);
+  color: var(--text-muted);
+}
+.md blockquote > :last-child {
+  margin-bottom: 0;
+}
+.md code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  background: var(--surface-2);
+}
+.md pre {
+  position: relative;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  overflow-x: auto;
+  line-height: 1.5;
+}
+.md pre code {
+  padding: 0;
+  background: transparent;
+  font-size: 13px;
+}
+.md pre[data-lang]::after {
+  content: attr(data-lang);
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  font-size: 11px;
+  color: var(--text-faint);
+  font-family: var(--font-sans);
+}
+.md hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 2em 0;
+}
+.md a {
+  color: var(--link);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--link) 40%, transparent);
+  text-underline-offset: 2px;
+}
+.md a:hover {
+  text-decoration-color: var(--link);
+}
+.md img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+}
+.md .md-table {
+  overflow-x: auto;
+}
+.md table {
+  border-collapse: collapse;
+  font-size: 0.93em;
+  min-width: 50%;
+}
+.md th,
+.md td {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+.md th {
+  background: var(--surface-2);
+  font-weight: 600;
+}
+.md .md-hl {
+  background: #fde68a;
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 1px;
+  box-shadow: 0 0 0 1px color-mix(in srgb, currentColor 10%, transparent);
+}
+.md .md-hl[role="button"] {
+  cursor: pointer;
+}
+.md .md-hl[role="button"]:hover {
+  filter: brightness(0.95);
+}

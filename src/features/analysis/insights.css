@@ -1,0 +1,242 @@
+/* Insights: the analytics harness as a page — a ranked list of findings, each expandable to its entities and rows. */
+.ins {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 1100px;
+}
+.ins__picks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.ins__pick {
+  font-size: 13px;
+}
+.ins__meta {
+  margin-left: auto;
+  font-size: 12px;
+}
+.ins__error {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+.ins__empty {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.ins__catalog {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+.ins__card {
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.ins__card h3 {
+  margin: 0 0 4px;
+  font-family: var(--font-serif);
+  font-size: 17px;
+  font-weight: 500;
+}
+.ins__card p {
+  margin: 0 0 6px;
+  font-size: 13px;
+}
+.ins__question {
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
+}
+.ins__cta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ins__cta .muted {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.ins__section h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 2px;
+  font-family: var(--font-serif);
+  font-size: 19px;
+  font-weight: 500;
+}
+.ins__section > .ins__question {
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+.ins__list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  overflow: hidden;
+}
+.ins__finding {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  gap: 4px 8px;
+  padding: 10px 12px 10px 6px;
+  border-top: 1px solid var(--border);
+  align-items: start;
+}
+.ins__finding:first-child {
+  border-top: 0;
+}
+.ins__finding.is-open {
+  background: var(--surface-2);
+}
+.ins__toggle {
+  border: 0;
+  background: none;
+  color: var(--text-faint);
+  cursor: pointer;
+  padding: 3px 4px;
+  margin-top: 1px;
+}
+.ins__body {
+  min-width: 0;
+}
+.ins__head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.ins__rank {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  min-width: 14px;
+}
+.ins__title {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  text-wrap: balance;
+}
+.ins__score {
+  display: inline-block;
+  width: 56px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--border);
+  overflow: hidden;
+  flex-shrink: 0;
+  align-self: center;
+}
+.ins__score > span {
+  display: block;
+  height: 100%;
+  background: var(--link);
+  border-radius: 3px;
+}
+.ins__detail {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.45;
+  max-width: 88ch;
+}
+.ins__actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding-top: 2px;
+}
+.ins__more {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+.ins__entities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+.ins__entities .chip {
+  text-decoration: none;
+  color: inherit;
+}
+/* "Name a community" chips are buttons. */
+.ins__entities button.chip {
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+.ins__entities button.chip:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
+}
+.ins__table {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+.ins__table table {
+  border-collapse: collapse;
+  font-size: 12.5px;
+  min-width: 100%;
+}
+.ins__table th,
+.ins__table td {
+  padding: 5px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.ins__table th {
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--surface-2);
+}
+.ins__table tr:last-child td {
+  border-bottom: 0;
+}
+.ins__table td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.ins__pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  user-select: none;
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+.ins__pick input {
+  display: none;
+}
+.ins__pick.is-on {
+  border-color: var(--text);
+  background: var(--surface);
+  color: var(--text);
+}

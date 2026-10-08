@@ -1,0 +1,24 @@
+/* A feature this deployment turned off: one sentence in the middle of the space the page would fill. */
+.feature-off {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 100%;
+  min-height: 40vh;
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--text-muted);
+}
+.feature-off__title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--text);
+}
+.feature-off p {
+  margin: 0;
+  max-width: 48ch;
+}

@@ -1,0 +1,57 @@
+.app {
+  display: flex;
+  height: 100vh;
+  background: var(--bg);
+}
+
+.app-main {
+  flex: 1;
+  min-width: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+/* The page itself, under the trail: the scroll container with the page padding. */
+.app-content {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 32px 40px;
+}
+
+/* Pages kept mounted behind the one on screen (KeptPages): the front one lays out as if it were the content's own child. */
+.app-page {
+  display: contents;
+}
+.app-page[hidden] {
+  display: none;
+}
+/* Full-bleed views bring their own chrome: no page padding, and they fill the height exactly. */
+.app-content:has(> .app-page:not([hidden]) > .gx),
+.app-content:has(> .app-page:not([hidden]) > .ws),
+.app-content:has(> .app-page:not([hidden]) > .pj),
+.app-content:has(> .app-page:not([hidden]) > .docs),
+.app-content:has(> .app-page:not([hidden]) > .sc),
+.app-content:has(> .app-page:not([hidden]) > .an),
+.app-content:has(> .app-page:not([hidden]) > .dp),
+.app-content:has(> .app-page:not([hidden]) > .chats),
+.app-content:has(> .app-page:not([hidden]) > .artifact) {
+  padding: 0;
+  overflow: hidden;
+}
+.app-content > .app-page > .gx,
+.app-content > .app-page > .ws,
+.app-content > .app-page > .pj,
+.app-content > .app-page > .docs,
+.app-content > .app-page > .sc,
+.app-content > .app-page > .an,
+.app-content > .app-page > .dp,
+.app-content > .app-page > .chats,
+.app-content > .app-page > .artifact {
+  margin: 0;
+  height: 100%;
+}
+/* Framed views end where the top padding began, so top and bottom match. */
+.app-content > .app-page > .res {
+  height: 100%;
+}

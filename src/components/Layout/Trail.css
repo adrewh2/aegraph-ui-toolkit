@@ -1,0 +1,24 @@
+.trail {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.trail__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--sb-text, var(--text));
+  cursor: pointer;
+}
+.trail__btn:hover:not(:disabled) {
+  background: var(--sb-hover, var(--surface-2));
+}
+.trail__btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}

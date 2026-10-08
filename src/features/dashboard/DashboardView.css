@@ -1,0 +1,103 @@
+.dash {
+  max-width: 1000px;
+}
+.dash__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+.dash__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  text-decoration: none;
+  color: inherit;
+}
+.dash__stat:hover {
+  border-color: var(--border-strong);
+}
+.dash__stat-label {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.dash__stat-value {
+  font-size: 28px;
+  font-weight: 600;
+}
+.dash__h2 {
+  margin: 28px 0 10px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.dash__types {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+.dash__type {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  text-decoration: none;
+  color: inherit;
+}
+.dash__type:hover {
+  border-color: var(--border-strong);
+}
+.dash__type-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+}
+.dash__type-name {
+  flex: 1;
+  font-weight: 500;
+}
+.dash__type-count {
+  color: var(--text-muted);
+}
+.dash__recent {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  overflow: hidden;
+}
+.dash__recent-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  color: inherit;
+  font-size: 13px;
+}
+.dash__recent-row:last-child {
+  border-bottom: 0;
+}
+.dash__recent-row:hover {
+  background: var(--surface-hover);
+}
+.dash__recent-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A state, not a count: the same tile, at the size a word reads at. */
+.dash__stat-value--word {
+  font-size: 18px;
+}

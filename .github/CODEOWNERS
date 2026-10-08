@@ -1,0 +1,13 @@
+# Who reviews what. A pull request touching these gets the owner on it by default.
+*       @adrewh2
+
+# The parts where a mistake is a vulnerability rather than a bug.
+/dev/                   @adrewh2
+/mcp/                   @adrewh2
+/.github/               @adrewh2
+/.githooks/             @adrewh2
+/public/sandbox/        @adrewh2
+/src/scripting/         @adrewh2
+SECURITY.md             @adrewh2
+vercel.json             @adrewh2
+package-lock.json       @adrewh2

@@ -1,0 +1,112 @@
+/* Analytics tabs: Charts (the plot tool on the Scenes page's frame) and Scripts, each filling its pane. */
+.an__charts {
+  height: 100%;
+}
+.an__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.an__title-name {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* Inspector tab for a chart or a script */
+.an__chart-embed {
+  height: 100%;
+  min-height: 0;
+}
+.an__chart-desc {
+  align-self: center;
+  font-size: 12px;
+}
+.an__chart-frame {
+  flex: 1;
+  min-height: 300px;
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.an__chart-frame > .plot {
+  flex: 1;
+  min-width: 0;
+}
+.an__code {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 60vh;
+  overflow: auto;
+}
+
+/* The script's result takes whatever the inspector gives: the actions and status sit on top, the figure fills the rest. */
+.an__script-embed {
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
+}
+.an__script-embed .an__script-out {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.an__script-embed .an__code-fold {
+  flex: none;
+}
+.an__script-embed .gp__actions {
+  align-items: center;
+}
+.an__script-embed .spacer {
+  flex: 1;
+}
+.an__autorun {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.an__script-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 16px;
+  font-size: 12px;
+}
+.an__script-out {
+  padding: 0;
+  background: transparent;
+  overflow: visible;
+}
+.an__script-out .sc__output--figure {
+  flex: 1 1 auto;
+  min-height: 360px;
+}
+.an__code-fold summary {
+  cursor: pointer;
+  font-size: 12px;
+}
+.an__code-fold[open] summary {
+  margin-bottom: 8px;
+}
+.an__spin {
+  animation: an-spin 0.9s linear infinite;
+}
+@keyframes an-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

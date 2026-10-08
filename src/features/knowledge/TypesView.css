@@ -1,0 +1,18 @@
+.types {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  gap: 12px;
+}
+.types .res__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+.types__add {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}

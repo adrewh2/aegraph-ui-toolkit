@@ -1,0 +1,84 @@
+/* The Projects dialog: wide enough for three demo cards abreast, tabbed so each way in has its own room. */
+.projdlg {
+  max-width: min(1120px, 94vw);
+  width: min(1120px, 94vw);
+}
+.projdlg .dialog__body {
+  display: flex;
+  flex-direction: column;
+  /* One height for every tab: the dialog must not jump as you move between them, so the panel scrolls instead. */
+  height: min(720px, 78vh);
+}
+.projdlg__tabs {
+  display: flex;
+  gap: 4px;
+  margin: 2px 0 0;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.projdlg__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: -1px;
+  padding: 9px 12px 10px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.projdlg__tab svg {
+  opacity: 0.75;
+}
+.projdlg__tab:hover {
+  color: var(--text);
+}
+.projdlg__tab.is-on {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+.projdlg__tab.is-on svg {
+  opacity: 1;
+}
+/* The Import, Examples, Export and Library tabs' one line about themselves; the first two have a bar of their own. */
+.projdlg__hint {
+  margin: 14px 0 0;
+  padding-left: 2px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.projdlg__panel {
+  flex: 1;
+  min-height: 0;
+  margin-top: 14px;
+  overflow: auto;
+  /* Room for a card's hover lift and focus ring, which the scroller would otherwise clip. */
+  padding: 2px 6px 2px 2px;
+}
+/* The cards inside are the page's own; two to a row at this width, one when the dialog is narrow. */
+.projdlg__grid {
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  margin: 0;
+}
+.projdlg .ds__mode {
+  margin: 0 0 12px;
+}
+.projdlg .ds__stats {
+  margin: 0 0 14px;
+}
+.projdlg .ds__log {
+  margin-top: 14px;
+}
+/* The Library tab says what is here in one line; the Dashboard keeps the tiles. */
+.projdlg__summary {
+  margin: 0 0 14px;
+  color: var(--text-muted, var(--muted));
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}

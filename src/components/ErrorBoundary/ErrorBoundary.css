@@ -1,0 +1,21 @@
+/* A part of the app that crashed, in its own place: the rest keeps working. */
+.crash {
+  padding: 16px;
+  color: var(--danger);
+  font-size: 13px;
+}
+.crash pre {
+  white-space: pre-wrap;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.crash__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.crash--compact {
+  padding: 12px;
+  font-size: 12px;
+}

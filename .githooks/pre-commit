@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# Refuse to commit your data. Installed by `npm run hooks` (which `npm install` runs
+# for you: package.json's `prepare` points core.hooksPath at this directory), so a
+# fresh clone is protected before the first commit. See SECURITY.md.
+#
+# It refuses, whatever .gitignore says — a file staged with `git add -f` reaches here.
+# What counts as data, and the files this repo really ships, are defined once in
+# .githooks/data-guard.sh; `.githooks/pre-push` refuses the same thing for every
+# commit you are about to send, in case this one was skipped with --no-verify.
+
+. "$(dirname "$0")/data-guard.sh"
+
+# Names as they are, NUL-separated: by default git quotes a name with a non-ASCII
+# character ("caf\303\251.ae.json"), which no shape matches and no size can be read
+# for, and a list split on spaces reads "my project.ae.json" as two harmless words.
+bad=''
+while IFS= read -r -d '' f; do
+  if reason=$(data_guard_reason "$f"); then
+    bad="$bad
+  $f — $reason"
+    continue
+  fi
+  sz=$(git cat-file -s ":$f" 2>/dev/null || echo 0)
+  if reason=$(data_guard_oversized "$f" "$sz"); then
+    bad="$bad
+  $f — $reason"
+  fi
+done < <(git -c core.quotePath=false diff --cached --name-only -z --diff-filter=ACMR)
+
+if [ -n "$bad" ]; then
+  cat >&2 <<MSG
+pre-commit: refusing to commit what looks like your data, not the project's:
+$bad
+
+Your projects belong outside this clone — the app's projects folder, or Downloads.
+If this really belongs in the repo, add it to DATA_ALLOW in .githooks/data-guard.sh,
+to .gitignore and to .github/workflows/ci.yml in the same commit, and say in the
+message why it holds nobody's data.
+To override once (you are certain, and it holds nobody's data): git commit --no-verify
+MSG
+  exit 1
+fi
+# Ours passed: the hook this clone had before, if any, has its say too.
+data_guard_chain pre-commit "$@"

@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+# Refuse to push your data — the last place to stop it while it is still yours.
+#
+# The commit hook can be skipped (`git commit --no-verify`) and CI only speaks
+# after the fact: by the time a job fails, the branch is on the server and, if
+# it is a pull request, the file is public. Deleting it afterwards does not
+# unpublish it. So everything about to leave this machine is read here, commit
+# by commit, against the same rules as the commit hook (.githooks/data-guard.sh).
+#
+# git hands us, on stdin: <local ref> <local sha> <remote ref> <remote sha>
+
+. "$(dirname "$0")/data-guard.sh"
+
+ZERO='0000000000000000000000000000000000000000'
+# Read once: the hook that ran here before ours (data_guard_chain) is handed the same lines.
+input=$(cat)
+found=$(mktemp "${TMPDIR:-/tmp}/aegraph-pre-push.XXXXXX") || exit 1
+trap 'rm -f "$found"' EXIT
+
+printf '%s\n' "$input" | while read -r _local_ref local_sha _remote_ref remote_sha; do
+  [ -z "$local_sha" ] && continue
+  case "$local_sha" in "$ZERO") continue ;; esac # deleting a branch sends nothing
+  # A branch the remote already has, at a commit we have too: only what is new. A new
+  # branch, or one whose remote tip we have never fetched (someone else pushed to it):
+  # what no remote branch we know of already carries — never nothing, which is what
+  # a range from an unknown commit would give. The fork's first push is not the whole
+  # history; and if even that cannot be listed, the last 200 commits.
+  if [ "$remote_sha" != "$ZERO" ] && [ -n "$remote_sha" ] && git cat-file -e "$remote_sha^{commit}" 2>/dev/null; then
+    range=$(git rev-list "$remote_sha..$local_sha" 2>/dev/null)
+  else
+    range=$(git rev-list "$local_sha" --not --remotes 2>/dev/null || git rev-list "$local_sha" --max-count=200)
+  fi
+  [ -z "$range" ] && continue
+  for sha in $range; do
+    # Files this commit added or changed, and the size each one has in it: names as
+    # they are (NUL-separated, unquoted), a merge read against each parent (`-m`: what
+    # it brings to the branch, an evil merge's own files included — without it a merge
+    # shows nothing), a root commit whole (`--root`).
+    git -c core.quotePath=false diff-tree --no-commit-id --name-only -z --diff-filter=ACMR -r -m --root "$sha" |
+      while IFS= read -r -d '' f; do
+        [ -z "$f" ] && continue
+        if reason=$(data_guard_reason "$f"); then
+          printf '%s|%s|%s\n' "$sha" "$f" "$reason"
+          continue
+        fi
+        sz=$(git cat-file -s "$sha:$f" 2>/dev/null || echo 0)
+        if reason=$(data_guard_oversized "$f" "$sz"); then
+          printf '%s|%s|%s\n' "$sha" "$f" "$reason"
+        fi
+      done
+  done
+done > "$found" 2>/dev/null
+
+# A merge is read once per parent, so the same file can be named twice.
+bad=$(sort -u "$found")
+
+if [ -n "$bad" ]; then
+  echo "pre-push: refusing to send what looks like your data, not the project's:" >&2
+  echo "$bad" | while IFS='|' read -r sha f reason; do
+    [ -z "$f" ] && continue
+    printf '  %s  %s — %s\n' "$(git rev-parse --short "$sha" 2>/dev/null)" "$f" "$reason" >&2
+  done
+  cat >&2 <<'MSG'
+
+These are in commits, not just in your working tree: pushing publishes them, and
+a pull request makes them public to everyone. Take them out of the history first —
+  git rm --cached <file> && git commit --amend        (the last commit)
+  git rebase -i <commit>~1                            (an older one)
+— or push a branch that does not contain them.
+
+If a file really belongs to the project, add it to DATA_ALLOW in
+.githooks/data-guard.sh, to .gitignore and to .github/workflows/ci.yml together.
+To override once (you are certain, and it holds nobody's data): git push --no-verify
+MSG
+  exit 1
+fi
+# Ours passed: the hook this clone had before, if any, has its say too.
+printf '%s\n' "$input" | data_guard_chain pre-push "$@"

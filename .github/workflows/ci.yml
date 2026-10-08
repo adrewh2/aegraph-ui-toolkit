@@ -1,0 +1,220 @@
+# Every push and pull request: the checks a contributor would otherwise have to
+# be trusted to run. Nothing here needs a secret, so it runs on a fork's pull
+# request too.
+#
+# Actions are pinned to a commit rather than a tag: a tag can be moved to point
+# at different code, and these run with access to the checkout.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Monday morning: the audit job catches an advisory published against a
+    # dependency we have not touched.
+    - cron: '17 6 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Types, lint and tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      # The demos, Pyodide and the vendor bundles are fetched by `predev`/`prebuild`;
+      # the tests and the type check do not need them, and fetching them here would
+      # make CI depend on other people's servers being up.
+      - run: npm ci --ignore-scripts
+      - name: The commit guard is installed by an install
+        run: |
+          npm run hooks
+          test "$(git config --get core.hooksPath)" = ".githooks"
+      # Every project `tsconfig.json` references: the app, the Vite configs, and the
+      # dev server's own handlers under `dev/` (which no bundler touches, so nothing else checks them).
+      - run: npx tsc -b --noEmit
+      - run: npm run lint
+      # `test:ci` runs the unit suite in parallel and the bridge tests after it,
+      # serially: those spawn real processes and bind real ports, and under 200-odd
+      # other files on a loaded runner they fail on timing rather than on anything true.
+      - run: npm run test:ci
+
+  build:
+    name: The app builds, with the sandboxes in it
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      # `vite build` directly rather than `npm run build`: the `prebuild` hook fetches
+      # Pyodide and the demos from other people's servers, which the bundle does not need
+      # to be built and CI should not depend on. The vendored libraries are the exception:
+      # `scripts/vendor.mjs` only copies them out of node_modules (three, d3, Plotly, and
+      # the ONNX runtime search by meaning loads from this origin), touches no network, and
+      # the check below fails without them — as it did on every run until this step.
+      - run: node scripts/vendor.mjs
+      - run: npx vite build
+      # A type check does not run the bundler, and the bundler has its own ways to lose a
+      # file: `?url` on a `.js` file under `src/` emitted nothing and silently dropped both
+      # script sandboxes' bootstraps, which nothing but a look at the output would catch.
+      - name: The sandbox bootstraps reached the output
+        run: |
+          for f in dist/sandbox/view-boot.js dist/sandbox/python-boot.js; do
+            test -s "$f" || { echo "missing from the build: $f"; exit 1; }
+          done
+          grep -q 'aegraph' dist/sandbox/view-boot.js || { echo "dist/sandbox/view-boot.js is not the bootstrap"; exit 1; }
+          test -s dist/index.html || { echo "no index.html"; exit 1; }
+      # Search by meaning runs the ONNX runtime in this origin; without these files
+      # transformers.js falls back to importing it from a CDN (and script-src refuses it).
+      - name: The ONNX runtime is served by the app, not a CDN
+        run: |
+          for f in ort-wasm-simd-threaded.jsep.mjs ort-wasm-simd-threaded.jsep.wasm ort-wasm-simd-threaded.mjs ort-wasm-simd-threaded.wasm; do
+            test -s "dist/vendor/ort/$f" || { echo "missing from the build: dist/vendor/ort/$f"; exit 1; }
+          done
+
+  audit:
+    name: No known advisory
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      # What ships to a browser must have no known advisory: this fails the build.
+      - name: No advisory in what ships
+        run: npm audit --omit=dev --audit-level=low
+      # The build tools too. There is nothing outstanding today, so this is a
+      # gate rather than a report; if a new advisory lands against a tool and a
+      # security fix needs to merge before it can be cleared, make it
+      # `|| true` for that one pull request and say so in SECURITY.md.
+      - name: No advisory in the build tools either
+        run: npm audit --audit-level=moderate
+
+  secrets:
+    name: No secret in the history
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # The whole history: a key removed in a later commit is still a key that leaked.
+          fetch-depth: 0
+      - name: Scan every commit for credentials
+        uses: trufflesecurity/trufflehog@4dd8831c5f12599465d4d45c3c447b4018a34c85 # v3.97.9
+        with:
+          extra_args: --results=verified,unknown
+          # The action runs the scanner as a container image whose tag defaults to `latest`:
+          # pinned to the same release as the action, by digest, so the code reading the
+          # whole history is the code reviewed here. Move it with the action's pin.
+          version: 3.97.9@sha256:52e67fef4d054ecff5c2ce4b4ae376626d1ef54aa0898b53cac19c25e92e14db
+
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # The whole history: the data check below walks the commits this branch adds.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      # The repo must never carry someone's data. `.gitignore` refuses it by shape,
+      # the commit and push hooks refuse it on the way out; these two read what is
+      # actually here, by the same rules (.githooks/data-guard.sh — one description,
+      # so a list cannot drift out of step with the hooks).
+      # Every list of names is read unquoted and NUL-separated, as the hooks read it: by
+      # default git quotes a name with a non-ASCII character, which no shape then matches,
+      # and a list split on spaces reads "my project.ae.json" as two harmless words.
+      - name: No project bundle, export or env file is tracked
+        run: |
+          . ./.githooks/data-guard.sh
+          bad=''
+          while IFS= read -r -d '' f; do
+            if reason=$(data_guard_reason "$f"); then bad="$bad\n  $f — $reason"; fi
+          done < <(git -c core.quotePath=false ls-files -z)
+          if [ -n "$bad" ]; then printf "Tracked files that look like data, not the project's:%b\n" "$bad"; exit 1; fi
+      # The hooks run on a contributor's machine and can be skipped (--no-verify).
+      # This runs on the commits themselves, so a pull request that carries data
+      # fails before anyone merges it.
+      # A pull request: the commits it adds to its base. A push: the commits it added to
+      # the branch (`before`), or the last 20 when that is not known — a new branch, or a
+      # force-push whose old tip is gone. A merge is read against each parent (`-m`).
+      - name: No commit in this branch adds data
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [ -n "$BASE" ] && [ "$BASE" != 0000000000000000000000000000000000000000 ] && git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+            shas=$(git rev-list "$BASE..HEAD")
+          else
+            shas=$(git rev-list HEAD --max-count=20)
+          fi
+          . ./.githooks/data-guard.sh
+          bad=''
+          for sha in $shas; do
+            while IFS= read -r -d '' f; do
+              if reason=$(data_guard_reason "$f"); then bad="$bad\n  $(git rev-parse --short "$sha")  $f — $reason"; fi
+            done < <(git -c core.quotePath=false diff-tree --no-commit-id --name-only -z --diff-filter=ACMR -r -m --root "$sha")
+          done
+          if [ -n "$bad" ]; then printf 'Commits in this branch add data, not source:%b\n' "$bad"; exit 1; fi
+      - name: Nothing tracked is over 5 MB
+        run: |
+          . ./.githooks/data-guard.sh
+          bad=''
+          while IFS= read -r -d '' f; do
+            sz=$(git cat-file -s "HEAD:$f" 2>/dev/null || echo 0)
+            if reason=$(data_guard_oversized "$f" "$sz"); then bad="$bad\n  $f — $reason"; fi
+          done < <(git -c core.quotePath=false ls-files -z)
+          if [ -n "$bad" ]; then printf 'Oversized tracked files:%b\n' "$bad"; exit 1; fi
+
+  lockfile:
+    name: The lockfile works everywhere
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # A lockfile regenerated on one machine can end up holding only that
+      # machine's optional binaries — which is how `oxlint` came to be
+      # uninstallable on Linux while every check passed on a Mac. The tools with
+      # a native binary must be in it for the platforms people actually use.
+      - name: Every platform's native binaries are in package-lock.json
+        run: |
+          missing=''
+          for pkg in @oxlint/binding @rolldown/binding lightningcss; do
+            for plat in linux-x64-gnu darwin-arm64 darwin-x64 win32-x64-msvc; do
+              grep -q "\"node_modules/${pkg}-${plat}\"" package-lock.json || missing="$missing ${pkg}-${plat}"
+            done
+          done
+          if [ -n "$missing" ]; then
+            echo "package-lock.json is missing native binaries:"
+            for m in $missing; do echo "  $m"; done
+            echo
+            echo "It was probably rebuilt with a node_modules present, which records only this machine's."
+            echo "Fix: rm -rf node_modules package-lock.json && npm install --package-lock-only && npm ci"
+            exit 1
+          fi

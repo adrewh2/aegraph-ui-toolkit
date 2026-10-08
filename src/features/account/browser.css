@@ -1,0 +1,109 @@
+/* The This browser page: one column that reads on a phone — the stashes, the switches, and Clear. */
+.browser {
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.browser__card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.browser__card h3 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.browser__card p {
+  margin: 0;
+}
+.browser__hint {
+  font-size: 12px;
+  line-height: 1.5;
+}
+.browser__error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.browser__rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+}
+.browser__row {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.browser__row-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.browser__name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-weight: 500;
+}
+.browser__remove {
+  flex: none;
+  padding: 6px;
+}
+.browser__switches {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.browser__switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  cursor: pointer;
+}
+.browser__switch input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+.browser__inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/* Phone-sized inputs stop iOS zooming in on focus. */
+@media (pointer: coarse) {
+  .browser .input {
+    font-size: 16px;
+    height: 40px;
+  }
+}
+
+.browser__stash-name {
+  flex: 1;
+  min-width: 0;
+}
+.browser__stash .browser__inline {
+  flex: none;
+}
