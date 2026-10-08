@@ -1,0 +1,41 @@
+# Dependabot: a pull request when a dependency has a new version, and at once
+# when one has an advisory. Grouped so a week's updates are one review rather
+# than thirty, and so a major — which can change behaviour — arrives alone.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        patterns: ['*']
+        update-types: [minor, patch]
+    ignore:
+      # A major is its own piece of work: the app's own framework and the build
+      # tool break things across the tree, and a bot cannot judge that.
+      - dependency-name: react
+        update-types: [version-update:semver-major]
+      - dependency-name: react-dom
+        update-types: [version-update:semver-major]
+      - dependency-name: vite
+        update-types: [version-update:semver-major]
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
+    commit-message:
+      prefix: 'deps'
+
+  # The actions in .github/workflows are pinned to commits, which Dependabot
+  # understands and will move for us — a pin nobody updates is its own problem.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    groups:
+      actions:
+        patterns: ['*']
+    commit-message:
+      prefix: 'ci'

@@ -1,0 +1,34 @@
+# A pull request that adds a dependency with a known advisory, or one under a
+# licence this project cannot carry, is told so on the pull request itself —
+# before it is merged and before `npm audit` finds it on main.
+name: Dependency review
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  review:
+    name: New dependencies
+    # The action reads GitHub's dependency graph, which is free on a public repository and
+    # needs Advanced Security on a private one — so while this repository is private the job
+    # would fail on every pull request rather than tell anyone anything. It starts working
+    # the day the repository is made public, with no edit here.
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4
+        with:
+          fail-on-severity: low
+          # Apache-2.0 can carry these; a copyleft dependency is a decision, not a merge.
+          allow-licenses: Apache-2.0, MIT, BSD-2-Clause, BSD-3-Clause, ISC, 0BSD, Unlicense, CC0-1.0, BlueOak-1.0.0, Python-2.0, MPL-2.0, CC-BY-4.0, CC-BY-3.0, WTFPL, PDDL-1.0, EPL-2.0
+          comment-summary-in-pr: on-failure

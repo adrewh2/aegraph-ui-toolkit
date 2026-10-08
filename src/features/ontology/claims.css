@@ -1,0 +1,92 @@
+/* The Claims tab of the Ontology: claims with their evidence, named communities with their size. */
+.claims {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 4px 0 24px;
+  overflow: auto;
+}
+.claims__section h2 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+.claims__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.claims__item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.claims__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.claims__head h3 {
+  font-size: 13.5px;
+  font-weight: 600;
+  margin: 0;
+}
+.claims__score {
+  width: 60px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--border);
+  overflow: hidden;
+  display: inline-block;
+}
+.claims__score > span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+.claims__detail {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+.claims__evidence {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+.claims__evidence .chip {
+  text-decoration: none;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+.claims__evidence .chip:hover {
+  background: var(--surface-hover);
+}
+.claims__actions {
+  display: flex;
+  gap: 6px;
+}
+.claims__empty {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  max-width: 640px;
+  padding: 24px 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.claims__empty p {
+  margin: 0;
+}

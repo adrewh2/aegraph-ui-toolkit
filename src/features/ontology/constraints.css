@@ -1,0 +1,493 @@
+/* The Constraints tab of the Ontology, and its inline form on a type's page: the rules, an audit, an editor. */
+.cons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 0 24px;
+  overflow: auto;
+}
+.cons--inline {
+  padding: 0;
+  overflow: visible;
+}
+.cons__bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+}
+.cons__bar .spacer {
+  flex: 1;
+}
+.cons__audit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  border: 1px solid var(--border);
+}
+.cons__audit.is-ok {
+  background: #ecfdf5;
+  color: #065f46;
+  border-color: #a7f3d0;
+}
+.cons__audit.is-bad {
+  background: #fff7ed;
+  color: #9a3412;
+  border-color: #fed7aa;
+}
+.cons__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cons__item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 10px);
+  background: var(--surface);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cons__item.is-off {
+  opacity: 0.6;
+}
+.cons__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.cons__head h3 {
+  font-size: 13.5px;
+  font-weight: 600;
+  margin: 0;
+}
+.cons__head .spacer {
+  flex: 1;
+}
+.cons__toggle input {
+  margin: 0;
+}
+.cons__sev {
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+}
+.cons__sev--reject {
+  background: #fef2f2;
+  color: #991b1b;
+  border-color: #fecaca;
+}
+.cons__sev--warn {
+  background: #fffbeb;
+  color: #92400e;
+  border-color: #fde68a;
+}
+.cons__count {
+  font-size: 12px;
+}
+.cons__count.is-bad {
+  color: #9a3412;
+}
+.cons__count.is-ok {
+  color: #065f46;
+}
+.cons__what {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: baseline;
+  font-size: 12.5px;
+}
+.cons__applies {
+  font-weight: 500;
+}
+.cons__rule {
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 12px;
+}
+.cons__desc {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+.cons__violations {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--border);
+}
+.cons__violation {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  border: 0;
+  background: none;
+  padding: 2px 4px;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.cons__violation:hover {
+  background: var(--surface-2);
+}
+.cons__vent {
+  font-weight: 500;
+  white-space: nowrap;
+}
+/* ── The editor dialog: two panes, side labels, aligned rows ───────────── */
+.dialog.cdlg {
+  max-width: 1040px;
+  padding: 16px 20px 14px;
+}
+.cdlg .dialog__title {
+  margin-bottom: 10px;
+}
+.cdlg__body {
+  display: grid;
+  grid-template-columns: 330px minmax(0, 1fr);
+  gap: 0 22px;
+  align-items: start;
+}
+.cdlg__left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 22px;
+  border-right: 1px solid var(--border);
+}
+.cdlg__right {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+/* Label on the left, control on the right, every row the same height. */
+.cdlg__grid {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  gap: 8px 10px;
+  align-items: center;
+}
+.cdlg__grid--rule {
+  grid-template-columns: 104px minmax(0, 1fr);
+}
+.cdlg__grid > label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.cdlg__grid .input {
+  height: 28px;
+  font-size: 12.5px;
+}
+.cdlg__grid .input.mono {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 12px;
+}
+.cdlg__section {
+  margin-top: 6px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.cdlg__section--span {
+  grid-column: 1 / -1;
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
+}
+/* A segmented control, the app's tab look at input height. */
+.cdlg__seg {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface-2);
+  width: fit-content;
+}
+.cdlg__seg > button {
+  border: 0;
+  background: transparent;
+  padding: 3px 9px;
+  border-radius: 5px;
+  font: inherit;
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.cdlg__seg > button.is-active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+.cdlg__badge {
+  font-size: 10px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--surface);
+}
+.cdlg__types {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+}
+.cdlg__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-height: 20px;
+  align-items: center;
+  font-size: 12px;
+}
+.cdlg__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 6px 1px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  font: inherit;
+  font-size: 11.5px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  color: var(--text);
+  cursor: pointer;
+}
+.cdlg__chip:hover {
+  border-color: var(--text-muted);
+}
+.cdlg__typeq {
+  height: 26px !important;
+}
+.cdlg__typelist {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+.cdlg__typeopt {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  border: 0;
+  background: none;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font: inherit;
+  font-size: 12px;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+.cdlg__typeopt:hover {
+  background: var(--surface-2);
+}
+.cdlg__ruletabs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+}
+.cdlg__add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.cdlg__add:hover {
+  color: var(--text);
+}
+.cdlg__preds {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  min-height: 28px;
+  justify-content: center;
+}
+.cdlg__pred {
+  display: grid;
+  grid-template-columns: 1.3fr 0.9fr 1fr 24px;
+  gap: 6px;
+  align-items: center;
+}
+.cdlg__pred .input {
+  height: 28px;
+  font-size: 12.5px;
+}
+.cdlg__x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.cdlg__x:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.cdlg__inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+.cdlg__inline .input[type='number'] {
+  width: 64px;
+}
+.cdlg__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+}
+.cdlg__code {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cdlg__codehint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.cdlg__preview {
+  flex: 1;
+  font-size: 12px;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.cdlg .dialog__footer {
+  align-items: center;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+@media (max-width: 860px) {
+  .cdlg__body {
+    grid-template-columns: 1fr;
+  }
+  .cdlg__left {
+    padding-right: 0;
+    border-right: 0;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+/* Scope and script badges on a constraint's line. */
+.cons__badge {
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+
+/* ── From a template ─────────────────────────────────────────────────── */
+.cdlg__tpls {
+  gap: 10px;
+}
+.cdlg__tpllist {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 420px;
+  overflow: auto;
+}
+.cdlg__tpllist .cdlg__section {
+  margin-top: 6px;
+}
+.cdlg__tpl {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 5px;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: 12.5px;
+  text-align: left;
+  cursor: pointer;
+}
+.cdlg__tpl:hover {
+  background: var(--surface-2);
+}
+.cdlg__tpl.is-on {
+  background: var(--accent-soft, #eef2ff);
+  color: var(--accent, #3730a3);
+}
+/* A parameter row: its label over its control, inside the rule grid. */
+.cdlg__param {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  gap: 8px 10px;
+  align-items: center;
+}
+.cdlg__rendered {
+  font-size: 12px;
+}
+.cdlg__rendered pre {
+  margin: 6px 0 0;
+  padding: 8px;
+  border-radius: 6px;
+  background: var(--surface-2);
+  font-size: 11.5px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.cdlg__preview.is-bad {
+  color: #9a3412;
+}
+.cdlg__pred--param {
+  grid-template-columns: 1fr 0.9fr 1fr 24px;
+}

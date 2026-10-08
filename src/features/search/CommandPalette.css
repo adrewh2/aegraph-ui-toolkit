@@ -1,0 +1,139 @@
+/* ⌘K: a box over everything, the results grouped underneath. */
+.cp {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 12vh;
+  background: rgba(31, 30, 27, 0.28);
+}
+.cp__box {
+  width: min(640px, calc(100% - 32px));
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 16px 48px rgba(31, 30, 27, 0.22);
+  overflow: hidden;
+}
+.cp__input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.cp__input input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 15px;
+  outline: none;
+  color: var(--text);
+}
+.cp__input kbd,
+.cp__alt kbd {
+  padding: 1px 5px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface-2);
+  font: inherit;
+  font-size: 10.5px;
+  color: var(--text-faint);
+}
+.cp__list {
+  overflow: auto;
+  padding: 6px;
+}
+.cp__group-title {
+  padding: 8px 10px 3px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.cp__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+.cp__item svg {
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+.cp__item.is-active {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.cp__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
+}
+.cp__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+}
+.cp__hint {
+  font-size: 11.5px;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+/* A text match: the label on one line, the line it matched on beneath, the words marked. */
+.cp__item--snippet {
+  align-items: flex-start;
+}
+.cp__item--snippet > svg,
+.cp__item--snippet > .cp__dot {
+  margin-top: 4px;
+}
+.cp__item--snippet .cp__hint,
+.cp__item--snippet .cp__alt {
+  margin-top: 2px;
+}
+.cp__snippet {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cp__snippet mark {
+  padding: 0 1px;
+  border-radius: 2px;
+  background: rgba(250, 204, 21, 0.35);
+  color: inherit;
+}
+.cp__alt {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+.cp__empty {
+  padding: 18px 12px;
+  font-size: 13px;
+}

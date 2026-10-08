@@ -1,0 +1,48 @@
+# CodeQL: GitHub's static analysis over the whole codebase, looking for the
+# classes of bug a review misses — injection, unsafe deserialisation, a tainted
+# value reaching the DOM. It runs on every pull request and weekly, because a
+# new query can find something in code that has not changed.
+#
+# Findings appear under Security → Code scanning, not as a failed check, so a
+# pull request is not blocked by a query's opinion; SECURITY.md says how the
+# open ones are handled.
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '41 6 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Analyze
+    # Code scanning — where CodeQL files what it finds — is free on a public repository and
+    # needs Advanced Security on a private one. While this repository is private the analysis
+    # runs and then cannot upload, which is a red cross that means nothing; the job waits for
+    # the repository to be public and needs no edit here when it is.
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      # What CodeQL needs to file what it finds.
+      security-events: write
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: github/codeql-action/init@1190a975f95ce23525efb6a3fc21ea29567c1b52 # v3
+        with:
+          languages: javascript-typescript
+          # The queries that look for real vulnerabilities, plus the quality ones.
+          queries: security-and-quality
+      - uses: github/codeql-action/analyze@1190a975f95ce23525efb6a3fc21ea29567c1b52 # v3
+        with:
+          category: '/language:javascript-typescript'

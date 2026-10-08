@@ -1,0 +1,316 @@
+.res {
+  display: flex;
+  flex-direction: column;
+  /* The page's own padding is 32px top/bottom and 40px at the sides; end 40px from the bottom too. */
+  height: calc(100% - 8px);
+  min-height: 0;
+  gap: 12px;
+}
+/* Title block beside the actions; in a narrow pane the actions drop under the title instead of squeezing the subtitle into a column. */
+.res__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px 16px;
+  flex-wrap: wrap;
+}
+.res__head > div:first-child {
+  flex: 1 1 320px;
+  min-width: 0;
+  max-width: 72ch;
+}
+.res__head-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+.res__tabs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+.res__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 10px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.res__tab:hover {
+  color: var(--text);
+}
+.res__tab.is-active {
+  color: var(--text);
+  border-bottom-color: var(--text);
+}
+.res__tab .count {
+  font-size: 11px;
+}
+.res__tabs .spacer {
+  flex: 1;
+}
+.res__search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--surface);
+  margin-bottom: 4px;
+}
+.res__search input {
+  border: 0;
+  outline: 0;
+  width: 200px;
+  background: transparent;
+  font-size: 13px;
+}
+.res__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.res__toolbar .spacer {
+  flex: 1;
+}
+.res__body {
+  display: flex;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+.res__body.is-dropping > .res__table {
+  outline: 2px dashed #6f9ee0;
+  outline-offset: -2px;
+  border-radius: 10px;
+}
+.res__drop {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: #3b7ddd;
+  background: rgba(234, 241, 251, 0.6);
+  border-radius: 10px;
+}
+.res__table {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+.res__inspector {
+  width: 380px;
+  flex-shrink: 0;
+  min-height: 0;
+}
+.res__body > .pane-gutter {
+  /* Sits inside the 12px gap: the whole gap is the hit area, grip centred. */
+  flex-basis: 12px;
+  margin: 0 -12px;
+}
+.res__tagfilter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+@media (max-width: 1100px) {
+  .res__body {
+    flex-direction: column;
+  }
+  .res__inspector {
+    width: auto !important;
+    height: 360px;
+  }
+  .res__body > .pane-gutter {
+    display: none;
+  }
+}
+
+/* Facet rail (open-ended categories) */
+.res__facets {
+  width: 200px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  overflow-y: auto;
+  min-height: 0;
+}
+.res__facet-search {
+  height: 28px;
+  margin-bottom: 6px;
+}
+.res__facet {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 28px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.res__facet:hover {
+  background: var(--surface-hover);
+}
+.res__facet.is-active {
+  background: var(--sb-active, #e3e1db);
+  font-weight: 500;
+}
+.res__facet--nested {
+  padding-left: 26px;
+  height: 28px;
+}
+.res__facet-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+.res__facet-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.res__facet .count {
+  font-size: 11px;
+}
+@media (max-width: 1100px) {
+  .res__facets {
+    width: auto;
+    max-height: 200px;
+  }
+}
+
+
+/* Filters on: an orange strip above the sections, "x of y" on every count, the filters themselves on hover. */
+.res__filterbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 4px;
+  padding: 6px 8px;
+  border-radius: 7px;
+  background: color-mix(in srgb, #f59e0b 16%, var(--surface));
+  border: 1px solid color-mix(in srgb, #f59e0b 55%, var(--border));
+  color: color-mix(in srgb, #b45309 75%, var(--text));
+  font-size: 12px;
+  font-weight: 600;
+}
+.res__filterbar-text {
+  flex: 1;
+  min-width: 0;
+}
+.res__filterbar-info {
+  position: relative;
+  display: inline-flex;
+  color: color-mix(in srgb, #d97706 80%, var(--text));
+  cursor: help;
+  outline: none;
+}
+.res__filterbar-tip {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  min-width: 180px;
+  max-width: 280px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--text);
+  color: var(--bg);
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: normal;
+  box-shadow: var(--shadow);
+  flex-direction: column;
+  gap: 3px;
+}
+.res__filterbar-info:hover .res__filterbar-tip,
+.res__filterbar-info:focus-visible .res__filterbar-tip {
+  display: flex;
+}
+.res__filterbar-x {
+  display: inline-flex;
+  padding: 2px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.res__filterbar-x:hover {
+  background: rgba(138, 75, 0, 0.12);
+}
+/* "x of y": the count badge is a flex box, so the space between the parts has to be a real gap. */
+.count:has(.count__of) {
+  gap: 4px;
+  padding: 0 6px;
+  white-space: nowrap;
+}
+.count__of {
+  color: color-mix(in srgb, #d97706 80%, var(--text));
+  font-weight: 600;
+}
+
+/* Bare: a table beside something else — no rail, no title block, no page inset */
+.res--bare {
+  margin: 0;
+  gap: 6px;
+}
+.app-content:has(> .app-page:not([hidden]) > .res--bare) {
+  padding: 8px;
+}
+.res__head--bare > div:first-child {
+  display: none;
+}
+.res__head--bare {
+  justify-content: flex-end;
+}
+.res__head--bare .res__head-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  row-gap: 6px;
+}
+.res--bare .res__inspector {
+  max-width: 65%;
+}

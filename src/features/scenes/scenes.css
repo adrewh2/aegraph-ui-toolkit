@@ -1,0 +1,172 @@
+.pj {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+.pj__top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.pj__top .spacer,
+.pj__tools .spacer {
+  flex: 1;
+}
+.pj__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+.pj__title .muted {
+  font-weight: 400;
+  font-size: 12px;
+}
+/* Scene | Plot: two joined buttons, the shown one filled. */
+.pj__mode {
+  display: inline-flex;
+}
+.pj__mode .btn:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.pj__mode .btn:last-child {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  margin-left: -1px;
+}
+.pj__tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+  font-size: 12px;
+}
+.pj__zoom {
+  min-width: 44px;
+  text-align: center;
+}
+.pj__hint {
+  font-size: 12px;
+}
+.pj__body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+.pj__canvas {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  background:
+    linear-gradient(0deg, rgba(31, 30, 27, 0.02), rgba(31, 30, 27, 0.02)),
+    var(--surface);
+  cursor: default;
+  touch-action: none;
+  user-select: none;
+}
+.pj__canvas.is-panning {
+  cursor: grabbing;
+}
+.pj__node {
+  cursor: grab;
+}
+.pj__node.is-selected {
+  filter: drop-shadow(0 0 0 rgba(59, 125, 221, 0.6)) drop-shadow(0 0 3px rgba(59, 125, 221, 0.6));
+}
+.pj__node.is-missing {
+  opacity: 0.45;
+}
+.pj__node text {
+  pointer-events: none;
+}
+.pj__edge.is-hot path {
+  stroke: #3b7ddd;
+}
+.pj__empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.pj__empty-inner {
+  text-align: center;
+  max-width: 380px;
+  padding: 24px;
+  pointer-events: auto;
+}
+.pj__empty-inner h2 {
+  margin: 0 0 6px;
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 500;
+}
+.pj__empty-inner p {
+  margin: 0 0 18px;
+  color: var(--text-muted);
+}
+.pj__empty-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+.pj__side {
+  flex-shrink: 0;
+  min-height: 0;
+  padding: 8px 8px 8px 0;
+}
+.pj__body > .pane-gutter {
+  margin: 0 -3px;
+}
+
+.pj__handle--nw,
+.pj__handle--se {
+  cursor: nwse-resize;
+}
+.pj__handle--ne,
+.pj__handle--sw {
+  cursor: nesw-resize;
+}
+
+.pj__group rect {
+  cursor: grab;
+}
+.pj__group text {
+  pointer-events: none;
+}
+.pj__group-name {
+  height: 26px;
+  width: 160px;
+  font-size: 12px;
+}
+.pj__tools .tb__sep {
+  width: 1px;
+  height: 18px;
+  background: var(--border);
+  margin: 0 4px;
+}
+
+/* The lifted node during a drag: its own small SVG over the scene, so the scene itself does not repaint per move. */
+.pj__lift {
+  display: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+.pj__canvas.is-dragging .pj__node,
+.pj__canvas.is-dragging .pj__edge,
+.pj__canvas.is-dragging .pj__group,
+.pj__canvas.is-dragging .pj__source {
+  pointer-events: none;
+}

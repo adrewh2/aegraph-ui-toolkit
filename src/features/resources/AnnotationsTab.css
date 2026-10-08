@@ -1,0 +1,139 @@
+.antab {
+  display: flex;
+  flex-direction: column;
+}
+.antab__head {
+  padding: 2px 0 6px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+.antab__row {
+  display: flex;
+  gap: 10px;
+  padding: 8px 6px;
+  margin: 0 -6px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.antab__row:hover {
+  background: var(--surface-hover);
+}
+.antab__row + .antab__row {
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 8px 8px;
+}
+.antab__glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+.antab__glyph--quote {
+  background: #fef9c3;
+  color: #854d0e;
+}
+.antab__thumb {
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  width: 64px;
+  height: 44px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #000;
+}
+.antab__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.antab__frame {
+  position: absolute;
+  border: 1.5px solid #f59e0b;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+}
+.antab__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 12.5px;
+}
+.antab__target {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.antab__where {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.antab__quote {
+  font-style: italic;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.antab__comment {
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.antab__meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+.antab__tags {
+  display: flex;
+  gap: 4px;
+  min-width: 0;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, #000 calc(100% - 16px), transparent);
+}
+.antab__tags > * {
+  flex-shrink: 0;
+}
+.antab__inspect {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: auto;
+  padding: 1px 6px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+}
+.antab__inspect:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.antab__go {
+  color: var(--text-faint);
+}

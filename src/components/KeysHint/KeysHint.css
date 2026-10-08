@@ -1,0 +1,61 @@
+/* A view's keys, a faint line on its bottom-right edge (a host sets `right` to clear its own controls). */
+.keys-hint {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  gap: 10px;
+  padding: 3px 7px;
+  font-size: 10.5px;
+  color: var(--text-faint);
+  background: color-mix(in srgb, var(--surface) 75%, transparent);
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+  user-select: none;
+  z-index: 3;
+  white-space: nowrap;
+}
+.keys-hint span {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+/* Every set of keys in one grid cell: the cell is as wide as the widest, the shown set from its start, beside the lead control. */
+.keys-hint .keys-hint__rows {
+  display: grid;
+}
+.keys-hint .keys-hint__row {
+  grid-area: 1 / 1;
+  gap: 10px;
+}
+.keys-hint .keys-hint__row.is-reserve {
+  visibility: hidden;
+}
+.keys-hint kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  font: inherit;
+  font-family: var(--font-mono);
+  text-align: center;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--surface);
+  color: var(--text-muted);
+}
+.keys-hint span > kbd:last-of-type {
+  margin-right: 3px;
+}
+/* A control at the line's start takes clicks, though the line itself does not. */
+.keys-hint__lead {
+  pointer-events: auto;
+}
+@media (max-width: 720px) {
+  .keys-hint {
+    display: none;
+  }
+}

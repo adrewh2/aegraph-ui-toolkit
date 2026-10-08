@@ -1,0 +1,305 @@
+:root {
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --bg: #faf9f6;
+  --surface: #ffffff;
+  --surface-2: #f5f4f0;
+  --surface-hover: #f0efea;
+  --border: #e6e4de;
+  --border-strong: #d6d3cb;
+  /* The thin scrollbar (`.thin-scroll`): the sidebar's, and every panel that scrolls a list beside the picture. */
+  --scroll-thumb: #cfccc4;
+  --scroll-thumb-hover: #b3b0a7;
+  --text: #1f1e1b;
+  --text-muted: #6d6b66;
+  /* 4.5:1 or better on --bg, --surface and --surface-2: the faint text is still text (WCAG 2.1 AA 1.4.3). */
+  --text-faint: #716f69;
+  --accent: #1f1e1b;
+  --accent-text: #ffffff;
+  --link: #9a3412;
+  --danger: #b91c1c;
+  --danger-bg: #fee2e2;
+  --info-bg: #dbe6f7;
+  --info-text: #2a4f8a;
+  --ok-bg: #dcfce7;
+  --ok-text: #166534;
+  --warn-bg: #fef3c7;
+  --warn-text: #92400e;
+  /* Caution: something to be careful with that is not a loss — a confirmation the assistant asks for. Red is for loss. */
+  --caution: #c2410c;
+  --caution-bg: #ffedd5;
+  --radius: 8px;
+  --radius-sm: 6px;
+  --shadow: 0 8px 24px rgba(31, 30, 27, 0.12), 0 1px 3px rgba(31, 30, 27, 0.08);
+
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  color: var(--text);
+  font-size: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--link);
+}
+
+/* Checkboxes: neutral box, blue check mark. Radios take a soft blue accent; sliders keep the browser's. */
+input[type='checkbox'] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 3px;
+  background: var(--surface) center / 10px 10px no-repeat;
+  cursor: pointer;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+input[type='checkbox']:hover {
+  border-color: var(--text-faint);
+}
+input[type='checkbox']:checked {
+  border-color: #b9cdea;
+  background-color: #eaf1fb;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%233b7ddd' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 6.5l2.6 2.6L10 3.5'/%3E%3C/svg%3E");
+}
+input[type='checkbox']:indeterminate {
+  border-color: #b9cdea;
+  background-color: #eaf1fb;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%233b7ddd' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M2.5 6h7'/%3E%3C/svg%3E");
+}
+input[type='checkbox']:focus-visible {
+  outline: 2px solid #b9cdea;
+  outline-offset: 1px;
+}
+input[type='checkbox']:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+input[type='radio'] {
+  accent-color: #6f9ee0;
+  cursor: pointer;
+}
+
+.page-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.page-subtitle {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+}
+/* A page's code still on its way (Suspense): the word sits in the middle of the space the page will fill, not in its corner. */
+.page-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 40vh;
+  color: var(--text-muted);
+}
+/* Title block + actions, the same on every framed page (see PageHeader). */
+.page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.page-head__text {
+  flex: 1 1 320px;
+  min-width: 0;
+  max-width: 72ch;
+}
+.page-head__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* Gutter between resizable panes — same look as the workstation splits: a centred grip that lights up on hover. */
+.pane-gutter {
+  flex: 0 0 6px;
+  position: relative;
+  z-index: 2;
+  cursor: col-resize;
+  touch-action: none;
+}
+.pane-gutter::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 2px;
+  height: 40px;
+  border-radius: 2px;
+  background: transparent;
+  transition: background 120ms;
+}
+.pane-gutter:hover::after,
+body.is-resizing .pane-gutter::after {
+  background: var(--border-strong);
+}
+body.is-resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+body.is-resizing canvas,
+body.is-resizing iframe,
+body.is-resizing-y canvas,
+body.is-resizing-y iframe {
+  pointer-events: none;
+}
+/* The same gutter laid flat, between a top and a bottom pane. */
+.pane-gutter--row {
+  flex: 0 0 6px;
+  cursor: row-resize;
+}
+.pane-gutter--row::after {
+  width: 40px;
+  height: 2px;
+}
+body.is-resizing-y {
+  cursor: row-resize;
+  user-select: none;
+}
+body.is-resizing-y .pane-gutter--row::after {
+  background: var(--border-strong);
+}
+
+/*
+ * The thin scrollbar, as the sidebar has it: 3 px, and visible whenever the element can scroll, so what is below the
+ * fold is discoverable — macOS overlay bars fade out on their own, and explicit ::-webkit-scrollbar rules opt an
+ * element out of that. overflow stays the element's own (`auto`), so the bar appears only when it is needed. The
+ * standard scrollbar-width / scrollbar-color are for browsers without the pseudo-elements (Firefox) only: in Chrome
+ * (121 on) and Safari either one set makes the ::-webkit-scrollbar rules be ignored and the bar fades again — so never
+ * set them outside that @supports block on anything listed here.
+ *
+ * It is the app's scrollbar wherever something scrolls a panel, a rail, a list, a menu, a dialog or a page: the
+ * `.thin-scroll` class, and the scrolling regions below by name (one list, so a new region is a line here, not a
+ * class threaded through its component). Left native on purpose: tab strips that hide theirs, and what scrolls
+ * sideways in earnest — code and editors (`pre`, CodeMirror), the data tables and grids (EntityTable, the dataset
+ * grid, the tag matrix, Markdown and script-output tables), and the pan-and-zoom stages — where a 3 px bar is too
+ * small to drag.
+ */
+:root {
+  --thin-scroll: 3px;
+}
+@supports not selector(::-webkit-scrollbar) {
+  :where(.thin-scroll, .app-content, .ws-pane__body, .dialog, .epick__list, .cp__list, .col-menu, .et__choice-list, .tag-editor__suggest,
+    .gx-side__body, .gx-checklist, .gx-list, .gx-scenes__list, .gx-ap__cats, .gx-gate, .gg-result,
+    .insp__body, .dp-pane__body, .dp-finder__hits, .res__facets, .res__tabs,
+    .ai__scroll, .chats__rows, .chats__imported-body, .chome, .bridge-permission,
+    .docs__rail, .docs__body, .dp__rail, .dp__main, .anns__body, .annd__quote, .and__reader .dp__editor--reader, .vh-text__body,
+    .mp__main, .vp__main, .iw__list, .globe__list, .geo-page__info, .geo__side-body, .plot__side, .an__script-embed, .sc__out,
+    .claims, .cons, .cdlg__tpllist, .onto__detail-body, .sch, .xp__ref-body,
+    .projdlg__panel, .save-as__columns, .spotify-import__steps) {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scroll-thumb) transparent;
+  }
+}
+:where(.thin-scroll, .app-content, .ws-pane__body, .dialog, .epick__list, .cp__list, .col-menu, .et__choice-list, .tag-editor__suggest,
+  .gx-side__body, .gx-checklist, .gx-list, .gx-scenes__list, .gx-ap__cats, .gx-gate, .gg-result,
+  .insp__body, .dp-pane__body, .dp-finder__hits, .res__facets, .res__tabs,
+  .ai__scroll, .chats__rows, .chats__imported-body, .chome, .bridge-permission,
+  .docs__rail, .docs__body, .dp__rail, .dp__main, .anns__body, .annd__quote, .and__reader .dp__editor--reader, .vh-text__body,
+  .mp__main, .vp__main, .iw__list, .globe__list, .geo-page__info, .geo__side-body, .plot__side, .an__script-embed, .sc__out,
+  .claims, .cons, .cdlg__tpllist, .onto__detail-body, .sch, .xp__ref-body,
+  .projdlg__panel, .save-as__columns, .spotify-import__steps)::-webkit-scrollbar {
+  width: var(--thin-scroll);
+  height: var(--thin-scroll);
+}
+:where(.thin-scroll, .app-content, .ws-pane__body, .dialog, .epick__list, .cp__list, .col-menu, .et__choice-list, .tag-editor__suggest,
+  .gx-side__body, .gx-checklist, .gx-list, .gx-scenes__list, .gx-ap__cats, .gx-gate, .gg-result,
+  .insp__body, .dp-pane__body, .dp-finder__hits, .res__facets, .res__tabs,
+  .ai__scroll, .chats__rows, .chats__imported-body, .chome, .bridge-permission,
+  .docs__rail, .docs__body, .dp__rail, .dp__main, .anns__body, .annd__quote, .and__reader .dp__editor--reader, .vh-text__body,
+  .mp__main, .vp__main, .iw__list, .globe__list, .geo-page__info, .geo__side-body, .plot__side, .an__script-embed, .sc__out,
+  .claims, .cons, .cdlg__tpllist, .onto__detail-body, .sch, .xp__ref-body,
+  .projdlg__panel, .save-as__columns, .spotify-import__steps)::-webkit-scrollbar-track,
+:where(.thin-scroll, .app-content, .ws-pane__body, .dialog, .epick__list, .cp__list, .col-menu, .et__choice-list, .tag-editor__suggest,
+  .gx-side__body, .gx-checklist, .gx-list, .gx-scenes__list, .gx-ap__cats, .gx-gate, .gg-result,
+  .insp__body, .dp-pane__body, .dp-finder__hits, .res__facets, .res__tabs,
+  .ai__scroll, .chats__rows, .chats__imported-body, .chome, .bridge-permission,
+  .docs__rail, .docs__body, .dp__rail, .dp__main, .anns__body, .annd__quote, .and__reader .dp__editor--reader, .vh-text__body,
+  .mp__main, .vp__main, .iw__list, .globe__list, .geo-page__info, .geo__side-body, .plot__side, .an__script-embed, .sc__out,
+  .claims, .cons, .cdlg__tpllist, .onto__detail-body, .sch, .xp__ref-body,
+  .projdlg__panel, .save-as__columns, .spotify-import__steps)::-webkit-scrollbar-corner {
+  background: transparent;
+}
+:where(.thin-scroll, .app-content, .ws-pane__body, .dialog, .epick__list, .cp__list, .col-menu, .et__choice-list, .tag-editor__suggest,
+  .gx-side__body, .gx-checklist, .gx-list, .gx-scenes__list, .gx-ap__cats, .gx-gate, .gg-result,
+  .insp__body, .dp-pane__body, .dp-finder__hits, .res__facets, .res__tabs,
+  .ai__scroll, .chats__rows, .chats__imported-body, .chome, .bridge-permission,
+  .docs__rail, .docs__body, .dp__rail, .dp__main, .anns__body, .annd__quote, .and__reader .dp__editor--reader, .vh-text__body,
+  .mp__main, .vp__main, .iw__list, .globe__list, .geo-page__info, .geo__side-body, .plot__side, .an__script-embed, .sc__out,
+  .claims, .cons, .cdlg__tpllist, .onto__detail-body, .sch, .xp__ref-body,
+  .projdlg__panel, .save-as__columns, .spotify-import__steps)::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+  border-radius: 999px;
+}
+:where(.thin-scroll, .app-content, .ws-pane__body, .dialog, .epick__list, .cp__list, .col-menu, .et__choice-list, .tag-editor__suggest,
+  .gx-side__body, .gx-checklist, .gx-list, .gx-scenes__list, .gx-ap__cats, .gx-gate, .gg-result,
+  .insp__body, .dp-pane__body, .dp-finder__hits, .res__facets, .res__tabs,
+  .ai__scroll, .chats__rows, .chats__imported-body, .chome, .bridge-permission,
+  .docs__rail, .docs__body, .dp__rail, .dp__main, .anns__body, .annd__quote, .and__reader .dp__editor--reader, .vh-text__body,
+  .mp__main, .vp__main, .iw__list, .globe__list, .geo-page__info, .geo__side-body, .plot__side, .an__script-embed, .sc__out,
+  .claims, .cons, .cdlg__tpllist, .onto__detail-body, .sch, .xp__ref-body,
+  .projdlg__panel, .save-as__columns, .spotify-import__steps)::-webkit-scrollbar-thumb:hover {
+  background: var(--scroll-thumb-hover);
+}
+
+/* One visible ring for keyboard focus on every control, whatever a component's own focus style took away (WCAG 2.1
+   AA 2.4.7, 1.4.11): only on :focus-visible, so a click shows none. Editors and canvases draw their own, and so do
+   text fields — a browser counts every focused text field as :focus-visible, a click included, so the ring drew a
+   black box inside the chat composer and every search box; their caret and their own focus border (.input:focus,
+   .ai__input, the composer's :focus-within) say where typing goes. */
+:is(button, a[href], input:is([type='checkbox'], [type='radio'], [type='range'], [type='color'], [type='file'], [type='button'], [type='submit'], [type='reset']), select, summary, [role='button'], [role='tab'], [role='menuitem'], [role='menuitemcheckbox'], [role='option'], [role='switch'], [role='checkbox'], [role='radio'], [tabindex]:not([tabindex='-1'])):not([contenteditable], canvas):focus-visible {
+  outline: 2px solid var(--text) !important;
+  outline-offset: 2px;
+}
+.toast-live:empty {
+  display: contents;
+}
+
+/* Less motion when the system asks for it (WCAG 2.1 2.3.3): every transition and animation is cut to an instant — the
+   end state still arrives, and `transitionend` / `animationend` still fire for code that waits on them. What moves
+   from script (a camera's flight, a smooth scroll) asks `lib/motion.ts › prefersReducedMotion` and jumps instead. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

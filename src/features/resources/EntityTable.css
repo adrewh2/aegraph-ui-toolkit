@@ -1,0 +1,472 @@
+.et {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  overflow: hidden;
+  outline: none;
+}
+.et:focus-visible {
+  box-shadow: 0 0 0 3px rgba(31, 30, 27, 0.08);
+}
+.et__bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.et__search {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 4px 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+}
+.et__search:focus-within {
+  border-color: var(--border-strong);
+}
+.et__search input {
+  border: 0;
+  outline: 0;
+  width: 200px;
+  background: transparent;
+  font-size: 13px;
+  color: var(--text);
+}
+.et__bar .spacer {
+  flex: 1;
+}
+.et__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  position: relative;
+}
+.et__scroll.is-marquee,
+.et__scroll.is-marquee * {
+  user-select: none;
+  cursor: crosshair;
+}
+.et__marquee {
+  position: absolute;
+  pointer-events: none;
+  border: 1px solid #6f9ee0;
+  background: rgba(59, 125, 221, 0.12);
+  border-radius: 2px;
+  z-index: 3;
+}
+.et table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  font-size: 13px;
+}
+.et thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  height: 36px;
+  padding: 0 10px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  text-align: left;
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+  user-select: none;
+}
+.et thead tr.et__filters th {
+  top: 36px;
+  height: 34px;
+  padding: 0 4px;
+  background: var(--surface-2);
+}
+.et thead tr.et__filters input {
+  width: 100%;
+  height: 24px;
+  padding: 0 5px; /* placeholder text lines up with the column's text */
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 12px;
+  background: var(--surface);
+  outline: none;
+}
+.et thead tr.et__filters input:focus {
+  border-color: var(--border-strong);
+}
+/* Choice columns (type, tags, options) filter by ticking values in a dropdown instead of typing. */
+.et thead tr.et__filters .et__choice {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  height: 24px;
+  padding: 0 4px 0 5px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--text-faint);
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+.et thead tr.et__filters .et__choice:hover,
+.et thead tr.et__filters .et__choice.is-open {
+  border-color: var(--border-strong);
+}
+.et thead tr.et__filters .et__choice.is-active {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+.et__choice-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.et__choice-clear {
+  display: inline-flex;
+  padding: 2px;
+  border-radius: 3px;
+  color: var(--text-muted);
+}
+.et__choice-clear:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+.et__choice-menu {
+  width: 240px;
+  max-height: none;
+  overflow: visible;
+}
+.et__choice-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  padding: 0 6px;
+  height: 28px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.et__choice-search input {
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 12.5px;
+}
+.et__choice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 300px;
+  overflow: auto;
+}
+.et__choice-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.et__choice-count {
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+}
+.et__choice-none {
+  padding: 6px;
+  font-size: 12.5px;
+}
+.et__clear-filters {
+  color: #3b7ddd;
+}
+.et__th-inner {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+.et thead th.is-dragging {
+  opacity: 0.4;
+}
+.et thead th.is-drop-before,
+.et thead th.is-drop-after {
+  background: #eaf1fb;
+}
+.et thead th.is-drop-before::before,
+.et thead th.is-drop-after::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  background: #3b7ddd;
+  border-radius: 1px;
+}
+.et thead th.is-drop-before::before {
+  left: -1px;
+}
+.et thead th.is-drop-after::after {
+  right: -1px;
+}
+.et__th-inner:hover {
+  color: var(--text);
+}
+.et__resize {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 6px;
+  height: 100%;
+  cursor: col-resize;
+}
+.et__resize:hover {
+  background: var(--border-strong);
+}
+.et th,
+.et td {
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.et tbody td {
+  height: 34px;
+  padding: 0 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.et tbody tr {
+  cursor: default;
+}
+.et tbody tr:hover td {
+  background: var(--surface-hover);
+}
+.et tbody tr.is-context td {
+  box-shadow: inset 0 0 0 1px var(--border-strong);
+}
+.et tbody tr.is-context td:not(:first-child) {
+  box-shadow: inset 0 1px 0 var(--border-strong), inset 0 -1px 0 var(--border-strong);
+}
+.et tbody tr.is-context td:first-child {
+  box-shadow: inset 1px 1px 0 var(--border-strong), inset 0 -1px 0 var(--border-strong);
+}
+.et tbody tr.is-context td:last-child {
+  box-shadow: inset -1px 1px 0 var(--border-strong), inset 0 -1px 0 var(--border-strong);
+}
+.et tbody tr.is-selected td {
+  background: #ecebe6;
+}
+.et tbody tr.is-selected:hover td {
+  background: #e3e1db;
+}
+.et .col-fill {
+  width: auto;
+  padding: 0;
+}
+.et .col-check {
+  width: 36px;
+  padding: 0 0 0 10px;
+}
+.et .col-check input {
+  margin: 0;
+  vertical-align: middle;
+}
+.et__cell-edit {
+  width: 100%;
+  height: 28px;
+  padding: 0 6px;
+  border: 1px solid var(--text-faint);
+  border-radius: 4px;
+  background: var(--surface);
+  font-size: 13px;
+  outline: none;
+}
+textarea.et__cell-edit {
+  height: 80px;
+  padding: 4px 6px;
+  resize: none;
+  white-space: pre-wrap;
+}
+.et__tags {
+  display: flex;
+  gap: 4px;
+  overflow: hidden;
+}
+.et__thumb {
+  height: 28px;
+  width: 44px;
+  object-fit: cover;
+  border-radius: 4px;
+  vertical-align: middle;
+  background: var(--surface-2);
+}
+.et__empty {
+  padding: 48px;
+  text-align: center;
+  color: var(--text-muted);
+}
+.et__footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-2);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+/* Nothing in the footer shrinks or wraps but the count on the left, which is cut short: with a big table in a narrow
+   pane the count grew wide enough to squeeze the Rows label, which broke the word and its dropdown onto two lines. */
+.et__footer > * {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.et__footer > span:first-child {
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.et__footer label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.et__footer .spacer {
+  flex: 1;
+  flex-shrink: 1;
+}
+.et__footer select {
+  height: 24px;
+  padding: 0 4px;
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  background: var(--surface);
+  font-size: 12px;
+}
+.et .sort-icon {
+  opacity: 0.6;
+}
+.et__editable {
+  cursor: default;
+}
+.et__ref {
+  color: var(--link);
+  cursor: pointer;
+}
+.et__ref:hover {
+  text-decoration: underline;
+}
+/* The referenced entity's type after its label: grey, with the type's colour dot, not part of the link's underline. */
+.et__ref-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  color: var(--text-faint);
+  font-size: 11.5px;
+  text-decoration: none;
+}
+.et__ref-type > .res__facet-dot {
+  width: 7px;
+  height: 7px;
+}
+.tag-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 280px;
+}
+.tag-editor__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-height: 22px;
+}
+.tag-editor__suggest {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-height: 120px;
+  overflow: auto;
+}
+.tag-editor__suggest .chip {
+  cursor: pointer;
+  opacity: 0.85;
+}
+.tag-editor__suggest .chip:hover {
+  opacity: 1;
+}
+.col-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 320px;
+  overflow: auto;
+  width: 220px;
+}
+.col-menu label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 26px;
+  padding: 0 6px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.col-menu label:hover {
+  background: var(--surface-hover);
+}
+
+/* Type column as text with the type's colour (relationships). The dot sits in the gutter after the checkbox, so the text starts where label text starts in every other table. */
+.et__type {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 500;
+}
+/* Cells can't overflow, so the colour sits inside the cell's padding: a short bar flush with the cell edge, text at the usual x. */
+.et td:has(> .et__type) {
+  padding-left: 0;
+}
+.et__type > .res__facet-dot {
+  width: 4px;
+  height: 14px;
+  margin-right: 6px;
+  border-radius: 2px;
+  border: 0;
+}
+.et__cell-editor {
+  display: block;
+  min-width: 0;
+}
+.et__cell-editor select.et__cell-edit {
+  height: 26px;
+}
+
+/* A group in the Types list: the root type ticks its subtypes as one; the subtypes sit under it. */
+.et__choice-group + .et__choice-group {
+  margin-top: 2px;
+}
+.et__choice-group > label:first-child .et__choice-label {
+  font-weight: 500;
+}
+.et__choice-menu label.et__choice-sub {
+  padding-left: 22px;
+}

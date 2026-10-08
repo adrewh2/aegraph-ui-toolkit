@@ -1,0 +1,132 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+# Vite's pre-bundled dependencies, per checkout (vite.config.ts › cacheDir)
+.vite/
+dist
+dist-ssr
+# The headless engine's build (npm run build:headless)
+dist-headless
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ─────────────────────────────────────────────────────────────────────────
+# Your data must never land in the repo.
+#
+# Everything the app can write — a saved project, a bundle, an export, a
+# published page, a screenshot — is ignored by its shape, wherever it sits
+# in the tree, and the few such files this repo really ships are allowed
+# back one by one below. A demo project belongs in the aegraph-ui-demos
+# repository, not here. Never widen a rule to a whole directory.
+#
+# `.githooks/pre-commit` refuses these at commit time as well, for the case
+# where a file was staged with `git add -f`. See SECURITY.md.
+# ─────────────────────────────────────────────────────────────────────────
+
+# Anything the app saves or exports: project bundles and packs, in any form.
+*.ae.json
+*.aeb
+*.aegraph.json
+*.ae.json.gz
+*.aegraph.json.gz
+*.aeb.gz
+
+# The datasets, exports and published pages the app writes beside them. A file
+# dropped at the top of the tree is the app's doing, not the repo's — the
+# repo's own top-level files are named back, so adding one is deliberate.
+/*.csv
+/*.html
+/*.svg
+/*.png
+/*.gz
+!/index.html
+public/datasets/*
+downloads/
+exports/
+
+# The ones this repo does ship — every addition is deliberate.
+!public/spec/example.ae.json
+!public/templates/conversation-atlas.template.ae.json
+!src/**/*.ae.json
+!src/**/*.aegraph.json
+!src/assets/*.png
+!src/**/*.svg
+!public/brands/*.png
+
+# ChatGPT exports and anything derived from one, by any name.
+conversations.json
+conversations-*.json
+*chatgpt*
+!src/**/*chatgpt*
+!src/**/*ChatGpt*
+chat.html
+
+# Browser profiles the driver makes: cookies and live sign-in sessions.
+mcp-profile/
+*-profile/
+
+# Screenshots and recordings from a driven run, wherever they land.
+*.screenshot.png
+shot-*.png
+smoke-*.png
+
+# Environment files. Only the example is ever committed; every other form holds real keys.
+.env
+.env.*
+!.env.example
+# Keys and certificates, wherever they sit (.githooks/data-guard.sh refuses the same shapes).
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+id_dsa*
+id_ecdsa*
+id_ed25519*
+*service-account*.json
+
+# Python engine runtime + wheels, fetched by `npm run pyodide` (~100 MB)
+public/pyodide/
+# Demo projects from the aegraph-ui-demos repo, fetched by `npm run demos` (scripts/demos/fetch.mjs)
+public/demos/
+
+# Libraries for the Visual script sandbox, copied by `npm run vendor`
+public/vendor/
+
+# Vercel project link (local)
+.vercel
+
+# What the tools around the repo leave behind. An unignored directory is how a
+# `git add -A` sweeps something in; none of these belong to the project.
+.codex/
+.claude/settings.local.json
+dist-*/
+**/.probe/
+**/.temp/
+
+# Session exports (private conversations)
+public/datasets/session-trails*
+
+# Where the app's own file pickers default to, if someone points one at the repo.
+/projects/
+/aegraph-projects/
+
+# Brand marks dropped in locally (see public/brands/README.md): not ours to redistribute
+public/brands/*.svg

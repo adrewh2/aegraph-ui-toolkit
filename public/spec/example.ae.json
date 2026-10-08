@@ -1,0 +1,99 @@
+{
+  "$schema": "aegraph/v1",
+  "exportedAt": "2026-09-13T12:00:00.000Z",
+  "tags": [
+    { "tag": "reading", "color": "#3b82f6", "description": "Things to read" }
+  ],
+  "entities": [
+    {
+      "id": "type:claim",
+      "type": "schema:type",
+      "label": "Claim",
+      "tags": [],
+      "data": {
+        "name": "claim",
+        "category": "knowledge",
+        "color": "#e11d48",
+        "properties": [
+          { "key": "stance", "label": "Stance", "kind": "text", "options": ["supports", "disputes", "neutral"], "required": true },
+          { "key": "confidence", "label": "Confidence", "kind": "number" }
+        ]
+      },
+      "meta": { "createdAt": "2026-09-13T12:00:00.000Z", "updatedAt": "2026-09-13T12:00:00.000Z", "source": "import:example" }
+    },
+    {
+      "id": "w3c-semantic-web",
+      "type": "webpage",
+      "label": "The Semantic Web — W3C",
+      "tags": ["reading"],
+      "data": { "url": "https://www.w3.org/standards/semanticweb/" },
+      "meta": { "createdAt": "2026-09-13T12:00:00.000Z", "updatedAt": "2026-09-13T12:00:00.000Z", "source": "import:example" }
+    },
+    {
+      "id": "doc-notes",
+      "type": "document",
+      "label": "Reading notes",
+      "tags": ["reading"],
+      "data": { "extension": "md", "content": "# Notes\n\nLinked data is data with URIs for things and relationships." },
+      "meta": { "createdAt": "2026-09-13T12:00:00.000Z", "updatedAt": "2026-09-13T12:05:00.000Z", "createdBy": "andrew" }
+    },
+    {
+      "id": "tim-berners-lee",
+      "type": "person",
+      "label": "Tim Berners-Lee",
+      "tags": [],
+      "data": { "born": "1955-06-08" },
+      "meta": { "createdAt": "2026-09-13T12:00:00.000Z", "updatedAt": "2026-09-13T12:00:00.000Z" }
+    },
+    {
+      "id": "claim-1",
+      "type": "claim",
+      "label": "The web of data needs shared vocabularies",
+      "tags": [],
+      "data": { "stance": "supports", "confidence": 0.8 },
+      "meta": { "createdAt": "2026-09-13T12:00:00.000Z", "updatedAt": "2026-09-13T12:00:00.000Z", "createdBy": "agent:reader" }
+    },
+    {
+      "id": "ann-1",
+      "type": "annotation",
+      "label": "Key sentence",
+      "tags": [],
+      "data": { "annotationType": "text", "comment": "This is the thesis.", "selectedText": "The Semantic Web is a Web of Data" },
+      "meta": { "createdAt": "2026-09-13T12:01:00.000Z", "updatedAt": "2026-09-13T12:01:00.000Z" }
+    },
+    {
+      "id": "rel-ann-1",
+      "kind": "relationship",
+      "type": "annotates",
+      "tags": [],
+      "data": {},
+      "source": { "id": "ann-1" },
+      "target": { "id": "w3c-semantic-web", "selector": { "kind": "text", "exact": "The Semantic Web is a Web of Data" } },
+      "directed": true,
+      "meta": { "createdAt": "2026-09-13T12:01:00.000Z", "updatedAt": "2026-09-13T12:01:00.000Z" }
+    },
+    {
+      "id": "rel-author",
+      "kind": "relationship",
+      "type": "authored",
+      "label": "authored",
+      "tags": [],
+      "data": {},
+      "source": { "id": "tim-berners-lee" },
+      "target": { "id": "w3c-semantic-web" },
+      "directed": true,
+      "meta": { "createdAt": "2026-09-13T12:00:00.000Z", "updatedAt": "2026-09-13T12:00:00.000Z" }
+    },
+    {
+      "id": "rel-claim-source",
+      "kind": "relationship",
+      "type": "supported-by",
+      "tags": [],
+      "data": {},
+      "source": { "id": "claim-1" },
+      "target": { "id": "doc-notes", "selector": { "kind": "range", "start": 9, "end": 72 } },
+      "directed": true,
+      "meta": { "createdAt": "2026-09-13T12:02:00.000Z", "updatedAt": "2026-09-13T12:02:00.000Z" }
+    }
+  ]
+}

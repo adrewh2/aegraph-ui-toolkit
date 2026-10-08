@@ -1,0 +1,111 @@
+/* A tabbed detail pane: the workstation's tab strip over the standard detail view. */
+.dp-pane {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.dp-pane__body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+.dp-pane__empty {
+  padding: 24px 16px;
+  font-size: 13px;
+}
+/* The entity's type colour, where a view tab has its icon. */
+.dp-tab__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
+}
+.dp-finder {
+  padding: 6px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+}
+.dp-finder__box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.dp-finder__x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.dp-finder__x:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+.dp-finder__box input {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+}
+.dp-finder__hits {
+  display: flex;
+  flex-direction: column;
+  margin-top: 4px;
+  max-height: 260px;
+  overflow: auto;
+}
+.dp-finder__hit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.dp-finder__hit:hover {
+  background: var(--surface-hover);
+}
+.dp-finder__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* The page's own tab has no close button and keeps its icon. */
+.dp-tab--lead .ws-tab__label {
+  font-weight: 500;
+}
+.dp-pane__lead {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.dp-pane__lead .et {
+  flex: 1;
+  min-height: 0;
+}

@@ -1,0 +1,745 @@
+/* The Chats page: the list, the conversation, the artifacts — three columns that fill the page. */
+.chats {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  background: var(--bg);
+}
+
+/* ── The list ──────────────────────────────────────────────────────── */
+.chats__list {
+  display: flex;
+  flex-direction: column;
+  width: 240px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+  min-height: 0;
+}
+.chats__list-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 10px 6px 14px;
+}
+.chats__home {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  margin-left: -8px;
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+}
+.chats__home:hover,
+.chats__home.is-active {
+  background: var(--surface-hover);
+}
+.chats .spacer {
+  flex: 1;
+}
+.chats__search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 10px 6px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+.chats__search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+}
+.chats__rows {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 8px 12px;
+}
+.chats__group-label {
+  padding: 16px 10px 6px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+/* One list, not a stack of boxes: rows are quiet until hovered, an inset hairline between them (as in the
+   dropdowns), and the chat that is open lifts off the list as the one card. */
+.chats__group {
+  display: flex;
+  flex-direction: column;
+}
+.chats__row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  transition: background 120ms ease, box-shadow 120ms ease;
+}
+.chats__row + .chats__row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 10px;
+  left: 10px;
+  height: 1px;
+  background: var(--border);
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+.chats__row:is(:hover, .is-active)::before,
+.chats__row:is(:hover, .is-active) + .chats__row::before {
+  opacity: 0;
+}
+.chats__row:hover {
+  background: var(--surface-hover);
+}
+.chats__row.is-active {
+  background: var(--bg);
+  box-shadow: 0 0 0 1px var(--border), 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+.chats__row.is-active .chats__row-title {
+  font-weight: 600;
+}
+.chats__row-open {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  min-height: 52px;
+  flex: 1;
+  min-width: 0;
+  padding: 9px 26px 9px 10px;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+.chats__row-open:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  outline-offset: -2px;
+}
+/* A chat at work: the pulsing dot, in the row's bottom-right corner. */
+.chats__row-open .ai__tab-busy {
+  position: absolute;
+  right: 10px;
+  bottom: 12px;
+  margin: 0;
+}
+.chats__row-title {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+.chats__row-meta {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11.5px;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+.chats__row-close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: none;
+  padding: 3px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.chats__row:hover .chats__row-close {
+  display: inline-flex;
+}
+.chats__row-close:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.chats__group-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+.chats__group-toggle:hover {
+  color: var(--text);
+}
+.chats__more {
+  display: block;
+  width: 100%;
+  padding: 6px 8px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+.chats__more:hover {
+  color: var(--accent);
+}
+/* With nothing to list the column centres its one line, so the empty state reads as a state and not as a row. */
+.chats__rows--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.chats__none {
+  padding: 10px 8px;
+  font-size: 12px;
+  text-align: center;
+  text-wrap: balance;
+  max-width: 180px;
+}
+
+/* ── The conversation ──────────────────────────────────────────────── */
+.chats__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.chats__chat {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+.chats__thread {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 320px;
+}
+.chats__head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.chats__title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 2px 4px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: left;
+  cursor: default;
+}
+.chats__sub {
+  font-size: 12px;
+}
+.chats__rename {
+  flex: 1;
+  font: inherit;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 2px 6px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+}
+/* The thread fills the column; the dock's fixed width and full-height don't apply here. */
+.ai.chats__ai {
+  flex: 1;
+  min-height: 0;
+  width: auto;
+  height: auto;
+  border-left: 0;
+  background: var(--bg);
+}
+.chats__ai .ai__scroll,
+.chats__ai .ai__composer,
+.chats__ai .ai__pending {
+  width: 100%;
+  max-width: 820px;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+.chats__imported {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.chats__imported-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 12px;
+}
+.chats__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: auto;
+  padding: 24px;
+  font-size: 13px;
+  text-align: center;
+}
+
+/* ── The artifacts ─────────────────────────────────────────────────── */
+/* Not there until something is shown: it slides in from the right (width 0 → its width), and back out. */
+.chats__panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 0;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-left: 1px solid transparent;
+  background: var(--surface);
+  min-height: 0;
+  transition: width 220ms ease, border-color 220ms ease;
+}
+.chats__panel.is-open {
+  width: min(52%, 860px);
+  border-left-color: var(--border);
+}
+body.is-resizing .chats__panel {
+  transition: none;
+}
+body.is-resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+.chats__panel-grip {
+  position: absolute;
+  left: -3px;
+  top: 0;
+  bottom: 0;
+  width: 7px;
+  cursor: col-resize;
+  z-index: 3;
+}
+.chats__panel-grip:hover {
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+.chats__host {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  /* The panel's width animates; its contents keep the width they will have, so nothing reflows mid-slide. */
+  min-width: 340px;
+}
+.chats__host > * {
+  flex: 1;
+  min-height: 0;
+}
+/* The pane host is made to fill a page (100vh, bleeding over the page's padding); here it fills the panel. */
+.chats__host > .ws {
+  height: auto;
+  margin: 0;
+}
+.chats__host-empty {
+  margin: auto;
+  padding: 24px;
+  font-size: 12px;
+  text-align: center;
+}
+
+/* The header's Artifacts menu button. */
+.chats__artifacts-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.chats__artifacts-btn:hover {
+  border-color: var(--accent);
+}
+.chats__artifacts-btn.is-empty {
+  color: var(--text-muted);
+}
+.chats__count {
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+}
+
+/* ── One artifact (/artifact/:id) ──────────────────────────────────── */
+.artifact {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--bg);
+}
+.artifact__body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.artifact__body > * {
+  flex: 1;
+  min-height: 0;
+}
+
+@media (max-width: 1100px) {
+  .chats__list {
+    width: 200px;
+  }
+}
+
+/* ── The landing (/chats) ─────────────────────────────────────────────── */
+.chome {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background:
+    radial-gradient(1200px 420px at 50% -120px, color-mix(in srgb, var(--accent) 9%, transparent), transparent 70%),
+    var(--bg);
+}
+.chome__inner {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 9vh 32px 64px;
+}
+.chome__hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 28px;
+}
+.chome__greet {
+  margin: 0 0 4px;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+.chome__title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 34px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.chome__lede {
+  max-width: 520px;
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.chome__composer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 14px 10px 18px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 28px rgba(0, 0, 0, 0.06);
+  cursor: text;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+.chome__settings {
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 28px rgba(0, 0, 0, 0.06);
+}
+.chome__composer:focus-within {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 10px 32px color-mix(in srgb, var(--accent) 14%, transparent);
+}
+.chome__input {
+  border: 0;
+  outline: 0;
+  resize: none;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.55;
+  min-height: 72px;
+}
+.chome__composer-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.chome__hint {
+  flex: 1;
+  font-size: 11px;
+}
+.chome__send {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+}
+.chome__suggestions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+.chome__suggestion {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
+}
+.chome__suggestion:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  background: var(--surface);
+  color: var(--text);
+}
+.chome__suggestion > svg {
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-top: 2px;
+  color: var(--accent);
+}
+.chome__suggestion-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.chome__suggestion-title {
+  color: var(--text);
+  font-weight: 550;
+}
+.chome__suggestion-hint {
+  font-size: 12px;
+  line-height: 1.35;
+}
+.chome__section {
+  margin-top: 40px;
+}
+.chome__h2 {
+  margin: 0 0 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.chome__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 10px;
+}
+.chome__card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 118px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 120ms ease, transform 120ms ease, box-shadow 120ms ease;
+}
+.chome__card:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+.chome__card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.chome__card-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 13px;
+}
+.chome__card-last {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.chome__card-foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  font-size: 11px;
+}
+.chome__card-foot .spacer {
+  flex: 1;
+}
+.chome__made {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 8px;
+}
+.chome__artifact {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.chome__artifact:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  background: var(--surface);
+}
+.chome__artifact-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+.chome__artifact-icon--map {
+  color: #2f855a;
+  background: color-mix(in srgb, #2f855a 12%, var(--surface));
+}
+.chome__artifact-icon--document {
+  color: #2b6cb0;
+  background: color-mix(in srgb, #2b6cb0 12%, var(--surface));
+}
+.chome__artifact-icon--diagram {
+  color: #805ad5;
+  background: color-mix(in srgb, #805ad5 12%, var(--surface));
+}
+.chome__artifact-icon--scene {
+  color: #c05621;
+  background: color-mix(in srgb, #c05621 12%, var(--surface));
+}
+.chome__artifact-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.chome__artifact-label,
+.chome__artifact-chat {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chome__artifact-label {
+  font-size: 13px;
+}
+.chome__artifact-chat {
+  font-size: 11px;
+}
+@media (max-width: 900px) {
+  .chome__suggestions {
+    grid-template-columns: 1fr;
+  }
+  .chome__inner {
+    padding: 6vh 20px 48px;
+  }
+}
+
+/* ── One experience: the chat's composer is the landing's ─────────────── */
+.chats__ai .ai__composer {
+  margin-bottom: 14px;
+  padding: 10px 10px 10px 14px;
+  border: 1px solid var(--border);
+  border-top: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.05);
+  width: calc(100% - 28px);
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+.chats__ai .ai__composer:focus-within {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+}
+.chats__ai .ai__input {
+  border: 0;
+  background: transparent;
+  padding: 4px 0;
+  font-size: 14.5px;
+}
+.chats__ai .ai__input:focus {
+  outline: 0;
+}
+/* The panel's tab bar lines up with the chat's header beside it. */
+.chats__host .ws-tabbar {
+  min-height: 44px;
+  box-sizing: border-box;
+}

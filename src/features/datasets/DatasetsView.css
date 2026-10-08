@@ -1,0 +1,195 @@
+.ds {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+/* Keep the intro copy readable; the stat row and card grid fill the width. */
+.ds > div:first-child {
+  max-width: 72ch;
+}
+.ds__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+.ds__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.ds__stat-label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.ds__stat-value {
+  font-size: 22px;
+  font-weight: 600;
+}
+.ds__job {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.ds__job-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.ds__job-head .muted {
+  flex: 1;
+  font-weight: 400;
+}
+.ds__bar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.ds__bar-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 120ms linear;
+}
+.ds__mode {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+}
+.ds__mode label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.ds__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 12px;
+}
+.ds__card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  min-width: 0; /* let long action rows wrap instead of widening the cell */
+}
+.ds__card header {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.ds__card h2 {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.ds__card p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.ds__card code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 0 3px;
+  border-radius: 3px;
+  background: var(--surface-2);
+}
+.ds__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  flex-shrink: 0;
+}
+.ds__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  min-width: 0;
+}
+.ds__actions .input {
+  min-width: 0;
+}
+.ds__presets {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.ds__inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-left: 6px;
+  white-space: nowrap;
+}
+.ds__drop {
+  border-style: dashed;
+}
+.ds__drop.is-dragging {
+  border-color: var(--text);
+  background: var(--surface-2);
+}
+.ds__log {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+.ds__log h3 {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.ds__log .mono {
+  padding: 3px 0;
+  color: var(--text-muted);
+}
+.ds__template-name {
+  flex: 1 1 100%;
+  font-size: 13px;
+}
+
+/* Demo projects from the demos repo: a preview thumbnail where the icon goes, highlights under the description. */
+.ds__preview {
+  width: 96px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--surface-2);
+}
+.ds__highlights {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+.ds__counts {
+  font-size: 12px;
+}

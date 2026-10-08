@@ -1,0 +1,593 @@
+.sb {
+  --sb-width: 248px;
+  --sb-bg: #f5f4f0;
+  --sb-border: #e6e4de;
+  --sb-text: #1f1e1b;
+  --sb-muted: #6d6b66;
+  --sb-hover: #ecebe6;
+  --sb-active: #e3e1db;
+  --sb-input-bg: #fbfaf8;
+  --sb-input-border: #dedcd5;
+  --sb-scroll-thumb: var(--scroll-thumb);
+  --sb-scroll-thumb-hover: var(--scroll-thumb-hover);
+
+  width: var(--sb-width);
+  flex: 0 0 var(--sb-width);
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0 12px 12px;
+  box-sizing: border-box;
+  background: var(--sb-bg);
+  border-right: 1px solid var(--sb-border);
+  color: var(--sb-text);
+  font-size: 14px;
+  overflow: hidden;
+}
+
+/* Folded to the icon rail: every row is its icon, centred; labels, hints and states are gone (the rows keep
+   their tooltips). The width change is a transition, so the page slides rather than jumps. */
+.sb {
+  transition: width 160ms ease, flex-basis 160ms ease;
+}
+.sb--rail {
+  --sb-width: 56px;
+  padding: 0 8px 12px;
+}
+.sb--rail .sb-header {
+  justify-content: center;
+  padding: 0;
+}
+.sb--rail .sb-item {
+  justify-content: center;
+  gap: 0;
+  padding: 0;
+}
+.sb--rail .sb-item__label,
+.sb--rail .sb-item__chevron,
+.sb--rail .sb-item__trailing,
+.sb--rail .sb-item > .sb-kbd-group,
+.sb--rail .sb-badge,
+.sb--rail .bridge-item__state {
+  display: none;
+}
+.sb--rail .bridge-item {
+  position: relative;
+}
+.sb--rail .bridge-item__dot {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+}
+
+/* Nothing in the sidebar shrinks... */
+.sb > :not(.sb-spacer) {
+  flex-shrink: 0;
+}
+
+/* ...except the primary nav, which is the one scrolling region. Everything below it —
+   Documentation, Assistant, Claude Code and the account row — stays pinned to the bottom
+   instead of being pushed off when the nav outgrows the viewport. min-height:0 is what
+   lets a flex child actually scroll rather than grow past its parent. */
+.sb > .sb-nav--scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Rows inside the nav are flex children too, so without this they compress to fit the
+   available height instead of overflowing it — the nav scrunches rather than scrolls. */
+.sb-nav > *,
+.sb-group__children > * {
+  flex-shrink: 0;
+}
+
+/* Whenever the nav can scroll, its scrollbar stays visible so the rows below the fold are
+   discoverable. macOS overlay scrollbars fade out on their own; giving ::-webkit-scrollbar
+   explicit rules opts this element out of that. overflow-y stays `auto`, so the scrollbar
+   still only appears when it is actually needed.
+   The standard scrollbar-width / scrollbar-color are for browsers without the pseudo-elements
+   (Firefox) only: in Chrome (121 on) and Safari either one set makes the ::-webkit-scrollbar
+   rules be ignored, and the bar goes back to an overlay that fades. */
+@supports not selector(::-webkit-scrollbar) {
+  .sb-nav--scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--sb-scroll-thumb) transparent;
+  }
+}
+.sb-nav--scroll::-webkit-scrollbar {
+  width: 3px;
+}
+.sb-nav--scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sb-nav--scroll::-webkit-scrollbar-thumb {
+  background: var(--sb-scroll-thumb);
+  border-radius: 999px;
+}
+.sb-nav--scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--sb-scroll-thumb-hover);
+}
+
+/* On the icon rail a full-width bar would shove the icons off-centre. */
+.sb--rail .sb-nav--scroll::-webkit-scrollbar {
+  width: 2px;
+}
+
+.sb button,
+.sb input,
+.sb kbd {
+  font: inherit;
+  color: inherit;
+}
+
+/* Header */
+.sb-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 44px;
+  padding: 0 4px 0 6px;
+}
+.sb-header__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.sb-title {
+  font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.sb-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--sb-muted);
+  cursor: pointer;
+}
+.sb-icon-btn:hover {
+  background: var(--sb-hover);
+  color: var(--sb-text);
+}
+
+/* Workspace select */
+.sb-select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 34px;
+  margin-top: 4px;
+  padding: 0 10px;
+  border: 1px solid var(--sb-input-border);
+  border-radius: 8px;
+  background: var(--sb-input-bg);
+  cursor: pointer;
+  text-align: left;
+}
+.sb-select:hover {
+  border-color: #cfccc4;
+}
+.sb-select__icon {
+  color: var(--sb-muted);
+}
+.sb-select__label {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sb-select__chevron {
+  color: var(--sb-muted);
+}
+
+/* Search */
+/* The search box is a button that opens the ⌘K palette; it looks like the field it stands for. */
+.sb-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 34px;
+  margin-top: 8px;
+  padding: 0 8px 0 10px;
+  border: 1px solid var(--sb-input-border);
+  border-radius: 8px;
+  background: var(--sb-input-bg);
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: text;
+}
+.sb-search:hover,
+.sb-search:focus-visible {
+  border-color: #b8b5ac;
+  outline: 0;
+}
+.sb-search__icon {
+  color: var(--sb-muted);
+  flex-shrink: 0;
+}
+.sb-search__placeholder {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #9b9993;
+}
+.sb-kbd-group {
+  display: inline-flex;
+  gap: 3px;
+}
+.sb-kbd-group kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border: 1px solid var(--sb-input-border);
+  border-radius: 4px;
+  background: #fff;
+  font-size: 11px;
+  color: var(--sb-muted);
+}
+
+/* Nav */
+.sb-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-top: 12px;
+}
+
+.sb-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 34px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  color: var(--sb-text);
+}
+.sb-item:hover {
+  background: var(--sb-hover);
+}
+.sb-item--active {
+  background: var(--sb-active);
+  font-weight: 500;
+}
+.sb-item--nested {
+  height: 32px;
+  padding-left: 34px;
+}
+.sb-item__icon {
+  display: inline-flex;
+  color: var(--sb-muted);
+  flex-shrink: 0;
+}
+.sb-item--active .sb-item__icon {
+  color: var(--sb-text);
+}
+.sb-item__label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sb-item__chevron {
+  display: inline-flex;
+  color: var(--sb-muted);
+}
+/* A group that is also a page: the row holds two buttons side by side — the page, and the chevron that folds it. */
+.sb-item--split {
+  gap: 0;
+  padding: 0;
+  cursor: default;
+}
+.sb-item--split > .sb-item__main {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  height: 100%;
+  padding: 0 0 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.sb-item--split > .sb-item__chevron {
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 10px 0 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+}
+.sb-item__trailing {
+  color: var(--sb-muted);
+  font-size: 13px;
+}
+
+.sb-badge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #dbe6f7;
+  color: #2a4f8a;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.sb-group__children {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-top: 1px;
+}
+
+.sb-spacer {
+  flex: 0 0 auto;
+  min-height: 16px;
+}
+
+.sb-divider {
+  height: 1px;
+  margin: 0 -12px;
+  background: var(--sb-border);
+}
+
+/* Footer */
+/* The foot of the sidebar: the account and settings button, and — where the edition's code is public — a link to it on
+   the left. On the rail they stack, centred like the rows above. */
+.sb-foot {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+}
+.sb-foot--rail {
+  flex-direction: column;
+}
+.sb-repo {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  color: var(--text-muted);
+}
+.sb-repo:hover {
+  background: var(--sb-hover);
+  color: var(--text);
+}
+.sb-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px 6px 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+}
+.sb-footer:hover,
+.sb-footer.is-open {
+  background: var(--sb-hover);
+}
+/* On the rail the button is the icon alone, centred like the rows above it. */
+.sb-footer--rail {
+  width: auto;
+  padding: 4px;
+  margin: 0 auto;
+}
+.sb-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--sb-input-border);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--sb-muted);
+  flex-shrink: 0;
+}
+.sb-footer__text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  line-height: 1.2;
+}
+/* One line each, cut short rather than wrapped: the button shares its row with the repository link in some editions. */
+.sb-footer__name,
+.sb-footer__meta {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sb-footer__name {
+  font-weight: 500;
+}
+.sb-footer__meta {
+  font-size: 12px;
+  color: var(--sb-muted);
+}
+.sb-footer__chevron {
+  color: var(--sb-muted);
+}
+
+/* Shortcut hint on a nav row sits at the right edge */
+.sb-item > .sb-kbd-group {
+  margin-left: auto;
+}
+
+/* How much a page holds, beside its name: a small solid figure in the muted ink, set in tabular numerals so
+   the column of counts lines up. Quieter than the label by size and colour, not by fading — a number at half
+   opacity reads as thin and broken rather than secondary. The label is flex:1, so this sits at the right edge
+   on a leaf and just before the chevron on a group. */
+.sb-item__count {
+  padding-left: 8px;
+  color: var(--sb-muted);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+}
+.sb-item--active .sb-item__count,
+.sb-item:hover .sb-item__count {
+  color: var(--sb-text);
+}
+.sb--rail .sb-item__count {
+  display: none;
+}
+
+/* The mark on the rail: the fold button wears the wordmark's head, "ae", and shows the panel icon under the
+   pointer so what it does is still obvious. Both sit in the same 28px box, one on top of the other. */
+.sb-logo-btn {
+  position: relative;
+  color: var(--sb-text);
+}
+.sb-logo-btn__mark {
+  font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.sb-logo-btn__icon {
+  position: absolute;
+  inset: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  color: var(--sb-muted);
+}
+.sb-logo-btn:hover .sb-logo-btn__mark,
+.sb-logo-btn:focus-visible .sb-logo-btn__mark {
+  opacity: 0;
+}
+.sb-logo-btn:hover .sb-logo-btn__icon,
+.sb-logo-btn:focus-visible .sb-logo-btn__icon {
+  opacity: 1;
+}
+
+/* A rail row with its group open reads as pressed, the way the page it belongs to would. */
+.sb--rail .sb-item--open {
+  background: var(--sb-active);
+}
+
+/* What a rail icon is, said beside it. A leaf gets its name; a group gets its pages as a menu. It is portalled to
+   the body — the nav scrolls and the sidebar clips, so anything positioned inside them would be cut off — and so
+   it carries its own colours rather than the sidebar's custom properties. */
+.sb-flyout {
+  position: fixed;
+  z-index: 60;
+  min-width: 168px;
+  padding: 6px;
+  border: 1px solid #e0ded7;
+  border-radius: 10px;
+  background: #fffefb;
+  box-shadow: 0 10px 28px rgba(31, 30, 27, 0.14);
+  color: #1f1e1b;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+/* The pointer has to cross the gap between icon and panel; this keeps it inside the element while it does. */
+.sb-flyout::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -10px;
+  width: 10px;
+}
+.sb-flyout__title {
+  padding: 4px 8px;
+  color: #6d6b66;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+/* A leaf has nothing under its name: the panel is then just a label, and says so quietly. */
+.sb-flyout--tip {
+  min-width: 0;
+  padding: 2px 2px;
+}
+.sb-flyout--tip .sb-flyout__title {
+  padding: 3px 8px;
+  color: #1f1e1b;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+}
+.sb-flyout__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.sb-flyout__item:hover {
+  background: #ecebe6;
+}
+.sb-flyout__item--active {
+  background: #e3e1db;
+  font-weight: 500;
+}
+.sb-flyout__label {
+  flex: 1;
+  white-space: nowrap;
+}
+.sb-foot .sb-footer {
+  flex: 1;
+  min-width: 0;
+}
+.sb-foot--rail .sb-footer {
+  flex: none;
+}
