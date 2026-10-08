@@ -1,0 +1,90 @@
+.bridge-item__state {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: var(--sb-muted, var(--text-faint));
+}
+.bridge-item__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-faint);
+  flex-shrink: 0;
+}
+.bridge-item--connecting .bridge-item__dot {
+  background: #d97706;
+  animation: bridge-pulse 1.2s ease-in-out infinite;
+}
+.bridge-item--connected .bridge-item__dot {
+  background: var(--ok-text);
+}
+@keyframes bridge-pulse {
+  50% {
+    opacity: 0.3;
+  }
+}
+.bridge-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.bridge-howto {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+.bridge-howto__title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+  margin-bottom: 4px;
+}
+.bridge-howto pre {
+  margin: 0 0 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+/* A command to copy: the line, wrapped where it must, and its Copy button beside it. */
+.bridge-howto__cmd {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.bridge-howto__cmd pre {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  word-break: break-all;
+  user-select: all;
+}
+.bridge-howto__cmd .btn {
+  flex: none;
+}
+.bridge-howto__title:not(:first-child) {
+  margin-top: 10px;
+}
+
+/* The options of a question from Claude Code, one button each. */
+.bridge-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* A permission question, whole and as written: a command's payload may sit anywhere in it. */
+.bridge-permission {
+  margin: 0;
+  max-height: 50vh;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 12px;
+}

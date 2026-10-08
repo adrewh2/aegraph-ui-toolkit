@@ -1,0 +1,18 @@
+/* The canvas fills whatever box it is given; the host decides the size. */
+.diagram-editor {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+}
+.diagram-editor .excalidraw {
+  --color-primary: var(--accent, #6965db);
+  --color-primary-darker: var(--accent, #5b57d1);
+  --color-primary-darkest: var(--accent, #4a47b1);
+  --color-primary-light: var(--info-bg, #e3e2fe);
+  font-family: inherit;
+}
+/* Excalidraw's shape library sidebar says "Library", which means something else in this app; keep it out of the way. */
+.diagram-editor .excalidraw .default-sidebar-trigger {
+  display: none;
+}

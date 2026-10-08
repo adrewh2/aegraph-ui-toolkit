@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "aegraph": {
+      "command": "node",
+      "args": ["mcp/server.mjs"]
+    }
+  }
+}

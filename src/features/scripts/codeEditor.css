@@ -1,0 +1,53 @@
+.ce {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  overflow: hidden;
+}
+.ce .cm-editor {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  background: var(--surface);
+}
+.ce .cm-editor.cm-focused {
+  outline: none;
+}
+.ce .cm-scroller {
+  line-height: 1.55;
+  overflow: auto;
+}
+.ce .cm-content {
+  padding: 12px 0;
+}
+.ce .cm-gutters {
+  background: var(--surface);
+  color: var(--text-faint);
+  border-right: 1px solid var(--border);
+}
+.ce .cm-activeLineGutter,
+.ce .cm-activeLine {
+  background: color-mix(in srgb, var(--surface-2) 70%, transparent);
+}
+.ce .cm-selectionBackground,
+.ce .cm-editor ::selection {
+  background: #cfe0f7 !important;
+}
+
+/*
+ * The colours code is set in, the page's own rather than CodeMirror's: the same ink as the text, the link's rust
+ * for keywords, a green for strings, amber for numbers, a deep teal for what is called, and comments faint.
+ * `CodeEditor.tsx` maps the syntax tags onto these.
+ */
+:root {
+  --code-text: #33312c;
+  --code-comment: #a3a099;
+  --code-keyword: #9a3412;
+  --code-string: #3f6212;
+  --code-number: #a16207;
+  --code-function: #0f6f6a;
+  --code-type: #7c4a1e;
+  --code-property: #5b5852;
+  --code-punctuation: #8a877f;
+}

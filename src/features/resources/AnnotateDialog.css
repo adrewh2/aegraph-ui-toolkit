@@ -1,0 +1,202 @@
+/* Adaptive stage of the New annotation dialog: one fixed height whatever the target is. */
+.and__stage {
+  display: flex;
+  flex-direction: column;
+  height: 460px;
+  margin: 4px 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.and__stage-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 8px 0 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 12px;
+}
+.and__stage-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  font-weight: 500;
+}
+.and__whole {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+.and__stage-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.and__hint {
+  margin: 0;
+  padding: 16px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.and__passage,
+.and__image,
+.and__reader {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.and__text {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  outline: 0;
+  resize: none;
+  background: var(--surface);
+  font: 13px/1.55 var(--font-mono, ui-monospace, Menlo, monospace);
+  color: var(--text);
+  box-sizing: border-box;
+}
+.and__text::selection {
+  background: #fde68a;
+}
+.and__quote {
+  flex: 1;
+  min-height: 0;
+  margin: 10px 12px 12px;
+  resize: none;
+}
+.and__quote-preview {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 4px 12px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 12px;
+}
+.and__quote-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.and__image .ia {
+  flex: 1;
+  min-height: 0;
+}
+.and__image.is-disabled .ia {
+  opacity: 0.5;
+  pointer-events: none;
+}
+.and__time > .re {
+  flex: 1;
+  padding: 16px 16px 8px;
+  justify-content: center;
+}
+.and__time.is-disabled > .re {
+  opacity: 0.5;
+  pointer-events: none;
+}
+.and__comment {
+  min-height: 72px;
+}
+.and__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 600px) {
+  .and__row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Rich document reader */
+.and__reader .dp__editor--reader {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  background: var(--surface);
+}
+.and__reader .dp__prose--reader {
+  min-height: 0;
+  padding: 14px 20px 24px;
+  font-size: 14px;
+}
+.and__reader .dp__prose--reader ::selection {
+  background: #fde68a;
+}
+.and__reader.is-disabled .dp__editor--reader {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Video / audio pickers */
+.vpk,
+.apk {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.vpk.is-disabled > *,
+.apk.is-disabled > * {
+  opacity: 0.5;
+  pointer-events: none;
+}
+.vpk__bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 36px;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 12px;
+  overflow: hidden;
+}
+.vpk__bar .btn {
+  white-space: nowrap;
+}
+.vpk__status {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.vpk__stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  padding: 8px 12px 0;
+}
+.vpk__frame {
+  height: 100%;
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+  box-shadow: none;
+}
+.vpk__timeline {
+  flex-shrink: 0;
+  padding: 0 12px 6px;
+}
+.apk__stage {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 10px 12px 6px;
+}
+.apk__editor {
+  padding: 8px 0 0;
+}

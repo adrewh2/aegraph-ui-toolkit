@@ -1,0 +1,346 @@
+/* Diagram page: source on the left, live render on the right. */
+.dgp__main {
+  overflow: hidden;
+}
+.dgp__split {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+}
+.dgp__editor {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+}
+.dgp__source {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  padding: 14px 16px;
+  border: 0;
+  outline: 0;
+  resize: none;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.55;
+  tab-size: 2;
+  /* Long lines wrap: a source pane must never scroll sideways — a trackpad's horizontal drift used to leave
+     the text stranded off the left edge. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.dgp__warnings {
+  padding: 6px 12px;
+  border-top: 1px solid var(--border);
+  background: var(--warn-bg);
+  color: var(--warn-text);
+  font-size: 11px;
+  font-family: var(--font-mono);
+}
+.dgp__gutter {
+  width: 6px;
+  flex-shrink: 0;
+  cursor: col-resize;
+  background: transparent;
+  touch-action: none;
+  overscroll-behavior: contain;
+}
+.dgp__gutter:hover {
+  background: var(--border-strong);
+}
+/* The preview and what sits over its corner (the keys hint), which stays put while the preview scrolls. */
+.dgp__stage {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+.dgp__preview {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: auto;
+  padding: 20px;
+  background: var(--bg);
+}
+.dgp__svg {
+  display: inline-block;
+  min-width: 100%;
+  transition: opacity 120ms;
+}
+.dgp__svg.is-stale {
+  opacity: 0.6;
+}
+.dgp__svg img {
+  max-width: none;
+  height: auto;
+  display: block;
+}
+.dgp__error {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  background: var(--danger-bg);
+  color: var(--danger);
+  font-size: 12px;
+  font-family: var(--font-mono);
+  white-space: pre-wrap;
+}
+
+/* Index cards */
+.dgi__thumb {
+  background: #fff;
+  overflow: hidden;
+}
+.dgi__svg {
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* The picture is an image (DiagramPicture), shown whole: more specific than the image grid's `.ig__thumb img`, which crops. */
+.dgi__thumb .dgi__svg img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.dgi__code--pending {
+  opacity: 0.5;
+}
+.dgi__code {
+  margin: 0;
+  padding: 10px 12px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.45;
+  color: var(--text-muted);
+  white-space: pre;
+  overflow: hidden;
+}
+
+/* Import wizard */
+.iw {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.iw section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.iw section:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.iw h4 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+.iw h4 .gx-select {
+  margin-left: auto;
+}
+.iw__stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.iw__stat {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+.iw__stat-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.iw__stat-value {
+  font-size: 18px;
+  font-weight: 600;
+}
+.iw__cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.iw__cols h4 {
+  margin-bottom: 6px;
+}
+.iw__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 200px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.iw__list--tall {
+  max-height: 260px;
+}
+.iw__list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+.iw__list li:last-child {
+  border-bottom: 0;
+}
+.iw__list li .faint {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.iw__map {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.iw__map th {
+  text-align: left;
+  font-weight: 500;
+  color: var(--text-faint);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+}
+.iw__map td {
+  padding: 3px 6px;
+}
+.iw__map td .input {
+  width: 100%;
+  height: 28px;
+}
+.iw__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+}
+.iw__row > span:first-child {
+  flex: 0 0 240px;
+  color: var(--text-muted);
+}
+.iw__row .input {
+  flex: 1;
+  height: 28px;
+}
+.iw__check {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 12px;
+  cursor: pointer;
+}
+.iw__check input {
+  margin-top: 2px;
+}
+.iw__warn {
+  font-size: 12px;
+  color: var(--warn-text);
+}
+.iw__warn ul {
+  margin: 6px 0 0;
+  padding-left: 16px;
+}
+
+/* Workbench (page + inspector) */
+.dgw {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.dgw > .dp__toolbar {
+  flex-shrink: 0;
+}
+.dgw > .dgp__split {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+}
+.dgw--compact {
+  height: 100%;
+}
+.dgw__bar {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.dgw__bar .tb {
+  flex-wrap: wrap;
+  row-gap: 6px;
+}
+.dgw__status {
+  padding: 4px 10px;
+  font-size: 12px;
+  border-top: 1px solid var(--border);
+}
+.dgp__split--stacked {
+  flex-direction: column;
+}
+.dgp__split--stacked .dgp__editor {
+  min-height: 120px;
+  border-right: 0;
+  border-bottom: 1px solid var(--border);
+}
+.dgp__split--stacked .dgp__gutter {
+  width: auto;
+  height: 6px;
+  cursor: row-resize;
+}
+.dgp__split--stacked .dgp__preview {
+  min-height: 200px;
+}
+
+/* The drawing canvas takes the split's place and fills it. */
+.dgw > .dgp__canvas {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+.dgw--compact > .dgp__canvas {
+  min-height: 360px;
+}
+.dgp__canvas > .diagram-editor {
+  flex: 1;
+}
+/* Save + its menu, as one control. */
+.dp__save {
+  display: inline-flex;
+}
+.dp__save > .btn:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.dp__save > .btn:last-child {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  margin-left: -1px;
+  padding-inline: 4px;
+}

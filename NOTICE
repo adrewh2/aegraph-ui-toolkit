@@ -1,0 +1,24 @@
+aegraph-ui-toolkit
+Copyright 2026 Andrew Han
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+aegraph-ui-toolkit is a modified public version of aegraph-ui, a private
+repository (Copyright 2026 Andrew Han, Apache-2.0). The modifications: the
+Supabase sign-in (GitHub and Google), the assistant's allow list and its Admin
+page, free chat and the site's server functions (api/) are removed; the dev
+server's two local handlers live in dev/; the Admin page's browser tools are
+the This browser page (/browser); the default project is the aegraph-ui system
+map. Everything else is aegraph-ui's code as it was.
+
+Apache-2.0 asks anyone distributing a derivative work to carry this file
+along. A fork adds its own copyright line below this one; it does not replace it.
+
+This product bundles third-party software under their own licences; see
+package.json and the `licenses` of the packages it names. Among them, the
+built app bundles elkjs (the Eclipse Layout Kernel), used under the Eclipse
+Public License 2.0 (EPL-2.0); its source is at
+https://github.com/kieler/elkjs. The documents under
+public/spec and public/templates are made for this repository, Apache-2.0
+with the rest of it. The demo projects live in the aegraph-ui-demos
+repository, each with its sources' terms.

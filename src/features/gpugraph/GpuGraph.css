@@ -1,0 +1,580 @@
+/* The GPU renderer's stage: the WebGPU/WebGL2 canvas, the label canvas over it, the HUD and menus over both. */
+.gg {
+  overflow: hidden;
+}
+.gg-host {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.gg-host canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.gg-host canvas.gg-labels {
+  pointer-events: none;
+}
+.gg-marquee {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border: 1px solid var(--accent);
+  background: rgba(31, 30, 27, 0.06);
+  pointer-events: none;
+  z-index: 3;
+}
+.gg-toolbar {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  gap: 6px;
+  z-index: 4;
+}
+.gg-menu {
+  position: relative;
+}
+.gg-menu__list {
+  position: absolute;
+  /* The toolbar sits at the stage's top left, so a list hangs from its button's left edge and grows to the right —
+     hung from the right edge it would reach past the stage, which clips it. */
+  left: 0;
+  top: calc(100% + 4px);
+  min-width: 180px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  z-index: 5;
+}
+.gg-menu__list button {
+  text-align: left;
+  border: 0;
+  background: transparent;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font: inherit;
+  color: var(--text);
+  cursor: pointer;
+}
+.gg-menu__list button:hover {
+  background: var(--surface-hover);
+}
+.gg-menu__label {
+  font-size: 11px;
+  color: var(--text-faint);
+  padding: 6px 8px 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.gg-hud {
+  position: absolute;
+  /* Flush in the bottom-left corner; the view controls are at the bottom right (GraphNav). */
+  left: 8px;
+  bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  background: color-mix(in srgb, var(--surface) 85%, transparent);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  z-index: 4;
+  pointer-events: none;
+}
+.gg-hud__backend {
+  font-weight: 600;
+  color: var(--text);
+}
+.gg-hud__backend.is-webgpu {
+  color: var(--ok-text);
+}
+.gg-hud__bench {
+  color: var(--info-text);
+}
+.gg-hud__busy {
+  color: var(--warn-text);
+}
+.gg-error {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  padding: 6px 10px;
+  background: var(--danger-bg);
+  color: var(--danger);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  z-index: 4;
+}
+.gg-result {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  width: 360px;
+  max-height: 70%;
+  overflow: auto;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  padding: 8px 10px;
+  font-size: 12px;
+  z-index: 4;
+}
+.gg-result__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.gg-result table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.gg-result td {
+  padding: 2px 0;
+  border-top: 1px solid var(--border);
+  vertical-align: top;
+}
+.gg-result td:last-child {
+  text-align: right;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
+/* The slide layer (3D): cards hung in the world over the picture (SlideLayer.tsx), beams to what each shows, and the
+   bar at the top of the stage that picks the decks and steps through the slides. Clicks reach the cards through the
+   engine's overlay hook, never through the DOM: the layer lets every pointer event through to the picture. */
+.gg-slides {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+}
+.gg-slides__beams {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.gg-slide {
+  position: absolute;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  transform-origin: 0 0;
+  will-change: transform;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 26px 32px 22px;
+  overflow: hidden;
+  color: var(--text);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  border: 2px solid color-mix(in srgb, var(--deck) 55%, var(--border));
+  border-top: 10px solid var(--deck);
+  border-radius: 10px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.18);
+  font-size: 18px;
+  line-height: 1.38;
+  transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+.gg-slide.is-back {
+  opacity: 0.55;
+}
+.gg-slide.is-dim {
+  opacity: 0.45;
+}
+.gg-slide.is-back.is-dim {
+  opacity: 0.3;
+}
+.gg-slide.is-focus,
+.gg-slide.is-hovered {
+  opacity: 1;
+  border-color: var(--deck);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--deck) 35%, transparent), 0 12px 48px rgba(0, 0, 0, 0.24);
+}
+.gg-slide__head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.gg-slide__deck {
+  color: color-mix(in srgb, var(--deck) 70%, var(--text));
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gg-slide__kicker {
+  font-size: 14px;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--deck) 75%, var(--text));
+}
+.gg-slide__title {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+.gg-slide__body {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.gg-slide__body p {
+  margin: 0 0 6px;
+}
+.gg-slide__body ul {
+  margin: 0;
+  padding-left: 22px;
+}
+.gg-slide__body li {
+  margin: 0 0 5px;
+}
+.gg-slide__foot {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.gg-slidebar {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100% - 420px);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 4px;
+  font-size: 12px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  z-index: 4;
+}
+.gg-slidebar__decks {
+  display: flex;
+  gap: 3px;
+  min-width: 0;
+  overflow-x: auto;
+}
+.gg-slidebar__sep {
+  width: 1px;
+  align-self: stretch;
+  margin: 2px 2px;
+  background: var(--border);
+}
+.gg-slidebar__now {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 260px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-muted);
+}
+.gg-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.gg-chip:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+.gg-chip.is-on {
+  border-color: color-mix(in srgb, var(--deck, var(--accent)) 60%, var(--border));
+  background: color-mix(in srgb, var(--deck, var(--accent)) 12%, var(--surface));
+  color: var(--text);
+}
+.gg-chip__dot {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--deck, var(--accent));
+}
+
+/* Composed slides (Composition.tsx): the card holds a tree of blocks — rows and columns of flows, stats, lists,
+   timelines — each box bound to an entity. The same leaf blocks hang beneath as plates (`.gg-plate`), laid out at a
+   smaller size so their boxes read alike. */
+.gg-slide--composed {
+  gap: 6px;
+  padding: 22px 26px 18px;
+}
+.gg-slide--composed .gg-slide__title {
+  font-size: 24px;
+}
+.gg-slide__sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gg-slide__compose {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin-top: 4px;
+}
+.gg-slide__compose > .gg-c {
+  flex: 1;
+  min-height: 0;
+}
+.gg-c--row {
+  display: flex;
+  gap: 12px;
+  min-height: 0;
+}
+.gg-c--column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+.gg-c--row > .gg-c,
+.gg-c--column > .gg-c {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+.gg-c--leaf {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  overflow: hidden;
+}
+.gg-c__title,
+.gg-plate__title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gg-c__text p {
+  margin: 0 0 4px;
+  font-size: 13px;
+}
+.gg-flow {
+  display: flex;
+  align-items: stretch;
+  gap: 3px;
+  min-height: 0;
+}
+.gg-flow__arrow {
+  align-self: center;
+  flex: none;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--deck);
+}
+.gg-box {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 5px 7px;
+  border: 1.5px solid color-mix(in srgb, var(--deck) 70%, var(--border));
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--deck) 7%, var(--surface));
+  font-size: 12px;
+  line-height: 1.25;
+  overflow: hidden;
+}
+.gg-box__value {
+  font-weight: 700;
+  font-size: 14px;
+}
+.gg-box__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.gg-box__note {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gg-stats {
+  display: flex;
+  gap: 6px;
+}
+.gg-box--stat {
+  align-items: flex-start;
+}
+.gg-box__big {
+  font-size: 19px;
+  overflow-wrap: anywhere;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: color-mix(in srgb, var(--deck) 65%, var(--text));
+}
+.gg-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.gg-list__item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 6px;
+  border: 1px solid color-mix(in srgb, var(--deck) 40%, var(--border));
+  border-radius: 5px;
+  font-size: 12px;
+}
+.gg-list__item .gg-box__label {
+  flex: 1;
+  -webkit-line-clamp: 1;
+}
+.gg-list__dot,
+.gg-timeline__dot {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--deck);
+}
+.gg-list__value {
+  font-weight: 700;
+  white-space: nowrap;
+}
+.gg-timeline {
+  display: flex;
+  gap: 4px;
+  background: linear-gradient(var(--deck), var(--deck)) 0 25px / 100% 2px no-repeat;
+}
+.gg-timeline__item {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  font-size: 11.5px;
+  line-height: 1.25;
+}
+.gg-timeline__date {
+  font-weight: 700;
+  font-size: 12px;
+  height: 16px;
+  white-space: nowrap;
+}
+.gg-timeline__dot {
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--surface);
+}
+.gg-plate {
+  gap: 6px;
+  padding: 14px 14px 12px;
+  border-top-width: 6px;
+  border-radius: 8px;
+}
+.gg-plate__body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.gg-plate .gg-flow,
+.gg-plate .gg-stats {
+  flex: 1;
+  max-height: 140px;
+}
+
+/* The story layer: each beat of a story's outline a small card — a chapter with its numeral, a point with its letter —
+   in a row under the slide that realizes it. The finished slide can be hidden (`final: false`) and still be laid out,
+   since its blueprint is read from it. */
+.gg-slide.is-ghost {
+  visibility: hidden;
+}
+.gg-beat {
+  justify-content: center;
+  gap: 2px;
+  padding: 6px 12px;
+  border: 2px solid color-mix(in srgb, var(--deck) 80%, var(--border));
+  border-top-width: 2px;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--deck) 6%, var(--surface));
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+.gg-beat--chapter {
+  background: color-mix(in srgb, var(--deck) 16%, var(--surface));
+  border-width: 2.5px;
+}
+.gg-beat__story {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--deck) 75%, var(--text));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gg-beat__line {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  min-width: 0;
+}
+.gg-beat__num {
+  flex: none;
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--deck);
+}
+.gg-beat__label {
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.gg-beat--chapter .gg-beat__label {
+  font-size: 13.5px;
+  font-weight: 700;
+}

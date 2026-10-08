@@ -1,0 +1,514 @@
+/* The workstation is full-bleed inside the app main area (which pads 32px 40px). */
+.ws {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh);
+  margin: -32px -40px;
+  background: var(--surface-2);
+}
+.ws-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+.ws-top .spacer {
+  flex: 1;
+}
+.ws-title {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  font-weight: 500;
+}
+.ws-sep {
+  width: 1px;
+  height: 22px;
+  background: var(--border);
+}
+.ws-hint {
+  font-size: 12px;
+  white-space: nowrap;
+}
+.ws-hint .kbd {
+  margin: 0 1px;
+}
+.ws-body {
+  flex: 1;
+  min-height: 0;
+  padding: 6px;
+  /* A pane at the root (no split) must still fill the body, or nothing inside it can scroll. */
+  display: flex;
+}
+.ws-body > .ws-pane,
+.ws-body > .ws-split {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* ── Split tree ─────────────────────────────────────────────────────── */
+.ws-split {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+.ws-split--row {
+  flex-direction: row;
+}
+.ws-split--col {
+  flex-direction: column;
+}
+.ws-split__child {
+  flex: 0 1 auto;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+}
+.ws-split__child > * {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+.ws-gutter {
+  flex: 0 0 6px;
+  position: relative;
+  z-index: 2;
+}
+.ws-gutter--row {
+  cursor: col-resize;
+}
+.ws-gutter--col {
+  cursor: row-resize;
+}
+.ws-gutter::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  border-radius: 2px;
+  background: transparent;
+  transition: background 120ms;
+}
+.ws-gutter--row::after {
+  width: 2px;
+  height: 40px;
+}
+.ws-gutter--col::after {
+  height: 2px;
+  width: 40px;
+}
+.ws-gutter:hover::after {
+  background: var(--border-strong);
+}
+body.ws-resizing-x {
+  cursor: col-resize;
+  user-select: none;
+}
+body.ws-resizing-y {
+  cursor: row-resize;
+  user-select: none;
+}
+body.ws-resizing-x iframe,
+body.ws-resizing-y iframe,
+body.ws-resizing-x canvas,
+body.ws-resizing-y canvas {
+  pointer-events: none;
+}
+
+/* ── Pane ───────────────────────────────────────────────────────────── */
+.ws-pane {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  overflow: hidden;
+}
+.ws-pane.is-focused {
+  border-color: var(--text-faint);
+  box-shadow: 0 0 0 1px var(--text-faint);
+}
+/* The bar: [◀] scrolling tabs [▶] … back/forward/split. Only the tabs scroll; the controls stay put. */
+.ws-tabbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 32px;
+  padding: 0 4px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+  flex-shrink: 0;
+  min-width: 0;
+}
+.ws-tabs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 100%;
+  min-width: 0;
+  flex: 0 1 auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+  /* Many tabs scroll sideways; a visible scrollbar would eat the strip's height and squash the tabs. The active tab is kept in view. */
+  scrollbar-width: none;
+}
+.ws-tabs::-webkit-scrollbar {
+  display: none;
+}
+.ws-tabbar .spacer {
+  flex: 1;
+}
+/* The strip with its overflow arrows laid over its ends: no room reserved, so nothing shifts when an arrow appears. */
+.ws-tabs__wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  min-width: 0;
+  flex: 0 1 auto;
+}
+/* Overflow arrows: grey triangles over the strip's edge where tabs are hidden, on a fade of the bar's colour. */
+.ws-tabs__more {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 18px;
+  padding: 0;
+  border: 0;
+  background: linear-gradient(to right, var(--surface-2) 55%, transparent);
+  color: var(--text-muted);
+  cursor: pointer;
+  z-index: 1;
+  display: none;
+}
+.ws-tabs__more--left {
+  left: 0;
+}
+.ws-tabs__more--right {
+  right: 0;
+  background: linear-gradient(to left, var(--surface-2) 55%, transparent);
+}
+.ws-tabs__more.is-on {
+  display: block;
+}
+.ws-tabs__more::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 5px solid transparent;
+}
+.ws-tabs__more--left::before {
+  border-right-color: currentColor;
+  border-left-width: 0;
+}
+.ws-tabs__more--right::before {
+  border-left-color: currentColor;
+  border-right-width: 0;
+}
+.ws-tabs__more:hover {
+  color: var(--text-muted);
+}
+.ws-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  max-width: 200px;
+  padding: 0 4px 0 8px;
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: default;
+  user-select: none;
+  flex-shrink: 0;
+}
+.ws-tab:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+.ws-tab.is-active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+.ws-tab.is-over {
+  outline: 2px dashed var(--text-faint);
+  outline-offset: -2px;
+}
+.ws-tab__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Renaming in place: the same box as the label, nothing else moves. */
+.ws-tab__rename {
+  width: 120px;
+  height: 20px;
+  padding: 0 4px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: inherit;
+  outline: none;
+}
+.ws-tab__rename:focus {
+  border-color: var(--info-text);
+}
+.ws-tab__x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  opacity: 0;
+  flex-shrink: 0;
+}
+/* Always there on the front tab, and on any tab under the pointer — the faint version was easy to miss. */
+.ws-tab:hover .ws-tab__x,
+.ws-tab.is-active .ws-tab__x {
+  opacity: 1;
+}
+.ws-tab__x:hover {
+  background: var(--border);
+  color: var(--text);
+}
+.ws-tabs__add,
+.ws-tabs__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.ws-tabs__add:hover,
+.ws-tabs__add.is-active,
+.ws-tabs__btn:hover:not(:disabled) {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+.ws-tabs__btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* The pane body reproduces the app-main padding at pane scale, so pages that
+   negative-margin themselves to full bleed (.gx, .dp, .ws) still fit. */
+.ws-pane__body {
+  --pane-pad-y: 16px;
+  --pane-pad-x: 20px;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: var(--pane-pad-y) var(--pane-pad-x);
+  position: relative;
+}
+/* One per mounted tab; only the front one is laid out. A view fills it the way it filled the body before. */
+.ws-pane__view {
+  height: 100%;
+  min-height: 0;
+}
+.ws-pane__view[hidden] {
+  display: none;
+}
+.ws-pane__body .gx,
+.ws-pane__body .dp {
+  height: calc(100% + 2 * var(--pane-pad-y));
+  margin: calc(-1 * var(--pane-pad-y)) calc(-1 * var(--pane-pad-x));
+}
+.ws-pane__body .gx-side {
+  width: 240px;
+}
+.ws-pane__body .gx-inspector,
+.ws-pane__body .res__inspector {
+  width: 300px;
+}
+.ws-pane__body .page-title {
+  font-size: 20px;
+}
+.ws-pane__body .res {
+  height: 100%;
+}
+
+/* A page that hosts tabs of one view: no title bar, panes flush with the page. */
+.ws--tabs .ws-body {
+  padding: 0;
+}
+.ws--tabs .ws-pane {
+  border: 0;
+  border-radius: 0;
+}
+
+/* ── Fixed panes: a page's prescribed sections in the split tree (FixedPanes.tsx) ── */
+.fp {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+}
+.fp > .ws-split {
+  flex: 1;
+}
+.fp__pane {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.fp__head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 8px 0 4px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+  font-size: 12px;
+  color: var(--text-muted);
+  user-select: none;
+}
+.fp__pane.is-collapsed .fp__head {
+  border-bottom: 0;
+}
+.fp__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.fp__toggle:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+.fp__title {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+.fp__actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+}
+.fp__buttons {
+  margin-left: auto;
+  display: inline-flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.fp__actions + .fp__buttons {
+  margin-left: 4px;
+}
+.fp__pane--strip .fp__buttons {
+  margin-left: 0;
+  margin-top: auto;
+  flex-direction: column;
+}
+.fp__min {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.fp__toggle:disabled,
+.fp__min:disabled {
+  opacity: 0.35;
+  cursor: default;
+  background: transparent;
+  border-color: transparent;
+}
+.fp__min:hover {
+  background: var(--surface-hover);
+  border-color: var(--border);
+  color: var(--text);
+}
+.fp__body {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.fp__body > * {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+/* Collapsed beside its sibling: a 30px strip with the title reading downwards. */
+.fp__pane--strip {
+  width: 30px;
+  flex: 0 0 30px;
+}
+.fp__pane--strip .fp__head {
+  flex-direction: column;
+  height: 100%;
+  padding: 4px 0;
+  gap: 8px;
+  border-bottom: 0;
+}
+.fp__pane--strip .fp__title {
+  writing-mode: vertical-rl;
+}
+
+/* A section's host (a list tab and what was opened from it): its pages sit where a page sits on its own — 40 px in and
+   32 px down, Documents' and Diagrams' standard — not the tighter spacing of a workstation pane. */
+.ws--lists .ws-pane__body {
+  --pane-pad-y: 32px;
+  --pane-pad-x: 40px;
+}
+/* …and its titles at the page's own size: a section's tab is a page, not a workstation pane's compact view. */
+.ws--lists .ws-pane__body .page-title {
+  font-size: 26px;
+}
+/* The list tab: always first, never closed — the section's index. No close button, so it reads a touch firmer. */
+.ws-tab.is-list .ws-tab__label {
+  font-weight: 600;
+}
+.ws-tab.is-list {
+  padding-right: 8px;
+}

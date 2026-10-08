@@ -1,0 +1,108 @@
+/* The voice pill: floats over the page while voice is on, clear of the page's own controls. */
+.voice {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  z-index: 950;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(560px, calc(100vw - 32px));
+  padding: 8px 8px 8px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  font-size: 13px;
+}
+.voice--error {
+  border-color: var(--danger);
+}
+
+.voice__mic {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-text);
+  cursor: pointer;
+  position: relative;
+}
+.voice--error .voice__mic {
+  background: var(--danger);
+}
+/* The listening ring: a pulse while the microphone is open. */
+.voice--listening .voice__mic::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  opacity: 0;
+  animation: voice-pulse 1.8s ease-out infinite;
+}
+@keyframes voice-pulse {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+.voice__spin {
+  animation: voice-spin 1s linear infinite;
+}
+@keyframes voice-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.voice__body {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.voice__state {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.voice__text {
+  color: var(--text);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.35;
+}
+.voice__text.is-interim {
+  color: var(--text-muted);
+  font-style: italic;
+}
+.voice__error {
+  color: var(--danger);
+  font-size: 12px;
+}
+
+/* Loudness while an utterance is being recorded: a ring that swells with the voice. */
+.voice__level {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  opacity: 0.5;
+  pointer-events: none;
+  transition: transform 80ms linear;
+}

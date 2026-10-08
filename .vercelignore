@@ -1,0 +1,61 @@
+# What a CLI deploy (`vercel deploy` from a working checkout) uploads is decided here, not by .gitignore: without
+# this file a checkout's local data would ship and be served. Same shapes as .gitignore's user-data section —
+# every project, export and dataset the app writes, the browser profiles the headless driver keeps, local
+# environment files, ChatGPT exports, screenshots from driven runs — with the same exact-path allow-backs for the few
+# documents this repo ships (the demo projects live in aegraph-ui-demos). Change the allow-backs here in the same
+# commit as .gitignore and .githooks/data-guard.sh (DATA_ALLOW); scripts/__tests__/data-guard.test.ts checks all three.
+
+# Local machinery
+*-profile/
+downloads/
+exports/
+dist/
+dist-headless/
+.vercel/
+.claude/
+.env*
+!.env.example
+# Keys and certificates, wherever they sit (.githooks/data-guard.sh refuses the same shapes)
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+id_dsa*
+id_ecdsa*
+id_ed25519*
+*service-account*.json
+
+# Anything the app saves or exports
+*.ae.json
+*.aeb
+*.aegraph.json
+*.ae.json.gz
+*.aegraph.json.gz
+*.aeb.gz
+/*.csv
+/*.html
+/*.svg
+/*.png
+/*.gz
+!/index.html
+public/datasets/*
+
+# The ones this repo does ship
+!public/spec/example.ae.json
+!public/templates/conversation-atlas.template.ae.json
+!src/**/*.ae.json
+!src/**/*.aegraph.json
+
+# ChatGPT exports and anything derived from one, by any name (the app's own source about them excepted)
+conversations.json
+conversations-*.json
+*chatgpt*
+!src/**/*chatgpt*
+!src/**/*ChatGpt*
+chat.html
+
+# Screenshots and recordings from a driven run, wherever they land
+*.screenshot.png
+shot-*.png
+smoke-*.png

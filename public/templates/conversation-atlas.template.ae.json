@@ -1,0 +1,1702 @@
+{
+ "$schema": "aegraph/v1",
+ "exportedAt": "2026-09-15T00:00:00.000Z",
+ "template": {
+  "id": "conversation-atlas",
+  "label": "Conversation atlas",
+  "description": "Analytics over a ChatGPT export run through the atlas pipeline: the pace of conversations, what they were about and how that shifted, stakes, modes and intents, the shape of the exchanges, the vocabulary and its hubs, the regions and clusters — as charts, scripts and graph scenes, arranged in Analytics tabs and a Workstation.",
+  "requires": [
+   "segment",
+   "conversation"
+  ],
+  "adopts": [
+   "segment",
+   "conversation",
+   "topic",
+   "named-entity",
+   "cluster",
+   "domain",
+   "theme",
+   "persona",
+   "region"
+  ],
+  "home": "/analytics",
+  "hint": "for a ChatGPT export labelled as a conversation atlas"
+ },
+ "tags": [
+  {
+   "tag": "atlas",
+   "color": "#0f766e",
+   "description": "Part of the Conversation atlas template"
+  },
+  {
+   "tag": "chart",
+   "color": "#0891b2"
+  },
+  {
+   "tag": "script",
+   "color": "#7c3aed"
+  },
+  {
+   "tag": "scene",
+   "color": "#7a4fbf"
+  },
+  {
+   "tag": "guide",
+   "color": "#ca8a04"
+  }
+ ],
+ "entities": [
+  {
+   "id": "tpl:conversation-atlas:chart-conversations-per-month",
+   "kind": "entity",
+   "type": "plot",
+   "label": "Conversations per month",
+   "description": "How much you talked to it, month by month: one bar per month of conversations started.",
+   "tags": [
+    "atlas",
+    "chart",
+    "activity"
+   ],
+   "data": {
+    "spec": {
+     "selector": {
+      "types": [
+       "conversation"
+      ],
+      "scope": "dataset"
+     },
+     "traces": [
+      {
+       "kind": "bar",
+       "x": "data.startedAt",
+       "bin": "month"
+      }
+     ],
+     "layout": {
+      "title": "Conversations per month"
+     }
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:chart-conversations-cumulative",
+   "kind": "entity",
+   "type": "plot",
+   "label": "Conversations, cumulative",
+   "description": "The running total of conversations by week — the slope is the pace.",
+   "tags": [
+    "atlas",
+    "chart",
+    "activity"
+   ],
+   "data": {
+    "spec": {
+     "selector": {
+      "types": [
+       "conversation"
+      ],
+      "scope": "dataset"
+     },
+     "traces": [
+      {
+       "kind": "line",
+       "x": "data.startedAt",
+       "bin": "week",
+       "agg": "count",
+       "cumulative": true
+      }
+     ],
+     "layout": {
+      "title": "Conversations, cumulative"
+     }
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:chart-segments-by-region",
+   "kind": "entity",
+   "type": "plot",
+   "label": "Segments per month by region",
+   "description": "What the conversations were about, over time: segments per month stacked by the atlas region they cluster into.",
+   "tags": [
+    "atlas",
+    "chart",
+    "subject"
+   ],
+   "data": {
+    "spec": {
+     "selector": {
+      "types": [
+       "segment"
+      ],
+      "scope": "dataset"
+     },
+     "traces": [
+      {
+       "kind": "bar",
+       "x": "data.created",
+       "bin": "month",
+       "group": "data.region"
+      }
+     ],
+     "layout": {
+      "title": "Segments per month by region",
+      "barmode": "stack"
+     }
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:chart-month-by-region",
+   "kind": "entity",
+   "type": "plot",
+   "label": "Month × region",
+   "description": "The same as a heat grid: rows are regions, columns months; the colour is how many segments. Bright bands are the seasons of a subject.",
+   "tags": [
+    "atlas",
+    "chart",
+    "subject"
+   ],
+   "data": {
+    "spec": {
+     "selector": {
+      "types": [
+       "segment"
+      ],
+      "scope": "dataset"
+     },
+     "traces": [
+      {
+       "kind": "heatmap",
+       "x": "data.created",
+       "bin": "month",
+       "y": "data.region",
+       "palette": "viridis"
+      }
+     ],
+     "layout": {
+      "title": "Month × region"
+     }
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:chart-stakes-per-quarter",
+   "kind": "entity",
+   "type": "plot",
+   "label": "Stakes per quarter",
+   "description": "How much was riding on the exchanges, per quarter: segments stacked by the stakes facet.",
+   "tags": [
+    "atlas",
+    "chart",
+    "facets"
+   ],
+   "data": {
+    "spec": {
+     "selector": {
+      "types": [
+       "segment"
+      ],
+      "scope": "dataset"
+     },
+     "traces": [
+      {
+       "kind": "bar",
+       "x": "data.created",
+       "bin": "quarter",
+       "group": "data.stakes"
+      }
+     ],
+     "layout": {
+      "title": "Stakes per quarter",
+      "barmode": "stack"
+     }
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:chart-modes",
+   "kind": "entity",
+   "type": "plot",
+   "label": "Modes",
+   "description": "The register of the exchanges — the mode facet — as shares of all segments.",
+   "tags": [
+    "atlas",
+    "chart",
+    "facets"
+   ],
+   "data": {
+    "spec": {
+     "selector": {
+      "types": [
+       "segment"
+      ],
+      "scope": "dataset"
+     },
+     "traces": [
+      {
+       "kind": "pie",
+       "x": "data.mode"
+      }
+     ],
+     "layout": {
+      "title": "Modes"
+     }
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:chart-stakes",
+   "kind": "entity",
+   "type": "plot",
+   "label": "Stakes",
+   "description": "The stakes facet as shares of all segments.",
+   "tags": [
+    "atlas",
+    "chart",
+    "facets"
+   ],
+   "data": {
+    "spec": {
+     "selector": {
+      "types": [
+       "segment"
+      ],
+      "scope": "dataset"
+     },
+     "traces": [
+      {
+       "kind": "pie",
+       "x": "data.stakes"
+      }
+     ],
+     "layout": {
+      "title": "Stakes"
+     }
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:chart-mode-per-month",
+   "kind": "entity",
+   "type": "plot",
+   "label": "Modes per month",
+   "description": "Modes over time: segments per month stacked by mode.",
+   "tags": [
+    "atlas",
+    "chart",
+    "facets"
+   ],
+   "data": {
+    "spec": {
+     "selector": {
+      "types": [
+       "segment"
+      ],
+      "scope": "dataset"
+     },
+     "traces": [
+      {
+       "kind": "bar",
+       "x": "data.created",
+       "bin": "month",
+       "group": "data.mode"
+      }
+     ],
+     "layout": {
+      "title": "Modes per month",
+      "barmode": "stack"
+     }
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:chart-segment-length",
+   "kind": "entity",
+   "type": "plot",
+   "label": "Segment length",
+   "description": "How long the segments are, in characters — a histogram.",
+   "tags": [
+    "atlas",
+    "chart",
+    "shape"
+   ],
+   "data": {
+    "spec": {
+     "selector": {
+      "types": [
+       "segment"
+      ],
+      "scope": "dataset"
+     },
+     "traces": [
+      {
+       "kind": "histogram",
+       "x": "data.chars"
+      }
+     ],
+     "layout": {
+      "title": "Segment length"
+     }
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:chart-messages-vs-length",
+   "kind": "entity",
+   "type": "plot",
+   "label": "Messages vs length",
+   "description": "Each segment as a point: messages across, characters up, coloured by salience. Long low ones are monologues; tall short ones are rapid back-and-forth.",
+   "tags": [
+    "atlas",
+    "chart",
+    "shape"
+   ],
+   "data": {
+    "spec": {
+     "selector": {
+      "types": [
+       "segment"
+      ],
+      "scope": "dataset"
+     },
+     "traces": [
+      {
+       "kind": "scatter",
+       "x": "data.n_messages",
+       "y": "data.chars",
+       "color": "data.salience",
+       "palette": "viridis",
+       "text": "label",
+       "opacity": 0.6
+      }
+     ],
+     "layout": {
+      "title": "Messages vs length"
+     }
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:chart-salience-per-month",
+   "kind": "entity",
+   "type": "plot",
+   "label": "Mean salience per month",
+   "description": "The mean salience of segments per month — when the conversations mattered more.",
+   "tags": [
+    "atlas",
+    "chart",
+    "shape"
+   ],
+   "data": {
+    "spec": {
+     "selector": {
+      "types": [
+       "segment"
+      ],
+      "scope": "dataset"
+     },
+     "traces": [
+      {
+       "kind": "line",
+       "x": "data.created",
+       "bin": "month",
+       "y": "data.salience",
+       "agg": "mean"
+      }
+     ],
+     "layout": {
+      "title": "Mean salience per month"
+     }
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:chart-models-over-time",
+   "kind": "entity",
+   "type": "plot",
+   "label": "Models over time",
+   "description": "Which model the conversations ran on, per month.",
+   "tags": [
+    "atlas",
+    "chart",
+    "activity"
+   ],
+   "data": {
+    "spec": {
+     "selector": {
+      "types": [
+       "conversation"
+      ],
+      "scope": "dataset"
+     },
+     "traces": [
+      {
+       "kind": "bar",
+       "x": "data.startedAt",
+       "bin": "month",
+       "group": "data.model"
+      }
+     ],
+     "layout": {
+      "title": "Models over time",
+      "barmode": "stack"
+     }
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:chart-regions-by-size",
+   "kind": "entity",
+   "type": "plot",
+   "label": "Regions by size",
+   "description": "The atlas regions — the coarse clusters — by how many segments they hold.",
+   "tags": [
+    "atlas",
+    "chart",
+    "subject"
+   ],
+   "data": {
+    "spec": {
+     "selector": {
+      "types": [
+       "region"
+      ],
+      "scope": "dataset"
+     },
+     "traces": [
+      {
+       "kind": "bar",
+       "x": "label",
+       "y": "data.size"
+      }
+     ],
+     "layout": {
+      "title": "Regions by size"
+     }
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:chart-conversation-length-by-model",
+   "kind": "entity",
+   "type": "plot",
+   "label": "Conversation length by model",
+   "description": "The spread of conversation length (characters) per model, as boxes.",
+   "tags": [
+    "atlas",
+    "chart",
+    "shape"
+   ],
+   "data": {
+    "spec": {
+     "selector": {
+      "types": [
+       "conversation"
+      ],
+      "scope": "dataset"
+     },
+     "traces": [
+      {
+       "kind": "box",
+       "y": "data.charLength",
+       "x": "data.model"
+      }
+     ],
+     "layout": {
+      "title": "Conversation length by model"
+     }
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:script-top-topics",
+   "kind": "entity",
+   "type": "script",
+   "label": "Top topics",
+   "description": "The thirty topics with the most segments, as a horizontal bar — the vocabulary of the corpus at a glance.",
+   "tags": [
+    "atlas",
+    "script",
+    "subject"
+   ],
+   "data": {
+    "code": "// Top topics: the thirty with the most segments.\nconst topics = topK(ds.byType('topic'), (t) => t.data.segment_count ?? 0, 30).reverse()\nreturn figure(bar(topics.map((t) => t.data.segment_count ?? 0), topics.map((t) => t.label ?? t.id), { orientation: 'h', marker: { color: plotColor(0) }, text: topics.map((t) => t.data.segment_count ?? 0), textposition: 'outside' }), { title: 'Top topics', xaxis: { title: 'segments' }, margin: { l: 220 }, height: 720 })\n",
+    "language": "js",
+    "lastRun": {
+     "at": "2026-09-15T00:00:00.000Z",
+     "summary": "figure",
+     "ms": 0
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:script-domain-x-theme",
+   "kind": "entity",
+   "type": "script",
+   "label": "Domain × theme",
+   "description": "How often each domain (the subject area) meets each theme (the current underneath): a heat grid over the segments’ facets. The bright cells are what this corpus is really about.",
+   "tags": [
+    "atlas",
+    "script",
+    "subject"
+   ],
+   "data": {
+    "code": "// Domain × theme: co-occurrence over the segments' facets.\nconst cells = new Map()\nconst dom = new Map(), thm = new Map()\nfor (const s of ds.byType('segment')) {\n  const f = s.data.facets ?? {}\n  for (const d of f.domain ?? []) {\n    dom.set(d, (dom.get(d) ?? 0) + 1)\n    for (const t of f.theme ?? []) {\n      thm.set(t, (thm.get(t) ?? 0) + 1)\n      const k = d + '\\u0000' + t\n      cells.set(k, (cells.get(k) ?? 0) + 1)\n    }\n  }\n}\nconst domains = sortBy([...dom.keys()], (d) => dom.get(d), true).slice(0, 25)\nconst themes = sortBy([...thm.keys()], (t) => thm.get(t), true)\nconst z = themes.map((t) => domains.map((d) => cells.get(d + '\\u0000' + t) ?? 0))\nreturn figure(heatmap(domains, themes, z, { colorscale: 'Viridis', hovertemplate: '%{x} × %{y}: %{z}<extra></extra>' }), { title: 'Domain × theme', margin: { l: 180, b: 140 }, xaxis: { tickangle: -45 }, height: 640 })\n",
+    "language": "js",
+    "lastRun": {
+     "at": "2026-09-15T00:00:00.000Z",
+     "summary": "figure",
+     "ms": 0
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:script-topic-emergence",
+   "kind": "entity",
+   "type": "script",
+   "label": "Topic emergence",
+   "description": "When each topic first appeared, and how many distinct topics the corpus had touched by each month — the growth of what you talk about.",
+   "tags": [
+    "atlas",
+    "script",
+    "subject"
+   ],
+   "data": {
+    "code": "// Topic emergence: the month a topic is first seen, and the running number of distinct topics.\nconst first = new Map()\nfor (const s of ds.byType('segment')) {\n  const m = bin(s.data.created, 'month')\n  if (!m) continue\n  for (const r of ds.out(s.id, 'on-topic')) if (!first.has(r.target) || m < first.get(r.target)) first.set(r.target, m)\n}\nconst perMonth = groupBy([...first.values()], (m) => m)\nconst months = sortBy([...perMonth.keys()], (m) => m)\nlet running = 0\nconst cum = months.map((m) => (running += perMonth.get(m).length))\nreturn figure([bar(months, months.map((m) => perMonth.get(m).length), { name: 'new topics', marker: { color: plotColor(1) } }), line(months, cum, { name: 'topics so far', yaxis: 'y2', line: { color: plotColor(0), width: 2 } })], { title: 'Topic emergence', yaxis: { title: 'new topics in the month' }, yaxis2: { title: 'distinct topics so far', overlaying: 'y', side: 'right' }, legend: { orientation: 'h', y: 1.08 } })\n",
+    "language": "js",
+    "lastRun": {
+     "at": "2026-09-15T00:00:00.000Z",
+     "summary": "figure",
+     "ms": 0
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:script-length-trend",
+   "kind": "entity",
+   "type": "script",
+   "label": "Conversation length trend",
+   "description": "The median length of a segment per month, with a three-month rolling median — are the exchanges getting longer or shorter?",
+   "tags": [
+    "atlas",
+    "script",
+    "shape"
+   ],
+   "data": {
+    "code": "// Median segment length per month, and a 3-month rolling median.\nconst m = rollup(ds.byType('segment'), (s) => bin(s.data.created, 'month'), (s) => s.data.chars, 'median').filter((r) => r.key)\nconst xs = m.map((r) => r.key), ys = m.map((r) => r.value)\nconst roll = ys.map((_, i) => median(ys.slice(Math.max(0, i - 2), i + 1)))\nreturn figure([bar(xs, ys, { name: 'median chars', marker: { color: plotColor(0) }, opacity: 0.5 }), line(xs, roll, { name: '3-month rolling', line: { color: plotColor(2), width: 3 } })], { title: 'Segment length trend', yaxis: { title: 'characters' } })\n",
+    "language": "js",
+    "lastRun": {
+     "at": "2026-09-15T00:00:00.000Z",
+     "summary": "figure",
+     "ms": 0
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:script-hubs",
+   "kind": "entity",
+   "type": "script",
+   "label": "Hubs",
+   "description": "The most connected named entities, topics, personas and themes — by how many conversations and segments point at them — as a table.",
+   "tags": [
+    "atlas",
+    "script",
+    "subject"
+   ],
+   "data": {
+    "code": "// Hubs: the most connected things the conversations point at.\nconst rows = []\nfor (const type of ['named-entity', 'topic', 'persona', 'theme', 'domain']) {\n  for (const h of topK(ds.byType(type), (e) => ds.degree(e.id), 8)) rows.push({ type, label: h.label ?? h.id, links: ds.degree(h.id), segments: h.data.segment_count ?? '' })\n}\nreturn table(sortBy(rows, (r) => r.links, true), ['type', 'label', 'links', 'segments'])\n",
+    "language": "js",
+    "lastRun": {
+     "at": "2026-09-15T00:00:00.000Z",
+     "summary": "figure",
+     "ms": 0
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:script-intent-mix",
+   "kind": "entity",
+   "type": "script",
+   "label": "Intent mix over time",
+   "description": "What you wanted from the exchanges — the intent facet — as shares per quarter, stacked to 100%.",
+   "tags": [
+    "atlas",
+    "script",
+    "facets"
+   ],
+   "data": {
+    "code": "// Intent mix: the share of each intent per quarter.\nconst by = new Map()\nfor (const s of ds.byType('segment')) {\n  const q = bin(s.data.created, 'quarter')\n  if (!q) continue\n  for (const i of (s.data.facets ?? {}).intent ?? []) {\n    if (!by.has(i)) by.set(i, new Map())\n    by.get(i).set(q, (by.get(i).get(q) ?? 0) + 1)\n  }\n}\nconst quarters = sortBy([...new Set([...by.values()].flatMap((m) => [...m.keys()]))], (q) => q)\nconst totals = quarters.map((q) => [...by.values()].reduce((n, m) => n + (m.get(q) ?? 0), 0))\nconst intents = sortBy([...by.keys()], (i) => [...by.get(i).values()].reduce((a, b) => a + b, 0), true)\nconst traces = intents.map((i, k) => area(quarters, quarters.map((q, j) => (totals[j] ? (by.get(i).get(q) ?? 0) / totals[j] : 0)), { name: i, stackgroup: 'one', line: { color: plotColor(k), width: 0.5 } }))\nreturn figure(traces, { title: 'Intent mix over time', yaxis: { title: 'share', tickformat: '.0%' } })\n",
+    "language": "js",
+    "lastRun": {
+     "at": "2026-09-15T00:00:00.000Z",
+     "summary": "figure",
+     "ms": 0
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:script-region-timelines",
+   "kind": "entity",
+   "type": "script",
+   "label": "Region timelines",
+   "description": "Each region as a line of segments per month — which subjects rose, which faded.",
+   "tags": [
+    "atlas",
+    "script",
+    "subject"
+   ],
+   "data": {
+    "code": "// Region timelines: segments per month, one line per region.\nconst by = groupBy(ds.byType('segment').filter((s) => s.data.region), (s) => s.data.region)\nconst regions = sortBy([...by.keys()], (r) => by.get(r).length, true).slice(0, 12)\nconst traces = regions.map((r, k) => {\n  const m = rollup(by.get(r), (s) => bin(s.data.created, 'month'), () => 1, 'count').filter((x) => x.key)\n  return line(m.map((x) => x.key), m.map((x) => x.value), { name: r, line: { color: plotColor(k), width: 2 } })\n})\nreturn figure(traces, { title: 'Region timelines', yaxis: { title: 'segments' } })\n",
+    "language": "js",
+    "lastRun": {
+     "at": "2026-09-15T00:00:00.000Z",
+     "summary": "figure",
+     "ms": 0
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:script-starred-and-salient",
+   "kind": "entity",
+   "type": "script",
+   "label": "Starred and salient",
+   "description": "The segments that stood out: starred ones, and the most salient, with when and what — a table to read from.",
+   "tags": [
+    "atlas",
+    "script",
+    "shape"
+   ],
+   "data": {
+    "code": "// The segments that stood out.\nconst segs = ds.byType('segment')\nconst pick = sortBy(segs.filter((s) => s.data.starred || (s.data.salience ?? 0) >= 4), (s) => (s.data.starred ? 10 : 0) + (s.data.salience ?? 0), true).slice(0, 60)\nreturn table(pick.map((s) => ({ when: isoDate(s.data.created), conversation: s.data.conversation_title, region: s.data.region, salience: s.data.salience, starred: s.data.starred ? '★' : '', summary: (s.data.summary ?? '').slice(0, 160) })), ['when', 'conversation', 'region', 'salience', 'starred', 'summary'])\n",
+    "language": "js",
+    "lastRun": {
+     "at": "2026-09-15T00:00:00.000Z",
+     "summary": "figure",
+     "ms": 0
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:filter-regions-clusters",
+   "kind": "entity",
+   "type": "filter",
+   "label": "Regions and clusters · filter",
+   "tags": [
+    "atlas"
+   ],
+   "data": {
+    "tags": [],
+    "tagMode": "any",
+    "text": "",
+    "minDegree": 0,
+    "hideIsolated": true,
+    "roots": [],
+    "depth": 1,
+    "maxNodes": 5000,
+    "maxDegree": 0,
+    "kCore": 0,
+    "componentMin": 0,
+    "giantOnly": false,
+    "exclude": [],
+    "fields": [],
+    "direction": "both",
+    "types": [
+     "region",
+     "cluster"
+    ],
+    "relationshipTypes": [
+     "nested-in"
+    ]
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:layout-regions-clusters",
+   "kind": "entity",
+   "type": "layout",
+   "label": "Regions and clusters · layout",
+   "tags": [
+    "atlas"
+   ],
+   "data": {
+    "positions": {},
+    "algorithm": "force",
+    "params": {
+     "spacing": 1,
+     "iterations": 400,
+     "direction": "TB",
+     "seed": 7,
+     "gravity": 1.5,
+     "scalingRatio": 20
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:style-regions-clusters",
+   "kind": "entity",
+   "type": "rendering",
+   "label": "Regions and clusters · style",
+   "tags": [
+    "atlas"
+   ],
+   "data": {
+    "precedence": "type",
+    "nodes": {
+     "default": {
+      "color": {
+       "mode": "constant"
+      },
+      "size": {
+       "mode": "ranking",
+       "attr": {
+        "kind": "degree"
+       },
+       "log": true,
+       "min": 2,
+       "max": 18
+      },
+      "opacity": {
+       "mode": "constant",
+       "value": 1
+      },
+      "shape": {
+       "mode": "constant",
+       "value": "circle"
+      },
+      "visible": true,
+      "label": true
+     },
+     "types": {
+      "region": {
+       "color": {
+        "mode": "constant",
+        "value": "#7a4fbf"
+       }
+      },
+      "cluster": {
+       "color": {
+        "mode": "constant",
+        "value": "#e07a3f"
+       }
+      }
+     },
+     "tags": {}
+    },
+    "edges": {
+     "default": {
+      "color": {
+       "mode": "constant"
+      },
+      "width": {
+       "mode": "constant",
+       "value": 1
+      },
+      "opacity": {
+       "mode": "constant",
+       "value": 0.25
+      },
+      "visible": true,
+      "arrow": true
+     },
+     "types": {},
+     "tags": {}
+    },
+    "edgeLabels": false,
+    "curvedEdges": true
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:scene-regions-clusters",
+   "kind": "entity",
+   "type": "scene",
+   "label": "Regions and clusters",
+   "description": "The atlas’s two levels of clustering: regions (coarse) with their clusters (fine) nested in them. Size is how many things point at each.",
+   "tags": [
+    "atlas",
+    "scene"
+   ],
+   "data": {
+    "renderer": "2d",
+    "filterId": "tpl:conversation-atlas:filter-regions-clusters",
+    "layoutId": "tpl:conversation-atlas:layout-regions-clusters",
+    "renderingId": "tpl:conversation-atlas:style-regions-clusters",
+    "algorithm": "force",
+    "params": {
+     "spacing": 1,
+     "iterations": 400,
+     "direction": "TB",
+     "seed": 7,
+     "gravity": 1.5,
+     "scalingRatio": 20
+    },
+    "analysis": {
+     "auto": false,
+     "options": {
+      "metrics": [
+       "degree",
+       "inDegree",
+       "outDegree",
+       "pagerank",
+       "clustering",
+       "component",
+       "componentSize",
+       "community"
+      ]
+     }
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:filter-conversations-by-cluster",
+   "kind": "entity",
+   "type": "filter",
+   "label": "Conversations by cluster · filter",
+   "tags": [
+    "atlas"
+   ],
+   "data": {
+    "tags": [],
+    "tagMode": "any",
+    "text": "",
+    "minDegree": 0,
+    "hideIsolated": true,
+    "roots": [],
+    "depth": 1,
+    "maxNodes": 5000,
+    "maxDegree": 0,
+    "kCore": 0,
+    "componentMin": 0,
+    "giantOnly": false,
+    "exclude": [],
+    "fields": [],
+    "direction": "both",
+    "types": [
+     "conversation",
+     "cluster",
+     "region"
+    ],
+    "relationshipTypes": [
+     "in-cluster",
+     "nested-in"
+    ]
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:layout-conversations-by-cluster",
+   "kind": "entity",
+   "type": "layout",
+   "label": "Conversations by cluster · layout",
+   "tags": [
+    "atlas"
+   ],
+   "data": {
+    "positions": {},
+    "algorithm": "force",
+    "params": {
+     "spacing": 1,
+     "iterations": 400,
+     "direction": "TB",
+     "seed": 7,
+     "gravity": 1.5,
+     "scalingRatio": 20
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:style-conversations-by-cluster",
+   "kind": "entity",
+   "type": "rendering",
+   "label": "Conversations by cluster · style",
+   "tags": [
+    "atlas"
+   ],
+   "data": {
+    "precedence": "type",
+    "nodes": {
+     "default": {
+      "color": {
+       "mode": "constant"
+      },
+      "size": {
+       "mode": "ranking",
+       "attr": {
+        "kind": "degree"
+       },
+       "log": true,
+       "min": 2,
+       "max": 18
+      },
+      "opacity": {
+       "mode": "constant",
+       "value": 1
+      },
+      "shape": {
+       "mode": "constant",
+       "value": "circle"
+      },
+      "visible": true,
+      "label": true
+     },
+     "types": {
+      "conversation": {
+       "color": {
+        "mode": "constant",
+        "value": "#9ec5e8"
+       }
+      },
+      "cluster": {
+       "color": {
+        "mode": "constant",
+        "value": "#e07a3f"
+       }
+      },
+      "region": {
+       "color": {
+        "mode": "constant",
+        "value": "#7a4fbf"
+       }
+      }
+     },
+     "tags": {}
+    },
+    "edges": {
+     "default": {
+      "color": {
+       "mode": "constant"
+      },
+      "width": {
+       "mode": "constant",
+       "value": 1
+      },
+      "opacity": {
+       "mode": "constant",
+       "value": 0.25
+      },
+      "visible": true,
+      "arrow": true
+     },
+     "types": {},
+     "tags": {}
+    },
+    "edgeLabels": false,
+    "curvedEdges": true
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:scene-conversations-by-cluster",
+   "kind": "entity",
+   "type": "scene",
+   "label": "Conversations by cluster",
+   "description": "Every conversation pulled to the clusters its segments fall in, and the clusters to their regions — the map of the corpus.",
+   "tags": [
+    "atlas",
+    "scene"
+   ],
+   "data": {
+    "renderer": "2d",
+    "filterId": "tpl:conversation-atlas:filter-conversations-by-cluster",
+    "layoutId": "tpl:conversation-atlas:layout-conversations-by-cluster",
+    "renderingId": "tpl:conversation-atlas:style-conversations-by-cluster",
+    "algorithm": "force",
+    "params": {
+     "spacing": 1,
+     "iterations": 400,
+     "direction": "TB",
+     "seed": 7,
+     "gravity": 1.5,
+     "scalingRatio": 20
+    },
+    "analysis": {
+     "auto": false,
+     "options": {
+      "metrics": [
+       "degree",
+       "inDegree",
+       "outDegree",
+       "pagerank",
+       "clustering",
+       "component",
+       "componentSize",
+       "community"
+      ]
+     }
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:filter-topics-and-domains",
+   "kind": "entity",
+   "type": "filter",
+   "label": "Topics, domains and themes · filter",
+   "tags": [
+    "atlas"
+   ],
+   "data": {
+    "tags": [],
+    "tagMode": "any",
+    "text": "",
+    "minDegree": 2,
+    "hideIsolated": true,
+    "roots": [],
+    "depth": 1,
+    "maxNodes": 5000,
+    "maxDegree": 0,
+    "kCore": 0,
+    "componentMin": 0,
+    "giantOnly": false,
+    "exclude": [],
+    "fields": [],
+    "direction": "both",
+    "types": [
+     "conversation",
+     "topic",
+     "domain",
+     "theme",
+     "persona"
+    ],
+    "relationshipTypes": [
+     "on-topic",
+     "in-domain",
+     "has-theme",
+     "about-persona"
+    ]
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:layout-topics-and-domains",
+   "kind": "entity",
+   "type": "layout",
+   "label": "Topics, domains and themes · layout",
+   "tags": [
+    "atlas"
+   ],
+   "data": {
+    "positions": {},
+    "algorithm": "force",
+    "params": {
+     "spacing": 1,
+     "iterations": 400,
+     "direction": "TB",
+     "seed": 7,
+     "gravity": 1.5,
+     "scalingRatio": 20
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:style-topics-and-domains",
+   "kind": "entity",
+   "type": "rendering",
+   "label": "Topics, domains and themes · style",
+   "tags": [
+    "atlas"
+   ],
+   "data": {
+    "precedence": "type",
+    "nodes": {
+     "default": {
+      "color": {
+       "mode": "constant"
+      },
+      "size": {
+       "mode": "ranking",
+       "attr": {
+        "kind": "degree"
+       },
+       "log": true,
+       "min": 2,
+       "max": 18
+      },
+      "opacity": {
+       "mode": "constant",
+       "value": 1
+      },
+      "shape": {
+       "mode": "constant",
+       "value": "circle"
+      },
+      "visible": true,
+      "label": true
+     },
+     "types": {
+      "conversation": {
+       "color": {
+        "mode": "constant",
+        "value": "#cfd8dc"
+       }
+      },
+      "topic": {
+       "color": {
+        "mode": "constant",
+        "value": "#0f766e"
+       }
+      },
+      "domain": {
+       "color": {
+        "mode": "constant",
+        "value": "#2563eb"
+       }
+      },
+      "theme": {
+       "color": {
+        "mode": "constant",
+        "value": "#e11d48"
+       }
+      },
+      "persona": {
+       "color": {
+        "mode": "constant",
+        "value": "#ca8a04"
+       }
+      }
+     },
+     "tags": {}
+    },
+    "edges": {
+     "default": {
+      "color": {
+       "mode": "constant"
+      },
+      "width": {
+       "mode": "constant",
+       "value": 1
+      },
+      "opacity": {
+       "mode": "constant",
+       "value": 0.25
+      },
+      "visible": true,
+      "arrow": true
+     },
+     "types": {},
+     "tags": {}
+    },
+    "edgeLabels": false,
+    "curvedEdges": true
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:scene-topics-and-domains",
+   "kind": "entity",
+   "type": "scene",
+   "label": "Topics, domains and themes",
+   "description": "The hub vocabulary — topics, domains, themes, personas — linked through the conversations that share them.",
+   "tags": [
+    "atlas",
+    "scene"
+   ],
+   "data": {
+    "renderer": "2d",
+    "filterId": "tpl:conversation-atlas:filter-topics-and-domains",
+    "layoutId": "tpl:conversation-atlas:layout-topics-and-domains",
+    "renderingId": "tpl:conversation-atlas:style-topics-and-domains",
+    "algorithm": "force",
+    "params": {
+     "spacing": 1,
+     "iterations": 400,
+     "direction": "TB",
+     "seed": 7,
+     "gravity": 1.5,
+     "scalingRatio": 20
+    },
+    "analysis": {
+     "auto": false,
+     "options": {
+      "metrics": [
+       "degree",
+       "inDegree",
+       "outDegree",
+       "pagerank",
+       "clustering",
+       "component",
+       "componentSize",
+       "community"
+      ]
+     }
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:filter-segments-similar",
+   "kind": "entity",
+   "type": "filter",
+   "label": "Similar segments · filter",
+   "tags": [
+    "atlas"
+   ],
+   "data": {
+    "tags": [],
+    "tagMode": "any",
+    "text": "",
+    "minDegree": 0,
+    "hideIsolated": true,
+    "roots": [],
+    "depth": 1,
+    "maxNodes": 6000,
+    "maxDegree": 0,
+    "kCore": 0,
+    "componentMin": 0,
+    "giantOnly": false,
+    "exclude": [],
+    "fields": [],
+    "direction": "both",
+    "types": [
+     "segment"
+    ],
+    "relationshipTypes": [
+     "similar-to"
+    ]
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:layout-segments-similar",
+   "kind": "entity",
+   "type": "layout",
+   "label": "Similar segments · layout",
+   "tags": [
+    "atlas"
+   ],
+   "data": {
+    "positions": {},
+    "algorithm": "force",
+    "params": {
+     "spacing": 1,
+     "iterations": 400,
+     "direction": "TB",
+     "seed": 7,
+     "gravity": 1.5,
+     "scalingRatio": 20
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:style-segments-similar",
+   "kind": "entity",
+   "type": "rendering",
+   "label": "Similar segments · style",
+   "tags": [
+    "atlas"
+   ],
+   "data": {
+    "precedence": "type",
+    "nodes": {
+     "default": {
+      "color": {
+       "mode": "constant"
+      },
+      "size": {
+       "mode": "ranking",
+       "attr": {
+        "kind": "degree"
+       },
+       "log": true,
+       "min": 2,
+       "max": 18
+      },
+      "opacity": {
+       "mode": "constant",
+       "value": 1
+      },
+      "shape": {
+       "mode": "constant",
+       "value": "circle"
+      },
+      "visible": true,
+      "label": true
+     },
+     "types": {
+      "segment": {
+       "color": {
+        "mode": "constant",
+        "value": "#0891b2"
+       }
+      }
+     },
+     "tags": {}
+    },
+    "edges": {
+     "default": {
+      "color": {
+       "mode": "constant"
+      },
+      "width": {
+       "mode": "constant",
+       "value": 1
+      },
+      "opacity": {
+       "mode": "constant",
+       "value": 0.25
+      },
+      "visible": true,
+      "arrow": true
+     },
+     "types": {},
+     "tags": {}
+    },
+    "edgeLabels": false,
+    "curvedEdges": true
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:scene-segments-similar",
+   "kind": "entity",
+   "type": "scene",
+   "label": "Similar segments",
+   "description": "Segments joined to the segments most like them (the pipeline’s similar-to links): the fine texture of the corpus, communities and all.",
+   "tags": [
+    "atlas",
+    "scene"
+   ],
+   "data": {
+    "renderer": "2d",
+    "filterId": "tpl:conversation-atlas:filter-segments-similar",
+    "layoutId": "tpl:conversation-atlas:layout-segments-similar",
+    "renderingId": "tpl:conversation-atlas:style-segments-similar",
+    "algorithm": "force",
+    "params": {
+     "spacing": 1,
+     "iterations": 400,
+     "direction": "TB",
+     "seed": 7,
+     "gravity": 1.5,
+     "scalingRatio": 20
+    },
+    "analysis": {
+     "auto": false,
+     "options": {
+      "metrics": [
+       "degree",
+       "inDegree",
+       "outDegree",
+       "pagerank",
+       "clustering",
+       "component",
+       "componentSize",
+       "community"
+      ]
+     }
+    }
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:guide",
+   "kind": "entity",
+   "type": "document",
+   "label": "Reading the conversation atlas",
+   "tags": [
+    "atlas",
+    "guide"
+   ],
+   "data": {
+    "extension": "md",
+    "content": "# Reading the conversation atlas\n\nThis project holds a ChatGPT export run through the atlas pipeline (a separate, private tool): every *conversation* is split into *segments* (one coherent stretch each), and every segment is labelled against a fixed ontology — **domain**, **topic**, **theme**, **intent**, **mode**, **register**, **persona**, **entity**, **artifact**, **stakes** — as `facet:value` tags and `data.facets`. The segments are then clustered in the space of those labels into **clusters** and, above them, **regions**.\n\nThe analytics here are the Conversation atlas template, and they are all yours to change: a chart is a spec you can edit in its Charts tab, a script is code you can read and run, a scene is a filter and a style you can adjust in the Graph Explorer.\n\n## Where to look\n\n- **Analytics** — the tabs on the left are the charts, the tabs on the right the scripts. *Conversations per month* and *cumulative* are the pace; *Segments per month by region* and *Month × region* are what it was about and when; *Stakes*, *Modes* and *Intent mix* are how; *Segment length*, *Messages vs length* and *Salience* are the shape of the exchanges; *Top topics*, *Domain × theme*, *Topic emergence*, *Hubs* are the vocabulary.\n- **Graph Explorer** — *Regions and clusters*, *Conversations by cluster*, *Topics, domains and themes*, *Similar segments* are saved scenes; open one from the scene picker.\n- **Entities** — every segment, conversation, topic, region… as tables; the Tags rail filters by any facet value.\n- **Insights** — the analytics harness finds hubs, communities, bursts and anomalies over the whole thing.\n\n## Reproducing this\n\nRun the pipeline over an export (`acp all`) and open the bundle it writes, `data/out/conversation-atlas.ae.json` (Open bundle…, or `/open?url=…`): it arrives as a project with these charts, scripts and scenes already in place. Open a fresh run of it and the data updates while your pictures stay.\n"
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  },
+  {
+   "id": "tpl:conversation-atlas:workstation",
+   "kind": "entity",
+   "type": "workstation",
+   "label": "Conversation atlas",
+   "description": "The guide and the tables beside the map and the charts.",
+   "tags": [
+    "atlas"
+   ],
+   "data": {
+    "root": {
+     "kind": "split",
+     "id": "s0",
+     "dir": "row",
+     "ratio": 0.42,
+     "children": [
+      {
+       "kind": "pane",
+       "id": "p0",
+       "active": 0,
+       "tabs": [
+        {
+         "id": "t0",
+         "path": "/documents/tpl:conversation-atlas:guide",
+         "title": "Guide",
+         "back": [],
+         "forward": []
+        },
+        {
+         "id": "t1",
+         "path": "/entities?category=resource&type=conversation",
+         "title": "Conversations",
+         "back": [],
+         "forward": []
+        },
+        {
+         "id": "t2",
+         "path": "/entities?category=knowledge&type=region",
+         "title": "Regions",
+         "back": [],
+         "forward": []
+        },
+        {
+         "id": "t3",
+         "path": "/entities?category=knowledge&type=topic",
+         "title": "Topics",
+         "back": [],
+         "forward": []
+        }
+       ]
+      },
+      {
+       "kind": "pane",
+       "id": "p1",
+       "active": 0,
+       "tabs": [
+        {
+         "id": "t4",
+         "path": "/graph/2d?scene=tpl:conversation-atlas:scene-conversations-by-cluster",
+         "title": "Conversations by cluster",
+         "back": [],
+         "forward": []
+        },
+        {
+         "id": "t5",
+         "path": "/graph/2d?scene=tpl:conversation-atlas:scene-regions-clusters",
+         "title": "Regions and clusters",
+         "back": [],
+         "forward": []
+        },
+        {
+         "id": "t6",
+         "path": "/graph/2d?scene=tpl:conversation-atlas:scene-topics-and-domains",
+         "title": "Topics and domains",
+         "back": [],
+         "forward": []
+        },
+        {
+         "id": "t7",
+         "path": "/graph/2d?scene=tpl:conversation-atlas:scene-segments-similar",
+         "title": "Similar segments",
+         "back": [],
+         "forward": []
+        },
+        {
+         "id": "t8",
+         "path": "/analytics",
+         "title": "Analytics",
+         "back": [],
+         "forward": []
+        }
+       ]
+      }
+     ]
+    },
+    "focused": "p0"
+   },
+   "meta": {
+    "createdAt": "2026-09-15T00:00:00.000Z",
+    "updatedAt": "2026-09-15T00:00:00.000Z",
+    "source": "template:conversation-atlas"
+   }
+  }
+ ],
+ "state": {
+  "route": "/analytics",
+  "ui": {
+   "aegraph:analytics:v1": "{\"ws\":{\"root\":{\"kind\":\"split\",\"id\":\"s0\",\"dir\":\"row\",\"ratio\":0.5,\"children\":[{\"kind\":\"pane\",\"id\":\"p0\",\"active\":0,\"tabs\":[{\"id\":\"t0\",\"path\":\"/analytics/charts?plot=tpl:conversation-atlas:chart-conversations-per-month\",\"title\":\"Pace\",\"back\":[],\"forward\":[]},{\"id\":\"t1\",\"path\":\"/analytics/charts?plot=tpl:conversation-atlas:chart-segments-by-region\",\"title\":\"Subjects over time\",\"back\":[],\"forward\":[]},{\"id\":\"t2\",\"path\":\"/analytics/charts?plot=tpl:conversation-atlas:chart-month-by-region\",\"title\":\"Month × region\",\"back\":[],\"forward\":[]},{\"id\":\"t3\",\"path\":\"/analytics/charts?plot=tpl:conversation-atlas:chart-stakes-per-quarter\",\"title\":\"Stakes\",\"back\":[],\"forward\":[]},{\"id\":\"t4\",\"path\":\"/analytics/charts?plot=tpl:conversation-atlas:chart-mode-per-month\",\"title\":\"Modes\",\"back\":[],\"forward\":[]},{\"id\":\"t5\",\"path\":\"/analytics/charts?plot=tpl:conversation-atlas:chart-messages-vs-length\",\"title\":\"Shape\",\"back\":[],\"forward\":[]},{\"id\":\"t6\",\"path\":\"/analytics/charts?plot=tpl:conversation-atlas:chart-salience-per-month\",\"title\":\"Salience\",\"back\":[],\"forward\":[]},{\"id\":\"t7\",\"path\":\"/analytics/charts?plot=tpl:conversation-atlas:chart-models-over-time\",\"title\":\"Models\",\"back\":[],\"forward\":[]}]},{\"kind\":\"pane\",\"id\":\"p1\",\"active\":0,\"tabs\":[{\"id\":\"t10\",\"path\":\"/analytics/scripts?script=tpl:conversation-atlas:script-top-topics\",\"title\":\"Top topics\",\"back\":[],\"forward\":[]},{\"id\":\"t11\",\"path\":\"/analytics/scripts?script=tpl:conversation-atlas:script-domain-x-theme\",\"title\":\"Domain × theme\",\"back\":[],\"forward\":[]},{\"id\":\"t12\",\"path\":\"/analytics/scripts?script=tpl:conversation-atlas:script-topic-emergence\",\"title\":\"Topic emergence\",\"back\":[],\"forward\":[]},{\"id\":\"t13\",\"path\":\"/analytics/scripts?script=tpl:conversation-atlas:script-intent-mix\",\"title\":\"Intent mix\",\"back\":[],\"forward\":[]},{\"id\":\"t14\",\"path\":\"/analytics/scripts?script=tpl:conversation-atlas:script-region-timelines\",\"title\":\"Region timelines\",\"back\":[],\"forward\":[]},{\"id\":\"t15\",\"path\":\"/analytics/scripts?script=tpl:conversation-atlas:script-length-trend\",\"title\":\"Length trend\",\"back\":[],\"forward\":[]},{\"id\":\"t16\",\"path\":\"/analytics/scripts?script=tpl:conversation-atlas:script-hubs\",\"title\":\"Hubs\",\"back\":[],\"forward\":[]},{\"id\":\"t17\",\"path\":\"/analytics/scripts?script=tpl:conversation-atlas:script-starred-and-salient\",\"title\":\"Stood out\",\"back\":[],\"forward\":[]}]}]},\"focused\":\"p0\"},\"dirty\":false}",
+   "aegraph:workstation:v1": "{\"ws\":{\"root\":{\"kind\":\"split\",\"id\":\"s0\",\"dir\":\"row\",\"ratio\":0.42,\"children\":[{\"kind\":\"pane\",\"id\":\"p0\",\"active\":0,\"tabs\":[{\"id\":\"t0\",\"path\":\"/documents/tpl:conversation-atlas:guide\",\"title\":\"Guide\",\"back\":[],\"forward\":[]},{\"id\":\"t1\",\"path\":\"/entities?category=resource&type=conversation\",\"title\":\"Conversations\",\"back\":[],\"forward\":[]},{\"id\":\"t2\",\"path\":\"/entities?category=knowledge&type=region\",\"title\":\"Regions\",\"back\":[],\"forward\":[]},{\"id\":\"t3\",\"path\":\"/entities?category=knowledge&type=topic\",\"title\":\"Topics\",\"back\":[],\"forward\":[]}]},{\"kind\":\"pane\",\"id\":\"p1\",\"active\":0,\"tabs\":[{\"id\":\"t4\",\"path\":\"/graph/2d?scene=tpl:conversation-atlas:scene-conversations-by-cluster\",\"title\":\"Conversations by cluster\",\"back\":[],\"forward\":[]},{\"id\":\"t5\",\"path\":\"/graph/2d?scene=tpl:conversation-atlas:scene-regions-clusters\",\"title\":\"Regions and clusters\",\"back\":[],\"forward\":[]},{\"id\":\"t6\",\"path\":\"/graph/2d?scene=tpl:conversation-atlas:scene-topics-and-domains\",\"title\":\"Topics and domains\",\"back\":[],\"forward\":[]},{\"id\":\"t7\",\"path\":\"/graph/2d?scene=tpl:conversation-atlas:scene-segments-similar\",\"title\":\"Similar segments\",\"back\":[],\"forward\":[]},{\"id\":\"t8\",\"path\":\"/analytics\",\"title\":\"Analytics\",\"back\":[],\"forward\":[]}]}]},\"focused\":\"p0\"},\"presetId\":\"tpl:conversation-atlas:workstation\",\"dirty\":false}"
+  }
+ }
+}

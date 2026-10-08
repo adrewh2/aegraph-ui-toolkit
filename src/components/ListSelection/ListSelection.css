@@ -1,0 +1,42 @@
+.lsel__marquee {
+  position: fixed;
+  pointer-events: none;
+  border: 1px solid #6f9ee0;
+  background: rgba(59, 125, 221, 0.12);
+  border-radius: 2px;
+  z-index: 30;
+}
+.lsel__bar {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  font-size: 13px;
+  z-index: 20;
+}
+.lsel__name {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Selected cards and rows */
+[data-sel-root] [data-id].is-selected {
+  outline: 2px solid #6f9ee0;
+  outline-offset: -2px;
+  background: #eef4fc;
+}
+.is-marquee [data-sel-root],
+.is-marquee [data-sel-root] * {
+  user-select: none;
+}

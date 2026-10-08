@@ -1,0 +1,55 @@
+/* A saved scene or part in the inspector: open buttons, then what it holds. */
+.gp {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.gp__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.gp__actions .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.gp__rows {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.gp__row {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.gp__row dt {
+  color: var(--text-muted);
+}
+.gp__row dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.gp__ref {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--info-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.gp__ref:hover {
+  text-decoration: underline;
+}
+.gp__hint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+}

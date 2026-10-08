@@ -1,0 +1,183 @@
+/* The type editor (TypeEditor.tsx): the New type dialog and the type's Edit view. */
+.tyed-dialog {
+  max-width: 820px;
+}
+.tyed {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.tyed__section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.tyed__h {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+.tyed__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
+}
+@media (max-width: 640px) {
+  .tyed__grid {
+    grid-template-columns: 1fr;
+  }
+}
+.tyed .field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+}
+.tyed .field > span:first-child {
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+}
+.tyed__hint {
+  font-size: 12px;
+  margin: 0;
+}
+.tyed__issue {
+  font-size: 12px;
+  color: var(--danger);
+}
+.tyed__desc {
+  min-height: 64px;
+  resize: vertical;
+}
+.tyed__color {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  font-size: 12px;
+}
+
+/* Properties: a row each — details toggle, name, label, kind, required, move and remove. */
+.tyed__props {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.tyed__prop {
+  display: grid;
+  grid-template-columns: 28px minmax(110px, 1fr) minmax(110px, 1fr) minmax(150px, 1.2fr) 64px 84px;
+  gap: 6px;
+  align-items: center;
+  padding: 5px 8px;
+}
+.tyed__prop .input {
+  height: 30px;
+}
+.tyed__prop input[type='checkbox'] {
+  justify-self: center;
+}
+.tyed__prop--head {
+  background: var(--surface-2);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+.tyed__prop--head span:nth-child(5) {
+  text-align: center;
+}
+.tyed__prop-wrap {
+  border-top: 1px solid var(--border);
+}
+.tyed__prop-wrap.has-issue {
+  background: color-mix(in srgb, var(--danger) 5%, transparent);
+}
+.tyed__row-actions {
+  display: inline-flex;
+  justify-content: flex-end;
+}
+.tyed__prop-note {
+  padding: 0 8px 6px 42px;
+  font-size: 12px;
+}
+.tyed__prop-more {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 2px 8px 10px 42px;
+}
+.tyed__options {
+  min-height: 60px;
+  resize: vertical;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 12px;
+}
+.tyed__add {
+  align-self: flex-start;
+}
+@media (max-width: 640px) {
+  .tyed__prop {
+    grid-template-columns: 28px 1fr 1fr;
+  }
+  .tyed__prop--head span:nth-child(n + 4) {
+    display: none;
+  }
+  .tyed__prop-more {
+    grid-template-columns: 1fr;
+    padding-left: 8px;
+  }
+}
+
+/* What the type has without defining it. */
+.tyed__inherited ul {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.tyed__inherited li {
+  display: inline-flex;
+  gap: 6px;
+  align-items: baseline;
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 12px;
+  background: var(--surface-2);
+}
+.tyed__inherited li.is-shadowed {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+/* What saving will do to existing entities. */
+.tyed__plan {
+  border: 1px solid color-mix(in srgb, var(--warn-text) 35%, var(--border));
+  background: var(--warn-bg);
+  color: var(--warn-text);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+}
+.tyed__plan ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+
+/* The Edit view: the form in a readable column under the page head. */
+.tyed-page__body {
+  max-width: 900px;
+  padding: 0 0 40px;
+}

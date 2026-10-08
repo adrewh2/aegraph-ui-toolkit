@@ -1,0 +1,148 @@
+/* The Edit… dialog of an entity: a fixed frame (title, footer) around a body that scrolls, the entity on the left and
+   its properties in a grid on the right — the width of the screen used, the Save button always in reach. */
+.dialog.edit-dialog {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: min(1120px, calc(100vw - 48px));
+  max-height: min(820px, calc(100vh - 48px));
+  padding: 0;
+  overflow: hidden;
+}
+.edit-dialog .dialog__title {
+  margin: 0;
+  padding: 18px 24px 14px;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.edit-dialog .dialog__body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 20px 24px 24px;
+}
+.edit-dialog .dialog__footer {
+  align-items: center;
+  margin: 0;
+  padding: 12px 24px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-2);
+}
+.edit-dialog__who {
+  display: flex;
+  margin-right: auto;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 12px;
+}
+.edit-dialog__type {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.edit-dialog__type::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--type-color, var(--text-faint));
+}
+.edit-dialog__id {
+  min-width: 0;
+  overflow: hidden;
+  padding: 2px 6px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: copy;
+}
+.edit-dialog__id:hover {
+  background: var(--surface);
+  color: var(--text-muted);
+}
+.edit-dialog__keys {
+  font-size: 11.5px;
+}
+
+.edit-entity {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+}
+.edit-entity__main {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.edit-entity__name {
+  font-size: 15px;
+  font-weight: 600;
+}
+.edit-entity .tag-editor__suggest {
+  max-height: 84px;
+  overflow: auto;
+}
+.edit-entity__props {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.edit-entity__props-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 30px;
+}
+.edit-entity__props-head h4 {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.edit-entity__filter {
+  max-width: 240px;
+  margin-left: auto;
+}
+.edit-entity__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px 18px;
+}
+.edit-entity__grid .field.is-wide {
+  grid-column: 1 / -1;
+}
+.edit-entity__grid .field > label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.edit-entity__none {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+@media (max-width: 760px) {
+  .edit-entity {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .edit-entity__main {
+    position: static;
+  }
+}
