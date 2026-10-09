@@ -125,7 +125,7 @@ jobs:
           # The whole history: a key removed in a later commit is still a key that leaked.
           fetch-depth: 0
       - name: Scan every commit for credentials
-        uses: trufflesecurity/trufflehog@4dd8831c5f12599465d4d45c3c447b4018a34c85 # v3.97.9
+        uses: trufflesecurity/trufflehog@b2b0a92070f206ab7b5a1105d82a7f2f48d92341 # v3.99.0
         with:
           extra_args: --results=verified,unknown
           # The action runs the scanner as a container image whose tag defaults to `latest`:
