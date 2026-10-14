@@ -67,6 +67,13 @@ export const GpuGraph = forwardRef<GraphViewHandle, GraphViewProps & { dims: 2 |
   const packRef = useRef<{ ids: string[]; xyz: Float32Array; at: number } | null>(null)
   /** Where a running simulation last read the held positions: what moved since is somebody else's and the engine follows it. */
   const runFrom = useRef(0)
+  /**
+   * A live run being stopped, until it is: the next one waits for it. Started over it, the stop's last read-back
+   * landed in the new run and its end destroyed it — a scene loaded under a running simulation lost the simulation.
+   */
+  const stopping = useRef<Promise<void> | null>(null)
+  /** The next live run starts warm: the picture under the last one was replaced (a scene, a loaded layout) and it goes on. */
+  const warmNext = useRef(false)
   /** Whether the ids beside the numbers in storage are this graph's (see `saveHeldPositionsPacked`). */
   const wroteIds = useRef(false)
   const [physics, setPhysics] = useState<PhysicsState | null>(null)
@@ -82,6 +89,9 @@ export const GpuGraph = forwardRef<GraphViewHandle, GraphViewProps & { dims: 2 |
   const [bench, setBench] = useState<{ running: string; result?: BenchResult; loaded?: string }>({ running: '' })
   const live = useRef({ state, slice, computePath })
   live.current = { state, slice, computePath }
+  /** The explorer's positions as they are now, for what runs after the render that set them (a run's start and stop). */
+  const positionsForRef = useRef(positionsFor)
+  positionsForRef.current = positionsFor
   const viewKey = `${sliceKey}|${state.algorithm}|${state.layoutId ?? ''}`
   const viewKeyRef = useRef(viewKey)
   viewKeyRef.current = viewKey
@@ -273,13 +283,26 @@ export const GpuGraph = forwardRef<GraphViewHandle, GraphViewProps & { dims: 2 |
     const engine = engineRef.current
     if (!engine || sourceRef.current !== 'explorer') return
     const { positions } = positionsFor(dims)
+    // How many of the slice's nodes the engine does not hold yet: new data warms a live run by as much as it changes.
+    let joined = 0
+    for (const n of slice.nodes) {
+      const i = engine.nodeIndex(n.id)
+      if (i < 0 || !engine.graph.nodeAlive.has(i)) joined++
+    }
     // A running simulation owns the positions of the nodes it already holds: a write to the project must not put the
     // picture back to wherever the run was last read from. What has just arrived is placed as usual.
     compileSlice(engine, slice, styles, positions, { showEdges: state.showEdges, curvedEdges: state.rendering.curvedEdges, pinned: pinnedSet, keepPositions: engine.physicsState().on })
     packRef.current = null
     wroteIds.current = false
-    // A running simulation holds the old graph's adjacency: it starts over on the new one.
-    if (engine.physicsState().on) engine.startPhysics(live.current.state.physics ? liveForceParams(live.current.state.params, engine.dims) : forceParams(live.current.state.params, engine.dims))
+    // A running simulation holds the old graph's adjacency: it starts over on the new one — unless it is being stopped
+    // (its picture replaced; the live run's effect starts the next one over the new picture). A live run starts as
+    // hot as the change: settling the picture when nothing joined, warmed like a drag when a few nodes did, from
+    // scratch when most of what is drawn is new.
+    if (engine.physicsState().on && !stopping.current) {
+      const st = live.current.state
+      const alpha = !st.physics ? undefined : joined === 0 ? WARM_ALPHA : joined * 2 < slice.nodes.length ? JOIN_ALPHA : undefined
+      engine.startPhysics({ ...(st.physics ? liveForceParams(st.params, engine.dims) : forceParams(st.params, engine.dims)), ...(alpha === undefined ? {} : { alpha }) })
+    }
     syncUi()
     restoreCamera()
   }
@@ -474,123 +497,171 @@ export const GpuGraph = forwardRef<GraphViewHandle, GraphViewProps & { dims: 2 |
   // What the explorer set while the run was on is newer than the simulation and stays: a placement ("every tree
   // where it stands"), a transform, a loaded layout, a dragged node — each replaces the position objects it moved,
   // so a node whose held position is not the one the run started from keeps it, and the engine is brought to it.
+  // The switch is a standing choice (`ExplorerState.physics`): the run rests when it has cooled and goes on. A picture
+  // replaced under it — a scene, a loaded layout, a restore — starts the run again over the new picture, warm.
+  const picture = state.physics ? state.positions.id : 0
+  const restored = state.restoring === undefined
   useEffect(() => {
     const engine = engineRef.current
-    if (!engine || !state.physics || sourceRef.current !== 'explorer') return
-    // Where the last hand-back read the held positions. A node the person moved (or a layout placed) since then
-    // keeps that position, not the simulation's: the store lists what has changed, minus the simulation's own
-    // hand-backs, which are tagged so they are recognised however many versions the dispatches take (a reducer
-    // runs twice under StrictMode, and a drag can land between reading and dispatching). When it cannot say, the
-    // simulation's positions stand — a node dragged during a run is pinned where it was dropped anyway.
-    runFrom.current = live.current.state.positions.version
-    // Packed (ids and a column of coordinates), so a million nodes are handed over without a million-key object.
-    // Returns the nodes the explorer holds over the run's.
-    const handBack = (): EntityId[] => {
-      const t0 = performance.now()
-      const held = live.current.state.positions
-      const since = held.movedSince(runFrom.current, { ignore: PHYSICS_TAG })
-      const theirs = since && since.length ? new Set(since) : undefined
-      const g = engine.graph
-      const three = engine.dims === 3
-      const ids: EntityId[] = []
-      const xyz = new Float32Array(g.nodeCount * 3)
-      for (let i = 0; i < g.nodeCount; i++) {
-        if (!g.nodeAlive.has(i)) continue
-        const id = engine.nodeId(i)
-        if (id === undefined || theirs?.has(id)) continue
-        const k = ids.length * 3
-        xyz[k] = engine.x(i)
-        xyz[k + 1] = engine.y(i)
-        if (three) xyz[k + 2] = engine.z(i)
-        ids.push(id)
+    // Not while a session's positions are still being restored: the run would start over the seed cloud, and again
+    // the moment they land.
+    if (!engine || !state.physics || sourceRef.current !== 'explorer' || !restored) return
+    let gone = false
+    let end: (() => void) | undefined
+    const run = (): (() => void) | undefined => {
+      const store = live.current.state.positions.id
+      // The engine follows the picture before the run starts on it: replaced while the last run was stopping, the
+      // positions were not the engine's business then (it was still on), and are now.
+      const { positions: now } = positionsForRef.current(engine.dims)
+      if (now !== lastSynced.current) {
+        syncPositions(engine, now)
+        lastSynced.current = now
       }
-      runFrom.current = held.version
-      dispatch({ type: 'movePacked', ids, xyz, dims: engine.dims, from: PHYSICS_TAG })
-      // What the hand-back costs, for the cadence above to be set from measurement rather than taste.
-      measure('gx:handback', { start: t0, detail: { nodes: g.nodeCount } })
-      return theirs ? [...theirs] : []
-    }
-    // Switched on over a finished picture (`physicsWarm`), the run starts cool: it settles what is there instead of
-    // flinging it apart at full heat and re-forming it, which is what a first visit used to see.
-    const mode = engine.startPhysics({ ...liveForceParams(live.current.state.params, engine.dims), ...(live.current.state.physicsWarm ? { alpha: WARM_ALPHA } : {}) })
-    if (!mode) {
-      dispatch({ type: 'setPhysics', on: false })
-      return
-    }
-    // Settled: the positions it came to rest on are held and written, once — nothing moves until it is warmed again.
-    const off = engine.on('physics', (st) => {
-      if (st.on && st.cooled) {
-        handBack()
-        keep()
-      }
-    })
-    // While it moves it has to be saveable and survive a reload, so what it reached is written every few seconds.
-    handBackRef.current = handBack
-    // What the run reaches is written to storage straight from the engine's arrays — the ids once, then a fill of a
-    // float per coordinate — so a picture of a million nodes is saved while it moves for about the cost of a frame.
-    // The session's own positions are not touched while it runs: the picture, a save, an export and a tool read all
-    // take them from the engine, and a hand-back at the boundaries (behind, stopped, asked for) keeps them true.
-    const keep = () => {
-      const t0 = performance.now()
-      const g = engine.graph
-      let pack = packRef.current
-      const sameIds = !!pack && pack.at === g.nodeCount
-      if (!pack || pack.at !== g.nodeCount) {
-        const ids: string[] = []
+      // Warm over a picture that is placed — switched on over a scene's saved positions, restored, or carried on over
+      // a replaced picture — so it settles that picture rather than flinging it apart and re-forming it.
+      const { state: st0, slice: sl } = live.current
+      let placed = 0
+      for (const n of sl.nodes) if (st0.positions.get(n.id)) placed++
+      const warm = sl.nodes.length > 0 && placed >= sl.nodes.length * WARM_PLACED && (!!st0.physicsWarm || warmNext.current)
+      warmNext.current = false
+      // Where the last hand-back read the held positions. A node the person moved (or a layout placed) since then
+      // keeps that position, not the simulation's: the store lists what has changed, minus the simulation's own
+      // hand-backs, which are tagged so they are recognised however many versions the dispatches take (a reducer
+      // runs twice under StrictMode, and a drag can land between reading and dispatching). When it cannot say, the
+      // simulation's positions stand — a node dragged during a run is pinned where it was dropped anyway.
+      runFrom.current = live.current.state.positions.version
+      // Packed (ids and a column of coordinates), so a million nodes are handed over without a million-key object.
+      // Returns the nodes the explorer holds over the run's.
+      const handBack = (): EntityId[] => {
+        const t0 = performance.now()
+        const held = live.current.state.positions
+        // Only into the picture it ran on: one that replaced it (a scene, a loaded layout) is not this run's to write.
+        if (held.id !== store) return []
+        const since = held.movedSince(runFrom.current, { ignore: PHYSICS_TAG })
+        const theirs = since && since.length ? new Set(since) : undefined
+        const g = engine.graph
+        const three = engine.dims === 3
+        const ids: EntityId[] = []
+        const xyz = new Float32Array(g.nodeCount * 3)
         for (let i = 0; i < g.nodeCount; i++) {
           if (!g.nodeAlive.has(i)) continue
           const id = engine.nodeId(i)
-          if (id !== undefined) ids.push(id)
+          if (id === undefined || theirs?.has(id)) continue
+          const k = ids.length * 3
+          xyz[k] = engine.x(i)
+          xyz[k + 1] = engine.y(i)
+          if (three) xyz[k + 2] = engine.z(i)
+          ids.push(id)
         }
-        pack = packRef.current = { ids, xyz: new Float32Array(ids.length * 3), at: g.nodeCount }
+        runFrom.current = held.version
+        dispatch({ type: 'movePacked', ids, xyz, dims: engine.dims, from: PHYSICS_TAG, store })
+        // What the hand-back costs, for the cadence above to be set from measurement rather than taste.
+        measure('gx:handback', { start: t0, detail: { nodes: g.nodeCount } })
+        return theirs ? [...theirs] : []
       }
-      const { ids, xyz } = pack
-      let k = 0
-      for (let i = 0; i < g.nodeCount && k < ids.length; i++) {
-        if (!g.nodeAlive.has(i)) continue
-        xyz[k * 3] = engine.x(i)
-        xyz[k * 3 + 1] = engine.y(i)
-        xyz[k * 3 + 2] = engine.dims === 3 ? engine.z(i) : 0
-        k++
+      const mode = engine.startPhysics({ ...liveForceParams(live.current.state.params, engine.dims), ...(warm ? { alpha: WARM_ALPHA } : {}) })
+      if (!mode) {
+        dispatch({ type: 'setPhysics', on: false })
+        return
       }
-      void saveHeldPositionsPacked(positionsStorageKey, { ids, xyz, dims: engine.dims, count: ids.length }, sameIds && wroteIds.current).catch(() => undefined)
-      wroteIds.current = true
-      measure('gx:keeppositions', { start: t0, detail: { nodes: ids.length } })
-      return performance.now() - t0
-    }
-    finalKeep.current = () => {
-      if (engine.physicsState().on) keep()
-    }
-    // Paced by what it costs, so it never has more than KEEP_SHARE of the main thread: a second apart on anything
-    // ordinary, further on a graph of a million or a machine that needs it.
-    let beat = 0
-    const tick = () => {
-      let next = KEEP_MAX_MS
-      // Behind: the engine is paused, and what it reached was handed over and written on the way there.
-      if (viewActiveRef.current && engine.physicsState().on && !engine.physicsState().cooled) next = Math.min(KEEP_MAX_MS, Math.max(KEEP_MIN_MS, keep() / KEEP_SHARE))
-      beat = window.setTimeout(tick, next)
-    }
-    beat = window.setTimeout(tick, KEEP_MIN_MS)
-    return () => {
-      off()
-      clearTimeout(beat)
-      finalKeep.current = null
-      handBackRef.current = null
-      // Stopped: the positions the explorer kept over the run's are pushed into the engine, so the picture is theirs.
-      void engine.stopPhysics().then(() => {
-        const theirs = handBack()
-        if (!theirs.length) return
-        const held = live.current.state.positions
-        const push: Positions = {}
-        for (const id of theirs) {
-          const p = held.get(id)
-          if (p) push[id] = p
+      // Settled: the positions it came to rest on are held and written, once — nothing moves until it is warmed again.
+      const off = engine.on('physics', (st) => {
+        if (st.on && st.cooled) {
+          handBack()
+          keep()
         }
-        syncPositions(engine, push)
       })
+      // While it moves it has to be saveable and survive a reload, so what it reached is written every few seconds.
+      handBackRef.current = handBack
+      // What the run reaches is written to storage straight from the engine's arrays — the ids once, then a fill of a
+      // float per coordinate — so a picture of a million nodes is saved while it moves for about the cost of a frame.
+      // The session's own positions are not touched while it runs: the picture, a save, an export and a tool read all
+      // take them from the engine, and a hand-back at the boundaries (behind, stopped, asked for) keeps them true.
+      const keep = () => {
+        const t0 = performance.now()
+        const g = engine.graph
+        let pack = packRef.current
+        const sameIds = !!pack && pack.at === g.nodeCount
+        if (!pack || pack.at !== g.nodeCount) {
+          const ids: string[] = []
+          for (let i = 0; i < g.nodeCount; i++) {
+            if (!g.nodeAlive.has(i)) continue
+            const id = engine.nodeId(i)
+            if (id !== undefined) ids.push(id)
+          }
+          pack = packRef.current = { ids, xyz: new Float32Array(ids.length * 3), at: g.nodeCount }
+        }
+        const { ids, xyz } = pack
+        let k = 0
+        for (let i = 0; i < g.nodeCount && k < ids.length; i++) {
+          if (!g.nodeAlive.has(i)) continue
+          xyz[k * 3] = engine.x(i)
+          xyz[k * 3 + 1] = engine.y(i)
+          xyz[k * 3 + 2] = engine.dims === 3 ? engine.z(i) : 0
+          k++
+        }
+        void saveHeldPositionsPacked(positionsStorageKey, { ids, xyz, dims: engine.dims, count: ids.length }, sameIds && wroteIds.current).catch(() => undefined)
+        wroteIds.current = true
+        measure('gx:keeppositions', { start: t0, detail: { nodes: ids.length } })
+        return performance.now() - t0
+      }
+      finalKeep.current = () => {
+        if (engine.physicsState().on) keep()
+      }
+      // Paced by what it costs, so it never has more than KEEP_SHARE of the main thread: a second apart on anything
+      // ordinary, further on a graph of a million or a machine that needs it.
+      let beat = 0
+      const tick = () => {
+        let next = KEEP_MAX_MS
+        // Behind: the engine is paused, and what it reached was handed over and written on the way there.
+        if (viewActiveRef.current && engine.physicsState().on && !engine.physicsState().cooled) next = Math.min(KEEP_MAX_MS, Math.max(KEEP_MIN_MS, keep() / KEEP_SHARE))
+        beat = window.setTimeout(tick, next)
+      }
+      beat = window.setTimeout(tick, KEEP_MIN_MS)
+      return () => {
+        off()
+        clearTimeout(beat)
+        finalKeep.current = null
+        handBackRef.current = null
+        const replaced = live.current.state.positions.id !== store
+        // Replaced and still switched on: the next run carries on over the new picture.
+        if (replaced && live.current.state.physics) warmNext.current = true
+        const stopped: Promise<void> = engine.stopPhysics().then(() => {
+          if (stopping.current === stopped) stopping.current = null
+          // Replaced under the run: what it reached belongs to the picture that went, and the engine is brought to the
+          // one that came instead.
+          if (replaced) {
+            const { positions } = positionsForRef.current(engine.dims)
+            syncPositions(engine, positions)
+            lastSynced.current = positions
+            return
+          }
+          // Stopped: the positions the explorer kept over the run's are pushed into the engine, so the picture is theirs.
+          const theirs = handBack()
+          if (!theirs.length) return
+          const held = live.current.state.positions
+          const push: Positions = {}
+          for (const id of theirs) {
+            const p = held.get(id)
+            if (p) push[id] = p
+          }
+          syncPositions(engine, push)
+        })
+        stopping.current = stopped
+      }
+    }
+    // A run still being stopped finishes first.
+    const begin = () => {
+      if (!gone) end = run()
+    }
+    if (stopping.current) void stopping.current.then(begin)
+    else begin()
+    return () => {
+      gone = true
+      end?.()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.physics])
+  }, [state.physics, picture, restored])
 
   // The Layout tab's Force (Unigraph) knobs reach a running simulation at once — a picture tuned by eye.
   useEffect(() => {
@@ -604,12 +675,19 @@ export const GpuGraph = forwardRef<GraphViewHandle, GraphViewProps & { dims: 2 |
    * on (it cools and rests, and a drag or a change warms it again), a Run borrows it for a cooling run it can hand a
    * layout back from, and stops it at the end. So a Run must give it back — otherwise the switch was left reading on
    * over a simulation that had been stopped under it, and a drag no longer warmed anything. It comes back already at
-   * rest (`alpha` 0): the Run has just settled the picture, and a fresh start would shake it all over again.
+   * rest (`alpha` 0): the Run has just settled the picture, and a fresh start would shake it all over again. With the
+   * switch off, a Run of the simulation switches it on: the picture it settled stays live, so the next drag, scene or
+   * change of data is answered without another Run (Physics turns it off again).
    */
   const resumeLivePhysics = useCallback(() => {
     const engine = engineRef.current
-    if (!engine || !live.current.state.physics || engine.physicsState().on) return
+    if (!engine || sourceRef.current !== 'explorer' || engine.physicsState().on) return
+    if (!live.current.state.physics) {
+      dispatch({ type: 'setPhysics', on: true, warm: true })
+      return
+    }
     engine.startPhysics({ ...liveForceParams(live.current.state.params, engine.dims), alpha: 0 })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Force (Unigraph) as a layout run: Run in the Layout tab (or graph_layout) steps the simulation here, on the GPU
@@ -858,6 +936,10 @@ const forceParams = (params: Pick<LayoutParams, 'unigraph'>, dims: 2 | 3) => ({ 
 const LIVE_ALPHA_TARGET = 0
 /** Where a run starts over a picture whose nodes are all placed already: enough to settle it, not to re-form it. */
 const WARM_ALPHA = 0.04
+/** The share of the slice that must be placed for a run to start warm over it. */
+const WARM_PLACED = 0.9
+/** Where a live run restarts when a few nodes join the picture (new data, a wider filter): a drag's warmth. */
+const JOIN_ALPHA = 0.3
 /**
  * How often a live run writes what it has reached to storage. It never cools now, so it cannot wait for that, and
  * it is the only reason the run's positions leave the engine at all while it runs: the picture is the engine's, and

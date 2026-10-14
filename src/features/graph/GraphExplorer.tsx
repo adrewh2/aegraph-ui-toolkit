@@ -1005,8 +1005,8 @@ function ExplorerShell({ session }: { session?: string }) {
     dispatch({ type: 'setAnalysisAuto', on: !!d.analysis?.auto })
     if (d.analysis?.options?.metrics) dispatch({ type: 'setAnalysisOptions', options: d.analysis.options })
     dispatch({ type: 'setScene', id: scene.id })
-    // The view and the UI as they were saved. Physics stays off: a running simulation would move the picture away from
-    // the one saved; `graph_layout {physics: true}` or the button starts it again from these positions.
+    // The view and the UI as they were saved. Physics stays as the view has it (the scene does not switch it): off, the
+    // saved positions are the picture exactly; on, the simulation carries on over them, warm (`loadLayout`, GpuGraph).
     const v = d.view
     if (v) {
       if (v.labels) dispatch({ type: 'setLabels', labels: v.labels })

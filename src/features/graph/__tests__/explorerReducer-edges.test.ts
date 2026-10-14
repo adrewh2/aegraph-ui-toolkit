@@ -207,6 +207,15 @@ describe('the default layout', () => {
     mem.set('aegraph:explorer:v1', JSON.stringify({ algorithm: 'force' }))
     expect(initialState().algorithm).toBe('force')
   })
+  it('remembers the Physics switch: a tab left live comes back live, warm — where its algorithm runs live', () => {
+    vi.stubGlobal('localStorage', { getItem: (k: string) => mem.get(k) ?? null, setItem: (k: string, v: string) => void mem.set(k, v), removeItem: (k: string) => void mem.delete(k) })
+    mem.set('aegraph:explorer:v1', JSON.stringify({ algorithm: 'unigraph-force', physics: true }))
+    expect(initialState()).toMatchObject({ physics: true, physicsWarm: true })
+    mem.set('aegraph:explorer:v1', JSON.stringify({ algorithm: 'grid', physics: true }))
+    expect(initialState().physics).toBe(false)
+    mem.set('aegraph:explorer:v1', JSON.stringify({ algorithm: 'unigraph-force' }))
+    expect(initialState().physics).toBe(false)
+  })
 })
 
 describe('a restore', () => {

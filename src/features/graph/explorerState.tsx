@@ -76,6 +76,11 @@ export interface ExplorerState {
   hops: number
   labels: 'auto' | 'all' | 'none'
   showEdges: boolean
+  /**
+   * The live simulation is switched on (Physics in the toolbar, Keep running in the Layout tab). A standing choice,
+   * remembered with the tab: it cools and rests, and stays on so that a drag, a scene, a loaded layout or new data
+   * warms it again — only the switch, or an algorithm the engine cannot run live, turns it off.
+   */
   physics: boolean
   /**
    * The address asked for the live simulation (`?physics=1`) and it has not been switched on yet: until it is, positions
@@ -86,7 +91,7 @@ export interface ExplorerState {
   /**
    * The simulation was switched on over a picture whose every node is already placed (a scene opened with its saved
    * positions): it starts cool and only settles them, instead of flinging a finished picture apart and re-forming it.
-   * Set by `setPhysics` with `warm`; never persisted.
+   * Set by `setPhysics` with `warm`, by a layout loaded under a running simulation and by a restore; never persisted.
    */
   physicsWarm?: boolean
   /** Last computed metrics (never persisted to localStorage; may be stale for the current slice). */
@@ -134,12 +139,12 @@ type Action =
   | { type: 'markFilterSaved'; id: EntityId }
   | { type: 'setAlgorithm'; algorithm: LayoutAlgorithm }
   | { type: 'patchParams'; patch: Partial<Omit<LayoutParams, 'dimensions'>> }
-  | { type: 'setPositions'; positions: Positions; dirty?: boolean }
+  | { type: 'setPositions'; positions: Positions; dirty?: boolean; forLayout?: EntityId }
   | { type: 'restored'; positions?: PositionStore }
   | { type: 'moveNode'; id: EntityId; position: Position }
   | { type: 'moveNodes'; positions: Positions; dirty?: boolean; from?: 'physics'; /** The view the move was made in: whose positions on screen are held first (see `dispatchHeld`). */ dims?: Dimensions }
   /** Many nodes in the packed form (`PositionStore.movedPacked`): a live simulation's hand-back. */
-  | { type: 'movePacked'; ids: readonly EntityId[]; xyz: Float32Array | Float64Array; dims: 2 | 3; from?: 'physics' }
+  | { type: 'movePacked'; ids: readonly EntityId[]; xyz: Float32Array | Float64Array; dims: 2 | 3; from?: 'physics'; store?: number }
   | { type: 'loadLayout'; id: EntityId; positions: Positions; algorithm?: LayoutAlgorithm; pinned?: EntityId[]; rule?: LayoutRule }
   | { type: 'unloadLayout' }
   | { type: 'markLayoutSaved'; id: EntityId }
@@ -290,7 +295,10 @@ export function initialState(session?: string): ExplorerState {
         path: undefined,
         pathFrom: undefined,
         ...restoreHeldPositions(rest.layoutId, rest.layoutDirty, session),
-        physics: false,
+        // The switch is remembered: a tab left with the simulation on comes back with it on, starting warm over the
+        // positions it held (a run from scratch would throw the picture apart and re-form it).
+        physics: !!saved.physics && canRunLive(rest.algorithm ?? base.algorithm),
+        physicsWarm: !!saved.physics,
         hoveredId: undefined,
         metrics: undefined,
         metricsJob: undefined,
@@ -328,10 +336,15 @@ export function reducer(s: ExplorerState, a: Action): ExplorerState {
     case 'markFilterSaved':
       return { ...s, filterId: a.id, filterDirty: false }
     case 'setAlgorithm':
-      return { ...s, algorithm: a.algorithm, physics: false }
+      // The switch is a standing choice: it stays on for an algorithm the engine runs live, and only that.
+      return { ...s, algorithm: a.algorithm, physics: s.physics && canRunLive(a.algorithm) }
     case 'patchParams':
       return { ...s, params: { ...s.params, ...a.patch } }
     case 'setPositions':
+      // A saved layout's positions pulled from its entity (`forLayout`) are for that layout while nothing is held yet:
+      // read from the state of a render before, they landed after a scene loaded its own and put the tab's previous
+      // layout back over it.
+      if (a.forLayout !== undefined && (s.layoutId !== a.forLayout || s.positions.size > 0)) return s
       // A picture landed (a run on the main thread, a placement): whatever refused before no longer applies.
       return { ...s, positions: PositionStore.replace(a.positions), layoutDirty: a.dirty ?? s.layoutDirty, layoutError: undefined }
     case 'restored':
@@ -344,15 +357,22 @@ export function reducer(s: ExplorerState, a: Action): ExplorerState {
       // A layout landing passes `dirty`, and clears whatever refused before; a drag only marks the layout unsaved.
       return { ...s, positions: s.positions.moved(a.positions, a.from), layoutDirty: a.dirty ?? true, ...(a.dirty === undefined ? {} : { layoutError: undefined }) }
     case 'movePacked':
+      // A hand-back read for a set of positions (`store`, its id) that has since been replaced — a scene, a loaded
+      // layout — is the old picture's: written over the new one it put the run's last picture back over the scene.
+      if (a.store !== undefined && a.store !== s.positions.id) return s
       return { ...s, positions: s.positions.movedPacked(a, a.from), layoutDirty: true }
-    case 'loadLayout':
-      return { ...s, positions: PositionStore.replace(a.positions), layoutId: a.id, layoutDirty: false, physics: false, algorithm: a.algorithm ?? s.algorithm, ...(a.pinned ? { pinned: a.pinned } : {}), layoutRule: a.rule, placementOverlay: undefined, layoutError: undefined }
+    case 'loadLayout': {
+      // A loaded layout (a scene, a saved layout) under a running simulation keeps it running: the renderer starts it
+      // again over the picture that was loaded, warm, so it settles that picture rather than re-forming it.
+      const live = s.physics && canRunLive(a.algorithm ?? s.algorithm)
+      return { ...s, positions: PositionStore.replace(a.positions), layoutId: a.id, layoutDirty: false, physics: live, physicsWarm: live || s.physicsWarm, algorithm: a.algorithm ?? s.algorithm, ...(a.pinned ? { pinned: a.pinned } : {}), layoutRule: a.rule, placementOverlay: undefined, layoutError: undefined }
+    }
     case 'unloadLayout':
       return { ...s, layoutId: undefined, layoutDirty: false, positions: PositionStore.empty(), recomputeToken: s.recomputeToken + 1, layoutRule: undefined, placementOverlay: undefined }
     case 'markLayoutSaved':
       return { ...s, layoutId: a.id, layoutDirty: false }
     case 'recompute':
-      return { ...s, recomputeToken: s.recomputeToken + 1, physics: false, layoutRule: undefined, placementOverlay: undefined }
+      return { ...s, recomputeToken: s.recomputeToken + 1, physics: s.physics && canRunLive(s.algorithm), layoutRule: undefined, placementOverlay: undefined }
     case 'setRendering':
       return { ...s, rendering: a.rendering, renderingDirty: !!s.renderingId }
     case 'patchRendering':
@@ -688,9 +708,9 @@ export function ExplorerProvider({
 
   // Persist the cheap, user-intent parts of the state (positions go to their own key below; never the path).
   useEffect(() => {
-    const { filter, filterId, filterDirty, algorithm, params, layoutId, layoutDirty, rendering, renderingId, renderingDirty, sceneId, labels, showEdges, selectedIds, pinned, tool, pathOptions, hops, analysisId, analysisDirty, analysisAuto, analysisOptions, showLegend, slides, animateCamera, projectId, layoutRule, showPlacementOverlay, viewBudget, acceptedLoad } = state
+    const { filter, filterId, filterDirty, algorithm, params, layoutId, layoutDirty, rendering, renderingId, renderingDirty, sceneId, labels, showEdges, selectedIds, pinned, tool, pathOptions, hops, analysisId, analysisDirty, analysisAuto, analysisOptions, showLegend, slides, animateCamera, projectId, layoutRule, showPlacementOverlay, viewBudget, acceptedLoad, physics } = state
     try {
-      const json = JSON.stringify({ filter, filterId, filterDirty, algorithm, params, layoutId, layoutDirty, rendering, renderingId, renderingDirty, sceneId, labels, showEdges, selectedIds: selectedIds.slice(0, 500), pinned, tool, pathOptions, hops, analysisId, analysisDirty, analysisAuto, analysisOptions, showLegend, slides, animateCamera, projectId, layoutRule, showPlacementOverlay, viewBudget, acceptedLoad })
+      const json = JSON.stringify({ filter, filterId, filterDirty, algorithm, params, layoutId, layoutDirty, rendering, renderingId, renderingDirty, sceneId, labels, showEdges, selectedIds: selectedIds.slice(0, 500), pinned, tool, pathOptions, hops, analysisId, analysisDirty, analysisAuto, analysisOptions, showLegend, slides, animateCamera, projectId, layoutRule, showPlacementOverlay, viewBudget, acceptedLoad, physics })
       localStorage.setItem(scoped(STORAGE_KEY, session), json)
       // The unscoped key is what a new session starts from: the last-used state, whichever tab it was in.
       if (session) localStorage.setItem(STORAGE_KEY, json)
@@ -869,7 +889,7 @@ export function ExplorerProvider({
       const positions = (e?.data as LayoutData | undefined)?.positions
       // A layout saved with no positions has nothing to pull: loading its empty set would leave the store empty,
       // run this effect again and dispatch again — a render loop for as long as anything else re-renders.
-      if (positions && Object.keys(positions).length) dispatch({ type: 'setPositions', positions, dirty: false })
+      if (positions && Object.keys(positions).length) dispatch({ type: 'setPositions', positions, dirty: false, forLayout: state.layoutId })
       else if (!positions) dispatch({ type: 'unloadLayout' })
     }
   }, [state.layoutId, state.positions, store, version])

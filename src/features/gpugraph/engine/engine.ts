@@ -281,6 +281,8 @@ export class GraphEngine {
   private physicsWorkerBusy = false
   private physicsWorkerIterations = 0
   private physicsWorkerAlpha = 1
+  /** Which run this is: a worker batch asked for by an earlier run lands in none (a restart over a new picture). */
+  private physicsRun = 0
   private heldWords = new Uint32Array(0)
   /** Milliseconds of GPU physics per frame the loop aims for; the iterations per frame follow the measured cost. */
   physicsBudgetMs = 12
@@ -1712,6 +1714,7 @@ export class GraphEngine {
    */
   startPhysics(params: Partial<PhysicsParams> = {}): 'gpu' | 'worker' | null {
     this.stopPhysicsNow()
+    const run = ++this.physicsRun
     // A start is a fresh run: the defaults, then what was asked (`setPhysicsParams` adjusts a running one).
     this.physicsParams = { ...DEFAULT_PHYSICS, ...params, dims: this.dims }
     const N = this.graph.nodeCount
@@ -1772,6 +1775,7 @@ export class GraphEngine {
       void this.worker
         .call({ op: 'physicsStart', nodeCount: N, offsets, neighbors, positions, state, params: this.physicsParams }, [offsets.buffer, neighbors.buffer, positions.buffer, state.buffer])
         .then(() => {
+          if (run !== this.physicsRun) return
           this.physicsWorkerBusy = false
           this.pumpWorkerPhysics()
         })
@@ -1836,11 +1840,14 @@ export class GraphEngine {
   }
   /** Stop; the positions the simulation reached are the engine's (read back from the GPU first). */
   async stopPhysics(): Promise<void> {
-    if (this.physicsMode === 'gpu' && this.gpuPhysics) {
+    const gp = this.gpuPhysics
+    if (this.physicsMode === 'gpu' && gp) {
       // No more steps from here; a copy in flight lands first, then one more with the last positions.
       this.physicsStopping = true
       await this.physicsLastRead
       await this.readbackPhysics()
+      // A run started while this one was being read back is the newer one, and stays.
+      if (this.gpuPhysics !== gp) return
     }
     this.stopPhysicsNow()
     this.emit('physics', this.physicsState())
@@ -1925,10 +1932,13 @@ export class GraphEngine {
   private pumpWorkerPhysics() {
     if (this.physicsWorkerBusy || this.physicsMode !== 'worker' || this.physicsWorkerAlpha < this.physicsParams.alphaMin) return
     this.physicsWorkerBusy = true
+    const run = this.physicsRun
     void this.worker
       .call<{ positions: Float32Array; alpha: number; iterations: number }>({ op: 'physicsStep', iterations: 2, alpha: this.physicsWorkerAlpha })
       .then((r) => {
-        if (this.physicsMode !== 'worker') return
+        // A batch of a run since stopped (or started again over a new picture) is that run's: its positions and its
+        // temperature would overwrite the new run's.
+        if (this.physicsMode !== 'worker' || run !== this.physicsRun) return
         this.physicsWorkerAlpha = r.alpha
         this.physicsWorkerIterations += r.iterations
         this.setAllPositionsExceptHeld(r.positions)
@@ -1936,6 +1946,7 @@ export class GraphEngine {
       })
       .catch(() => {})
       .finally(() => {
+        if (run !== this.physicsRun) return
         this.physicsWorkerBusy = false
         this.pumpWorkerPhysics()
       })

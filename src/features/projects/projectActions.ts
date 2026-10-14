@@ -149,7 +149,10 @@ async function openImported(store: EntityStore, report: BundleReport, page: Prom
   route = withoutAutorun(route ?? project.data.home?.route)
   // Waited for, within reason: a page whose code is slow to arrive still opens, through its fallback, as before.
   if (route) await Promise.race([Promise.all([page, preloadRoute(route)]), new Promise((r) => setTimeout(r, PRELOAD_WAIT_MS))])
-  switchProject(store, project.id, { route })
+  // A file that changed the project and carries a screen brings that screen with it, even over the project already
+  // open: the tabs kept from before hold their own copies of the scenes' parts and would go on drawing the old
+  // version. One that changed nothing, or has no screen of its own, leaves the screen as the reader arranged it.
+  switchProject(store, project.id, { route, screen: !!report.screen && report.created + report.updated > 0 })
   return report
 }
 

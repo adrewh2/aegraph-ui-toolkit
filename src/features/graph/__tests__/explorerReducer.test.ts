@@ -102,4 +102,32 @@ describe('explorer sessions', () => {
     expect(reducer(on, { type: 'setPhysics', on: true }).physicsWarm).toBe(false)
     expect(reducer(defaultState(), { type: 'setPhysics', on: false, warm: true }).physicsWarm).toBe(false)
   })
+
+  it('the switch is a standing choice: a scene, a loaded layout or a Recompute keeps a live simulation on', () => {
+    const on = reducer(defaultState(), { type: 'setPhysics', on: true })
+    // A layout loaded under it (a scene's) keeps it running, and the run over the loaded picture starts warm.
+    const loaded = reducer(on, { type: 'loadLayout', id: 'layout:x', positions: { a: { x: 1, y: 2 } } })
+    expect(loaded).toMatchObject({ physics: true, physicsWarm: true, layoutId: 'layout:x' })
+    expect(reducer(on, { type: 'recompute' }).physics).toBe(true)
+    // Another algorithm the engine runs live keeps it; one it cannot run live turns it off, and a layout of one does too.
+    expect(reducer(on, { type: 'setAlgorithm', algorithm: 'unigraph-force' }).physics).toBe(true)
+    expect(reducer(on, { type: 'setAlgorithm', algorithm: 'grid' }).physics).toBe(false)
+    expect(reducer(on, { type: 'loadLayout', id: 'layout:g', positions: {}, algorithm: 'grid' }).physics).toBe(false)
+    // Off stays off: a scene does not switch it on.
+    expect(reducer(defaultState(), { type: 'loadLayout', id: 'layout:x', positions: {} }).physics).toBe(false)
+  })
+
+  it('a hand-back or a pull read for positions that were replaced since does not land over the new ones', () => {
+    const scene = reducer(defaultState(), { type: 'loadLayout', id: 'layout:s', positions: { a: { x: 1, y: 1 } } })
+    // The simulation's hand-back for the picture before the scene: dropped; for the scene's own positions: taken.
+    const stale = reducer(scene, { type: 'movePacked', ids: ['a'], xyz: new Float32Array([9, 9, 0]), dims: 2, from: 'physics', store: scene.positions.id - 1 })
+    expect(stale.positions.get('a')).toEqual({ x: 1, y: 1 })
+    const own = reducer(scene, { type: 'movePacked', ids: ['a'], xyz: new Float32Array([2, 2, 0]), dims: 2, from: 'physics', store: scene.positions.id })
+    expect(own.positions.get('a')).toEqual({ x: 2, y: 2 })
+    // A saved layout's positions pulled for another layout, or once positions are held, change nothing.
+    expect(reducer(scene, { type: 'setPositions', positions: { a: { x: 7, y: 7 } }, dirty: false, forLayout: 'layout:old' })).toBe(scene)
+    expect(reducer(scene, { type: 'setPositions', positions: { a: { x: 7, y: 7 } }, dirty: false, forLayout: 'layout:s' })).toBe(scene)
+    const empty = { ...scene, positions: defaultState().positions }
+    expect(reducer(empty, { type: 'setPositions', positions: { a: { x: 7, y: 7 } }, dirty: false, forLayout: 'layout:s' }).positions.get('a')).toEqual({ x: 7, y: 7 })
+  })
 })

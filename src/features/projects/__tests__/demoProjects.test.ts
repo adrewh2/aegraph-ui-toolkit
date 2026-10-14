@@ -71,3 +71,42 @@ describe('opening a demo marks its project', () => {
     expect(isDemoProject(store.get('project:trees') as never)).toBe(false)
   })
 })
+
+describe('opening a newer version of the project already open', () => {
+  const mem: Record<string, string> = {}
+  beforeEach(() => {
+    for (const k of Object.keys(mem)) delete mem[k]
+    vi.stubGlobal('localStorage', { getItem: (k: string) => mem[k] ?? null, setItem: (k: string, v: string) => (mem[k] = v), removeItem: (k: string) => delete mem[k], clear: () => Object.keys(mem).forEach((k) => delete mem[k]) })
+  })
+  const WS = 'aegraph:workstation:v1'
+  const bundle = (updatedAt: string, label: string, ws?: string) => {
+    const project = createProject({ id: 'project:story', label: 'Story', source: 'import:story' })
+    project.meta.updatedAt = updatedAt
+    const scene = createEntity({ id: 'scene-1', type: 'note', label })
+    scene.meta.updatedAt = updatedAt
+    return JSON.stringify({ $schema: 'aegraph/v1', project: project.id, ...(ws ? { state: { ui: { [WS]: ws } } } : {}), entities: [project, scene] })
+  }
+
+  it('takes the file’s screen when the file changed the project, and keeps the reader’s when it changed nothing or carries none', async () => {
+    const store = new EntityStore()
+    await openBundleText(store, bundle('2026-01-01T00:00:00.000Z', 'Old', 'ws-v1'), 'story', '/demos/story/bundle.ae.json')
+    expect(store.scope).toBe('project:story')
+    expect(localStorage.getItem(WS)).toBe('ws-v1')
+    // The reader arranges the screen; opening the same version again changes nothing and keeps it.
+    localStorage.setItem(WS, 'mine')
+    const same = await openBundleText(store, bundle('2026-01-01T00:00:00.000Z', 'Old', 'ws-v1'), 'story', '/demos/story/bundle.ae.json')
+    expect(same.created + same.updated).toBe(0)
+    expect(localStorage.getItem(WS)).toBe('mine')
+    // A newer build of it, over the project open now: its data and its screen — the tabs kept from before held copies
+    // of the old scenes' parts and would have gone on drawing them.
+    const newer = await openBundleText(store, bundle('2026-02-01T00:00:00.000Z', 'New', 'ws-v2'), 'story', '/demos/story/bundle.ae.json')
+    expect(newer.updated).toBeGreaterThan(0)
+    expect(store.get('scene-1')?.label).toBe('New')
+    expect(localStorage.getItem(WS)).toBe('ws-v2')
+    // A newer one with no screen of its own leaves the screen alone rather than bring back an older stash.
+    localStorage.setItem(WS, 'mine again')
+    await openBundleText(store, bundle('2026-03-01T00:00:00.000Z', 'Newer'), 'story', '/demos/story/bundle.ae.json')
+    expect(store.get('scene-1')?.label).toBe('Newer')
+    expect(localStorage.getItem(WS)).toBe('mine again')
+  })
+})

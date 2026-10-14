@@ -132,6 +132,8 @@ export interface BundleReport {
   /** What the file would have changed that is not its own, left as the Library has it (see `planImport`). */
   conflicts: BundleConflicts
   route?: string
+  /** The file carried a screen (`state.ui`), now stashed as the project's for when it opens (`stashUiState`). */
+  screen?: boolean
 }
 
 /**
@@ -382,7 +384,8 @@ function planImport(store: EntityStore, raw: unknown, opts: ImportOptions = {}):
   const finish = (): BundleReport => {
     if (!Array.isArray(doc) && doc.state?.ui) stashUiState(pid, doc.state.ui)
     const route = !Array.isArray(doc) ? doc.state?.route : undefined
-    return { project: (store.get(pid) as ProjectEntity) ?? project!, created, updated, upToDate, skipped, conflicts, route }
+    const screen = !Array.isArray(doc) && !!doc.state?.ui
+    return { project: (store.get(pid) as ProjectEntity) ?? project!, created, updated, upToDate, skipped, conflicts, route, ...(screen ? { screen } : {}) }
   }
   const preview = (): BundlePreview => {
     const exists = isProjectEntity(store.get(pid))

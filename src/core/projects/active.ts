@@ -161,11 +161,24 @@ export const projectEpoch = {
  * Make a project (or the Library, `null`) active: stash the outgoing UI
  * state, restore the incoming, scope the store, remount. Returns false if
  * the id isn't a project, or if its scope cannot be read (the Library is then open).
+ *
+ * `screen`: the project's stashed screen is put in place even when it is the project already open — a bundle of it
+ * just opened over it changed what it holds, so the screen comes from the file too: its workstation with fresh tabs,
+ * each scene loaded anew. Without it, a tab kept from before held its own copy of a scene's filter, layout and style,
+ * and went on drawing the old version over the new data.
  */
-export function switchProject(store: EntityStore, id: EntityId | null, opts: { route?: string } = {}): boolean {
+export function switchProject(store: EntityStore, id: EntityId | null, opts: { route?: string; screen?: boolean } = {}): boolean {
   if (id && !isProjectEntity(store.get(id))) return false
   const from = store.scope
   const home = id ? (store.get(id)?.data.home as { route?: string } | undefined)?.route : undefined
+  if (from === id && opts.screen) {
+    // The project you are in, its screen taken afresh: the stashed state replaces this one, and the app remounts on it.
+    writeUiState(readStashedUiState(id))
+    go(opts.route ?? home)
+    epoch++
+    for (const l of listeners) l()
+    return true
+  }
   if (from === id) {
     // Same scope: no remount, so let the router see the change. Opening the project you are in still takes you to
     // its home — that is what opening means — unless the caller says where.
