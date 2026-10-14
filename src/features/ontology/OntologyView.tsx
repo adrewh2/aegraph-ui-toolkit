@@ -176,7 +176,7 @@ export function OntologyView() {
         </label>
         {focused && (
           <span className="onto__focus">
-            <span className="chip" style={{ background: colorOf(focused.type), color: '#fff' }}>
+            <span className="chip" style={{ background: colorOf(focused.type), color: 'var(--on-media)' }}>
               {focused.label}
             </span>
             <button className="btn btn--sm btn--ghost" onClick={() => setFocus(null)}>

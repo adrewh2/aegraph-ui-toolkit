@@ -116,5 +116,5 @@ export function DemosPanel({ onOpened }: { onOpened: () => void }) {
 /** A card with no picture gets its own colour rather than a blank. */
 const wash = (id: string) => {
   const c = hashColor(id)
-  return `linear-gradient(135deg, color-mix(in srgb, ${c} 22%, white), color-mix(in srgb, ${c} 48%, white))`
+  return `linear-gradient(135deg, color-mix(in srgb, ${c} 22%, var(--surface)), color-mix(in srgb, ${c} 48%, var(--surface)))`
 }

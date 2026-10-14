@@ -68,7 +68,7 @@
   box-sizing: border-box;
 }
 .and__text::selection {
-  background: #fde68a;
+  background: var(--highlight-bg);
 }
 .and__quote {
   flex: 1;
@@ -135,7 +135,7 @@
   font-size: 14px;
 }
 .and__reader .dp__prose--reader ::selection {
-  background: #fde68a;
+  background: var(--highlight-bg);
 }
 .and__reader.is-disabled .dp__editor--reader {
   opacity: 0.5;

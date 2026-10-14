@@ -83,6 +83,16 @@
   height: auto;
   display: block;
 }
+/* In a dark theme the picture is laid on a sheet of Paper: Graphviz and Mermaid draw dark ink on nothing, which a
+   dark page would swallow. */
+:root[data-scheme='dark'] .dgp__svg img {
+  padding: 16px;
+  border-radius: 8px;
+  background: #faf9f6;
+}
+:root[data-scheme='dark'] .dgp__error {
+  border-color: color-mix(in srgb, var(--danger) 35%, transparent);
+}
 .dgp__error {
   position: sticky;
   top: 0;
@@ -116,6 +126,11 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+/* A rendered diagram is drawn for paper — dark ink on nothing — so in a dark theme its card shows it on a sheet of Paper. */
+:root[data-scheme='dark'] .dgi__thumb .dgi__svg img {
+  border-radius: 6px;
+  background: #faf9f6;
 }
 .dgi__code--pending {
   opacity: 0.5;

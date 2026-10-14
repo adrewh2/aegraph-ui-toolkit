@@ -14,8 +14,8 @@
  *
  * The socket listens on the loopback only, and only a page whose `Origin` is
  * allowed may connect (this machine's dev servers and previews, and the one
- * deployed site named by `AEGRAPH_HOSTED_ORIGIN`, aegraph.sh unless it is set;
- * `AEGRAPH_BRIDGE_ORIGINS` replaces that list). Without
+ * deployed site named by `AEGRAPH_HOSTED_ORIGIN`, this edition's own site
+ * unless it is set; `AEGRAPH_BRIDGE_ORIGINS` replaces that list). Without
  * that check any website could drive the app and spawn a chat turn — see
  * SECURITY.md › The bridge.
  *
@@ -35,6 +35,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js'
 import { spawn } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
+import { readFileSync } from 'node:fs'
 import net from 'node:net'
 import { fileURLToPath } from 'node:url'
 import { WebSocketServer } from 'ws'
@@ -59,18 +60,20 @@ const TOKEN = process.env.AEGRAPH_BRIDGE_TOKEN ?? ''
  * Loopback is allowed on any port because every worktree's dev server takes a
  * port of its own; a page there is code on this machine. A deployment is a
  * different matter: `HOSTED_ORIGIN` is the one site outside this machine that
- * may drive the bridge — whoever controls the page there can call every tool
- * of a developer's open workspace. **By default it is `https://aegraph.sh`**,
- * this edition's own site. `AEGRAPH_HOSTED_ORIGIN` names another, a deployment
- * of your own whose pages should reach your bridge; empty trusts no hosted site
- * at all, only this machine's pages.
+ * may drive the bridge by default — whoever controls the page there can call
+ * every tool of a developer's open workspace. It is `AEGRAPH_HOSTED_ORIGIN`
+ * when that is set (**empty trusts no hosted site at all**; an organisation's
+ * machines set it to their own deployment or to nothing), else this edition's
+ * own site: `site` in `src/app/edition.json` (https://aegraph.dev for
+ * aegraph-ui), the file that also tells the app which edition it is.
  */
+const EDITION_SITE = JSON.parse(readFileSync(new URL('../src/app/edition.json', import.meta.url), 'utf8')).site
 const HOSTED_ORIGIN = hostedOrigin(process.env.AEGRAPH_HOSTED_ORIGIN)
 const DEFAULT_ORIGINS = HOSTED_ORIGIN ? [HOSTED_ORIGIN] : []
 
-/** The hosted origin the bridge trusts: unset → aegraph.sh, this edition's own site; empty → none; otherwise the origin of the URL given (a path or a trailing slash is not part of an origin). */
+/** The hosted origin the bridge trusts: unset → this edition's site; empty → none; otherwise the origin of the URL given (a path or a trailing slash is not part of an origin). */
 function hostedOrigin(raw) {
-  if (raw === undefined) return 'https://aegraph.sh'
+  if (raw === undefined) return new URL(EDITION_SITE).origin
   const v = raw.trim()
   if (!v) return ''
   try {

@@ -349,6 +349,7 @@
 .sc__py {
   font-size: 11.5px;
 }
+/* What a script draws — a figure, its own page — is made for white paper, and keeps it in every theme. */
 .sc__image {
   max-width: 100%;
   border: 1px solid var(--border);

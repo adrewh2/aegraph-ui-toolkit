@@ -28,6 +28,17 @@ interface Props {
   colorOf: (e: AnyEntity | undefined, geom: NodeGeom) => string
 }
 
+/*
+ * What a scene draws in the theme's colours (SVG attributes take the CSS tokens): a group's tint, outline and title
+ * on the canvas, a diagram's captured edges. Each mix is within a step or two of Paper's old literal (#bbb, #666, #333).
+ * A node's own text stays dark: it sits on the node's fill, the type's colour, not on the canvas.
+ */
+const GROUP_FILL = 'color-mix(in srgb, var(--text) 2%, transparent)'
+const GROUP_STROKE = 'color-mix(in srgb, var(--text) 30%, var(--surface))'
+const GROUP_TITLE = 'color-mix(in srgb, var(--text) 68%, var(--surface))'
+const CAPTURED_EDGE = 'color-mix(in srgb, var(--text) 91%, var(--surface))'
+const NODE_TEXT = '#1f1e1b'
+
 /** Memoised: panning changes only the wrapper transform, so thousands of nodes are not re-rendered per move. */
 export const SceneLayer = memo(function SceneLayer({ layer, k, selected, selectedGroup, entityOf, colorOf }: Props) {
   const { data, rels, active } = layer
@@ -40,15 +51,15 @@ export const SceneLayer = memo(function SceneLayer({ layer, k, selected, selecte
         const isSel = active && selectedGroup === gid
         return (
           <g key={gid} data-group={active ? gid : undefined} className={`pj__group ${isSel ? 'is-selected' : ''}`}>
-            <rect x={g.x} y={g.y} width={g.width} height={g.height} rx={4} fill={g.fill ?? 'rgba(31,30,27,0.02)'} stroke={isSel ? '#3b7ddd' : (g.stroke ?? '#bbb')} strokeWidth={isSel ? 2 / k : undefined} strokeDasharray={g.fill ? undefined : '4 3'} />
-            <text x={g.label?.x ?? g.x + 8} y={g.label?.y ?? g.y + 16} fontSize={12} fill="#666">
+            <rect x={g.x} y={g.y} width={g.width} height={g.height} rx={4} fill={g.fill ?? GROUP_FILL} stroke={isSel ? 'var(--select)' : (g.stroke ?? GROUP_STROKE)} strokeWidth={isSel ? 2 / k : undefined} strokeDasharray={g.fill ? undefined : '4 3'} />
+            <text x={g.label?.x ?? g.x + 8} y={g.label?.y ?? g.y + 16} fontSize={12} fill={GROUP_TITLE}>
               {g.title ?? gid}
             </text>
             {isSel &&
               corners.map((c) => {
                 const cx = c.includes('e') ? g.x + g.width : g.x
                 const cy = c.includes('s') ? g.y + g.height : g.y
-                return <rect key={c} data-group-corner={c} className={`pj__handle pj__handle--${c}`} x={cx - h / 2} y={cy - h / 2} width={h} height={h} fill="#fff" stroke="#3b7ddd" strokeWidth={1.5 / k} />
+                return <rect key={c} data-group-corner={c} className={`pj__handle pj__handle--${c}`} x={cx - h / 2} y={cy - h / 2} width={h} height={h} fill="var(--surface)" stroke="var(--select)" strokeWidth={1.5 / k} />
               })}
           </g>
         )
@@ -58,7 +69,7 @@ export const SceneLayer = memo(function SceneLayer({ layer, k, selected, selecte
         const b = data.nodes[r.target.id]
         const captured = data.edges[r.id]
         const geom: EdgeGeom = captured ?? { points: straightRoute(a, b), curve: 'line', arrowEnd: r.directed }
-        const stroke = geom.stroke ?? (captured ? '#333' : '#8a8780')
+        const stroke = geom.stroke ?? (captured ? CAPTURED_EDGE : '#8a8780')
         const hot = selected === r.source.id || selected === r.target.id
         return (
           <g key={r.id} data-edge={active ? r.id : undefined} className={`pj__edge ${hot ? 'is-hot' : ''}`}>
@@ -85,7 +96,7 @@ export const SceneLayer = memo(function SceneLayer({ layer, k, selected, selecte
         return (
           <g key={id} data-node={active ? id : undefined} data-rot={rot} className={`pj__node ${isSel ? 'is-selected' : ''} ${entity ? '' : 'is-missing'}`} transform={rot}>
             {geom.shape === 'text' ? (
-              <rect x={geom.x - geom.width / 2} y={geom.y - geom.height / 2} width={geom.width} height={geom.height} fill="transparent" stroke={isSel ? '#3b7ddd' : 'none'} strokeDasharray="4 3" />
+              <rect x={geom.x - geom.width / 2} y={geom.y - geom.height / 2} width={geom.width} height={geom.height} fill="transparent" stroke={isSel ? 'var(--select)' : 'none'} strokeDasharray="4 3" />
             ) : geom.shape === 'ellipse' || geom.shape === 'circle' ? (
               <ellipse cx={geom.x} cy={geom.y} rx={geom.width / 2} ry={geom.height / 2} fill={fill} stroke={stroke} strokeWidth={sw} strokeDasharray={geom.dashed ? '6 4' : undefined} />
             ) : outline ? (
@@ -99,9 +110,9 @@ export const SceneLayer = memo(function SceneLayer({ layer, k, selected, selecte
               corners.map((c) => {
                 const cx = c.includes('e') ? geom.x + geom.width / 2 : geom.x - geom.width / 2
                 const cy = c.includes('s') ? geom.y + geom.height / 2 : geom.y - geom.height / 2
-                return <rect key={c} data-corner={c} className={`pj__handle pj__handle--${c}`} x={cx - h / 2} y={cy - h / 2} width={h} height={h} fill="#fff" stroke="#3b7ddd" strokeWidth={1.5 / k} />
+                return <rect key={c} data-corner={c} className={`pj__handle pj__handle--${c}`} x={cx - h / 2} y={cy - h / 2} width={h} height={h} fill="var(--surface)" stroke="var(--select)" strokeWidth={1.5 / k} />
               })}
-            <text x={geom.x} y={geom.y - ((lines.length - 1) * fs * 1.2) / 2} fontSize={fs} textAnchor="middle" dominantBaseline="central" fill={geom.color ?? '#1f1e1b'}>
+            <text x={geom.x} y={geom.y - ((lines.length - 1) * fs * 1.2) / 2} fontSize={fs} textAnchor="middle" dominantBaseline="central" fill={geom.color ?? (geom.shape === 'text' ? 'var(--text)' : NODE_TEXT)}>
               {lines.map((ln, i) => (
                 <tspan key={i} x={geom.x} dy={i === 0 ? 0 : fs * 1.2}>
                   {ln}

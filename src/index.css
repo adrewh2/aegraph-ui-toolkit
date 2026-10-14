@@ -30,10 +30,41 @@
   /* Caution: something to be careful with that is not a loss — a confirmation the assistant asks for. Red is for loss. */
   --caution: #c2410c;
   --caution-bg: #ffedd5;
+  /* Pending: connecting, waiting on something — amber, not a warning. */
+  --pending: #d97706;
+  /* Selection and focus: the soft blue of a selected row, a focused field, a picked region. */
+  --select: #3b7ddd;
+  --select-soft: #6f9ee0;
+  --select-bg: #eaf1fb;
+  --select-border: #b9cdea;
+  /* Highlight: marks, search hits, the playhead — amber. */
+  --highlight: #f59e0b;
+  --highlight-bg: #fde68a;
+  --highlight-text: #b45309;
+  /* Shadows and the scrim behind a dialog. */
+  --shadow-color: #000000;
+  --overlay: rgba(31, 30, 27, 0.35);
+  /* What the drawing surfaces show: Unigraph's canvas and its labels' halo, a selected node's ring, the default edge;
+     the ground under a map before its tiles arrive, and how the tiles are filtered (dark themes darken them). */
+  --canvas: #faf9f6;
+  --canvas-halo: rgba(250, 249, 246, 0.9);
+  --canvas-select: #1f1e1b;
+  --canvas-edge: #b5b2aa;
+  /* The hovered node's ring and a path through the graph: apart from the selection's colour. */
+  --canvas-path: #9a3412;
+  /* A hairline around a colour swatch or dot, so a dark data colour keeps its edge on a dark surface. */
+  --swatch-ring: rgba(0, 0, 0, 0.12);
+  --map-ground: #e9e7e1;
+  --map-tiles: none;
+  /* Text on a picture or a strong colour stays light in every theme. */
+  --on-media: #ffffff;
   --radius: 8px;
   --radius-sm: 6px;
   --shadow: 0 8px 24px rgba(31, 30, 27, 0.12), 0 1px 3px rgba(31, 30, 27, 0.08);
 
+  /* Declared here, not only set inline by the theme: the build compiles light-dark() into variables that a CSS
+     color-scheme declaration switches (lightningcss), so each theme block says its scheme too. */
+  color-scheme: light;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   color: var(--text);
@@ -62,7 +93,9 @@ a {
   color: var(--link);
 }
 
-/* Checkboxes: neutral box, blue check mark. Radios take a soft blue accent; sliders keep the browser's. */
+/* Checkboxes: neutral box, blue check mark. Radios take a soft blue accent; sliders keep the browser's. The mark is
+   the box's ::before, an SVG used as a mask over `--select`, so it takes the theme's blue (a data URI cannot read a
+   custom property). */
 input[type='checkbox'] {
   appearance: none;
   -webkit-appearance: none;
@@ -71,7 +104,7 @@ input[type='checkbox'] {
   margin: 0;
   border: 1px solid var(--border-strong);
   border-radius: 3px;
-  background: var(--surface) center / 10px 10px no-repeat;
+  background: var(--surface);
   cursor: pointer;
   vertical-align: middle;
   flex-shrink: 0;
@@ -79,18 +112,29 @@ input[type='checkbox'] {
 input[type='checkbox']:hover {
   border-color: var(--text-faint);
 }
+input[type='checkbox']:checked,
+input[type='checkbox']:indeterminate {
+  border-color: var(--select-border);
+  background-color: var(--select-bg);
+}
+input[type='checkbox']:checked::before,
+input[type='checkbox']:indeterminate::before {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--select);
+  -webkit-mask: var(--check-mark) center / 10px 10px no-repeat;
+  mask: var(--check-mark) center / 10px 10px no-repeat;
+}
 input[type='checkbox']:checked {
-  border-color: #b9cdea;
-  background-color: #eaf1fb;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%233b7ddd' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 6.5l2.6 2.6L10 3.5'/%3E%3C/svg%3E");
+  --check-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 6.5l2.6 2.6L10 3.5'/%3E%3C/svg%3E");
 }
 input[type='checkbox']:indeterminate {
-  border-color: #b9cdea;
-  background-color: #eaf1fb;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%233b7ddd' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M2.5 6h7'/%3E%3C/svg%3E");
+  --check-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M2.5 6h7'/%3E%3C/svg%3E");
 }
 input[type='checkbox']:focus-visible {
-  outline: 2px solid #b9cdea;
+  outline: 2px solid var(--select-border);
   outline-offset: 1px;
 }
 input[type='checkbox']:disabled {
@@ -98,7 +142,7 @@ input[type='checkbox']:disabled {
   cursor: default;
 }
 input[type='radio'] {
-  accent-color: #6f9ee0;
+  accent-color: var(--select-soft);
   cursor: pointer;
 }
 

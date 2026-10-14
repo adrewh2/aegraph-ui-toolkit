@@ -81,12 +81,13 @@ The repository carries a few defaults that name its author's deployment. A fork 
 
 | What | Where | Change it to |
 | --- | --- | --- |
+| The edition: its name, repository, site, whether the code is public | `src/app/edition.json` (described in `src/app/edition.ts`) | Your repository and your deployment; `site` is also the one hosted origin the bridge trusts by default |
 | The hosted origin the bridge trusts | `AEGRAPH_HOSTED_ORIGIN` (default `https://aegraph.sh`, `mcp/server.mjs`) | Your deployment's origin, set in each developer's environment (or the default in `mcp/server.mjs`); empty for none |
 | The web-fetch user agent | `USER_AGENT` in `dev/fetch.ts` (names `https://aegraph.dev/docs/assistant`) | A URL of yours, so a site that sees the requests knows whose they are |
 | What the site offers | `AEGRAPH_FEATURES_OFF` (default none, `vite.config.ts` › `src/app/features.ts`) | The features your deployment leaves out — `maps`, `globe`, `videos`, `audio` — set in the build's environment (and in the headless engine's, to match) |
 | The Wikipedia user agent | `HEADERS` in `src/features/maps/wikipedia.ts` | Wikimedia asks callers to identify themselves: your name and a contact |
 | The demos repository | `AEGRAPH_DEMOS_REPO` (default `adrewh2/aegraph-ui-demos`, `scripts/demos/fetch.mjs`) | Your own demos repository, or none; pin `AEGRAPH_DEMOS_REF` to a commit |
-| The project a first visit opens | `DEFAULT_DEMO`, `DEFAULT_DEMO_KEY` and `DEFAULT_DEMO_TAB` in `src/app/providers.tsx` (Aurora; its whole graph in 3D, live) | One of your demos' ids; bump the key to open it once more on existing installs; `DEFAULT_DEMO_TAB` names a scene of the demo (settled positions, its own force settings) for a first frame that is the finished picture |
+| The project a first visit opens | `defaultDemo` in `src/app/edition.json` — `id`, `title`, `key`, `tab` (aegraph-ui's is Aurora; a null `tab` is its whole graph in 3D, live) | One of your demos' ids; bump the key to open it once more on existing installs; `tab` names a scene of the demo (settled positions, its own force settings) for a first frame that is the finished picture |
 | Code owners | `.github/CODEOWNERS` | Your team's handles |
 | Where vulnerabilities are reported | `SECURITY.md` (*Found a vulnerability?*, at the top: a private advisory on the repository's Security tab) and the comment in `.github/ISSUE_TEMPLATE/config.yml` | Your repository's advisories, or your security contact |
 | The repository and badges | `package.json › repository` (add one), and any badges you add to `README.md` | Your repository |

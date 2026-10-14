@@ -32,15 +32,37 @@
 }
 .ce .cm-selectionBackground,
 .ce .cm-editor ::selection {
-  background: #cfe0f7 !important;
+  background: var(--code-selection) !important;
+}
+/*
+ * In a dark theme CodeEditor.tsx tells CodeMirror so (`EditorView.darkTheme`), which turns its caret, popups and
+ * completion list dark; these put them in the page's own ink and surface.
+ */
+:root[data-scheme='dark'] .ce .cm-content {
+  caret-color: var(--text);
+}
+:root[data-scheme='dark'] .ce .cm-cursor,
+:root[data-scheme='dark'] .ce .cm-dropCursor {
+  border-left-color: var(--text);
+}
+:root[data-scheme='dark'] .ce .cm-tooltip {
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+}
+:root[data-scheme='dark'] .ce .cm-tooltip-autocomplete ul li[aria-selected] {
+  background: var(--select-bg);
+  color: var(--text);
 }
 
 /*
  * The colours code is set in, the page's own rather than CodeMirror's: the same ink as the text, the link's rust
  * for keywords, a green for strings, amber for numbers, a deep teal for what is called, and comments faint.
- * `CodeEditor.tsx` maps the syntax tags onto these.
+ * `CodeEditor.tsx` maps the syntax tags onto these. Paper's are on :root; each other theme sets its own below, read
+ * on its surface (4.5:1 or better for everything but comments).
  */
 :root {
+  --code-selection: #cfe0f7;
   --code-text: #33312c;
   --code-comment: #a3a099;
   --code-keyword: #9a3412;
@@ -50,4 +72,40 @@
   --code-type: #7c4a1e;
   --code-property: #5b5852;
   --code-punctuation: #8a877f;
+}
+:root[data-theme='dark'] {
+  --code-selection: #35517c;
+  --code-text: #e4e2dc;
+  --code-comment: #8f8b82;
+  --code-keyword: #f2a57c;
+  --code-string: #a9d18e;
+  --code-number: #e8c069;
+  --code-function: #6fd0c6;
+  --code-type: #e0b388;
+  --code-property: #c9c5bc;
+  --code-punctuation: #a29e95;
+}
+:root[data-theme='midnight'] {
+  --code-selection: #2f4c78;
+  --code-text: #dbe3ee;
+  --code-comment: #7f8ea3;
+  --code-keyword: #ff9e7a;
+  --code-string: #9fd89a;
+  --code-number: #f0c674;
+  --code-function: #7fd6cf;
+  --code-type: #8ab4ff;
+  --code-property: #b9c4d3;
+  --code-punctuation: #93a1b5;
+}
+:root[data-theme='contrast'] {
+  --code-selection: #b3ccff;
+  --code-text: #000000;
+  --code-comment: #4a4a4a;
+  --code-keyword: #8a1c00;
+  --code-string: #2a5200;
+  --code-number: #7a4a00;
+  --code-function: #00524e;
+  --code-type: #5c3300;
+  --code-property: #2b2b2b;
+  --code-punctuation: #3d3d3d;
 }

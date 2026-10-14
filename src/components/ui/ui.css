@@ -30,7 +30,7 @@ a.btn {
   color: var(--accent-text);
 }
 .btn--primary:hover {
-  background: #33312d;
+  background: color-mix(in srgb, var(--accent) 75%, var(--text-muted));
 }
 .btn--ghost {
   border-color: transparent;
@@ -46,7 +46,7 @@ a.btn {
 .btn--danger-solid:hover {
   background: var(--danger);
   border-color: var(--danger);
-  color: #fff;
+  color: var(--accent-text);
 }
 .btn--sm {
   height: 28px;
@@ -60,7 +60,7 @@ a.btn {
   border: 0;
   background: none;
   font: inherit;
-  color: var(--accent, #2563eb);
+  color: var(--accent);
   text-decoration: underline;
   text-underline-offset: 2px;
   cursor: pointer;
@@ -90,7 +90,7 @@ a.btn {
 }
 .input:focus {
   border-color: var(--text-faint);
-  box-shadow: 0 0 0 3px rgba(31, 30, 27, 0.06);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--text) 6%, transparent);
 }
 textarea.input {
   height: auto;
@@ -279,6 +279,13 @@ select.input {
   white-space: nowrap;
   cursor: pointer;
 }
+/* A Select given no class of its own is a bare button, which a browser draws in its own button grey — light on a dark
+   theme. Zero specificity: any class that styles the field still wins, and Paper keeps the browser's look. */
+:where(:root[data-scheme='dark'] .select-trigger) {
+  background-color: var(--surface-2);
+  border-color: var(--border-strong);
+  color: var(--text);
+}
 .select-trigger:disabled {
   cursor: default;
 }
@@ -312,7 +319,7 @@ select.input {
   align-items: center;
   justify-content: center;
   padding: 16px;
-  background: rgba(31, 30, 27, 0.35);
+  background: var(--overlay);
 }
 .dialog {
   width: 100%;
@@ -388,7 +395,7 @@ select.input {
   width: 14px;
   height: 14px;
   border-radius: 4px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  border: 1px solid light-dark(color-mix(in srgb, var(--shadow-color) 12%, transparent), color-mix(in srgb, var(--text) 12%, transparent));
   vertical-align: middle;
 }
 .toast {
@@ -416,8 +423,8 @@ select.input {
   text-transform: uppercase;
 }
 .field__req {
-  color: #b45309;
-  background: #fef3c7;
+  color: var(--highlight-text);
+  background: var(--warn-bg);
 }
 .field__opt {
   color: var(--text-muted);
@@ -444,16 +451,16 @@ select.input {
 /* The colour a type or a tag is drawn in: the swatch is the control, wherever the swatch already appears. */
 .colorpick {
   padding: 0;
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  border: 1px solid light-dark(color-mix(in srgb, var(--shadow-color) 12%, transparent), color-mix(in srgb, var(--text) 12%, transparent));
   border-radius: 50%;
   cursor: pointer;
   flex: none;
 }
 .colorpick:hover {
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 0 0 3px light-dark(color-mix(in srgb, var(--shadow-color) 8%, transparent), color-mix(in srgb, var(--text) 8%, transparent));
 }
 .colorpick:focus-visible {
-  outline: 2px solid var(--accent, #8a4b2a);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 .colorpick__pop {
@@ -461,10 +468,10 @@ select.input {
   z-index: 80;
   width: 208px;
   padding: 8px;
-  border: 1px solid var(--border, #e0ded7);
+  border: 1px solid var(--border);
   border-radius: 10px;
-  background: var(--surface, #fff);
-  box-shadow: 0 10px 28px rgba(31, 30, 27, 0.16);
+  background: var(--surface);
+  box-shadow: 0 10px 28px light-dark(color-mix(in srgb, var(--text) 16%, transparent), color-mix(in srgb, var(--shadow-color) 16%, transparent));
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -484,12 +491,12 @@ select.input {
   width: 100%;
   aspect-ratio: 1;
   padding: 0;
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  border: 1px solid light-dark(color-mix(in srgb, var(--shadow-color) 12%, transparent), color-mix(in srgb, var(--text) 12%, transparent));
   border-radius: 4px;
   cursor: pointer;
 }
 .colorpick__swatch.is-on {
-  outline: 2px solid var(--text, #1f1e1b);
+  outline: 2px solid var(--text);
   outline-offset: 1px;
 }
 .colorpick__row {

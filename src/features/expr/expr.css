@@ -35,7 +35,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--shadow-color) 10%, transparent);
   font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 12px;
 }
@@ -62,7 +62,7 @@
 }
 .xp__editor .cm-lintRange-error {
   background-image: none;
-  border-bottom: 1px dotted #b91c1c;
+  border-bottom: 1px dotted var(--danger);
 }
 .xp__tip {
   padding: 8px 10px;
@@ -149,7 +149,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--shadow-color) 12%, transparent);
 }
 .xp__picker .input {
   height: 26px;

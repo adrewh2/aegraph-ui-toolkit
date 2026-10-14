@@ -15,6 +15,7 @@ import { MapCanvas, type MapCanvasHandle, type MapTool } from './MapCanvas'
 import type { MapLink } from './pointLayer'
 import { GlobeStage, type GlobeStageHandle } from '../globe/GlobeStage'
 import { featureOn } from '../../app/features'
+import { themeToken, useTheme } from '../../app/theme'
 import {
   allGeo,
   allMaps,
@@ -66,8 +67,8 @@ type Tool = MapTool
 
 /** Where the all-places map's view (centre, zoom, base layer, flat or globe) is remembered; a map's own is kept on its entity. */
 const ALL_VIEW_KEY = 'aegraph:maps:all-view'
-/** A link between two places with no coloured tag: the engine's own quiet grey. */
-const LINK_COLOR = '#b5b2aa'
+/** A link between two places with no coloured tag: the engine's own quiet grey, the theme's edge colour. */
+const linkColor = () => themeToken('--canvas-edge', '#b5b2aa')
 /** Whether the hover cards are shown — off until asked for. A preference of the person, not of a map, so it is one key for the page. */
 const CARDS_KEY = 'aegraph:maps:cards'
 export type MapMode = '2d' | 'globe'
@@ -258,7 +259,9 @@ export function useMapWorkbench(map: MapEntity | null, opts: { onOpenEntity?: (i
   // The links among what is drawn — relationships with both ends in the list — for the points to draw as edges: one
   // pass over the store's relationships per list (the table's rows change the list; a data change drops the cache),
   // by feature index, coloured by the link's first coloured tag.
-  const linkCache = useMemo(() => new WeakMap<GeoEntity[], MapLink[]>(), [store, dataVersion]) // eslint-disable-line react-hooks/exhaustive-deps
+  // Links are coloured as they are made: a theme change makes them again, in its edge colour.
+  const theme = useTheme()
+  const linkCache = useMemo(() => new WeakMap<GeoEntity[], MapLink[]>(), [store, dataVersion, theme]) // eslint-disable-line react-hooks/exhaustive-deps
   const linksFor = useCallback(
     (list: GeoEntity[]): MapLink[] => {
       const have = linkCache.get(list)
@@ -266,10 +269,11 @@ export function useMapWorkbench(map: MapEntity | null, opts: { onOpenEntity?: (i
       const at = new Map<EntityId, number>()
       list.forEach((p, i) => at.set(p.id, i))
       const out: MapLink[] = []
+      const plain = linkColor()
       for (const r of store.relationships()) {
         const a = at.get(r.source.id)
         const b = at.get(r.target.id)
-        if (a !== undefined && b !== undefined && a !== b) out.push([a, b, r.tags.map((t) => store.getTagInfo(t).color).find(Boolean) ?? LINK_COLOR])
+        if (a !== undefined && b !== undefined && a !== b) out.push([a, b, r.tags.map((t) => store.getTagInfo(t).color).find(Boolean) ?? plain])
       }
       linkCache.set(list, out)
       return out

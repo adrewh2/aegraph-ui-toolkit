@@ -65,7 +65,7 @@
   min-width: 0;
   height: 100%;
   background:
-    linear-gradient(0deg, rgba(31, 30, 27, 0.02), rgba(31, 30, 27, 0.02)),
+    linear-gradient(0deg, color-mix(in srgb, var(--text) 2%, transparent), color-mix(in srgb, var(--text) 2%, transparent)),
     var(--surface);
   cursor: default;
   touch-action: none;
@@ -78,7 +78,7 @@
   cursor: grab;
 }
 .pj__node.is-selected {
-  filter: drop-shadow(0 0 0 rgba(59, 125, 221, 0.6)) drop-shadow(0 0 3px rgba(59, 125, 221, 0.6));
+  filter: drop-shadow(0 0 0 color-mix(in srgb, var(--select) 60%, transparent)) drop-shadow(0 0 3px color-mix(in srgb, var(--select) 60%, transparent));
 }
 .pj__node.is-missing {
   opacity: 0.45;
@@ -87,7 +87,7 @@
   pointer-events: none;
 }
 .pj__edge.is-hot path {
-  stroke: #3b7ddd;
+  stroke: var(--select);
 }
 .pj__empty {
   position: absolute;

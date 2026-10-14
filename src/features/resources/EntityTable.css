@@ -10,7 +10,7 @@
   outline: none;
 }
 .et:focus-visible {
-  box-shadow: 0 0 0 3px rgba(31, 30, 27, 0.08);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--text) 8%, transparent);
 }
 .et__bar {
   display: flex;
@@ -60,8 +60,8 @@
 .et__marquee {
   position: absolute;
   pointer-events: none;
-  border: 1px solid #6f9ee0;
-  background: rgba(59, 125, 221, 0.12);
+  border: 1px solid var(--select-soft);
+  background: color-mix(in srgb, var(--select) 12%, transparent);
   border-radius: 2px;
   z-index: 3;
 }
@@ -192,7 +192,7 @@
   font-size: 12.5px;
 }
 .et__clear-filters {
-  color: #3b7ddd;
+  color: var(--select);
 }
 .et__th-inner {
   display: flex;
@@ -205,7 +205,7 @@
 }
 .et thead th.is-drop-before,
 .et thead th.is-drop-after {
-  background: #eaf1fb;
+  background: var(--select-bg);
 }
 .et thead th.is-drop-before::before,
 .et thead th.is-drop-after::after {
@@ -214,7 +214,7 @@
   top: 4px;
   bottom: 4px;
   width: 2px;
-  background: #3b7ddd;
+  background: var(--select);
   border-radius: 1px;
 }
 .et thead th.is-drop-before::before {
@@ -270,10 +270,10 @@
   box-shadow: inset -1px 1px 0 var(--border-strong), inset 0 -1px 0 var(--border-strong);
 }
 .et tbody tr.is-selected td {
-  background: #ecebe6;
+  background: color-mix(in srgb, var(--surface) 25%, var(--border));
 }
 .et tbody tr.is-selected:hover td {
-  background: #e3e1db;
+  background: color-mix(in srgb, var(--surface-2) 42.5%, var(--border-strong));
 }
 .et .col-fill {
   width: auto;

@@ -114,7 +114,7 @@ export async function clearBrowser(options: ResetOptions = {}, onBlocked: () => 
 export async function finishBrowserReset(options: ResetOptions) {
   const root = document.getElementById('root')
   const say = (text: string) => {
-    if (root) root.innerHTML = `<p style="font: 14px system-ui, sans-serif; padding: 48px; text-align: center; color: #666">${text}</p>`
+    if (root) root.innerHTML = `<p style="font: 14px system-ui, sans-serif; padding: 48px; text-align: center; color: light-dark(#666, var(--text-muted))">${text}</p>`
   }
   say('Clearing this browser…')
   await clearBrowser(options, () => say('Clearing this browser… another aegraph tab is still open — close it (or reload it) to finish.'))

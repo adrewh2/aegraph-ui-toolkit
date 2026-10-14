@@ -29,6 +29,7 @@ import '../core/constraints/constraint'
 import '../core/constraints/templates'
 import '../core/projects/commitType'
 import { ConstraintEngine } from '../core/constraints/engine'
+import { EDITION } from './edition'
 import { preloadFor } from './preload'
 import { linkedScene, readDemoLink, sceneTab, type DemoLink } from './demoLink'
 import { databaseExists, guardUnsaved, unpersistedStore } from './unsaved'
@@ -38,20 +39,13 @@ const INIT_FLAG = 'aegraph:initialized'
 /** The front door: a visit that loads the app at `/` opens the workstation (Chats in front, `defaultWorkstation`). */
 const FIRST_ROUTE = '/workstation'
 /**
- * The project the app opens by default: the aegraph-ui system map, the app's own architecture as an ontology and its
- * instance graph — the toolkit's first picture is the thing it is — a demo built into the deployment
- * (scripts/demos/fetch.mjs). Opened once per edition, on a first run and on existing installs alike; bump the key to
- * push a new edition. A build without demos opens nothing.
+ * The project the app opens by default, and the tab its first run opens on: the edition's (`edition.json` ›
+ * `defaultDemo`, described in `edition.ts`). Opened once per key; a build without demos opens nothing.
  */
-const DEFAULT_DEMO = 'aegraph-ui-system-map'
-const DEFAULT_DEMO_TITLE = 'aegraph-ui system map'
-const DEFAULT_DEMO_KEY = 'aegraph:default-project:aegraph-ui-system-map-toolkit-v2'
-/**
- * The one tab the first run opens the default project on (`firstRunWorkstation`); unset, its whole graph in 3D, live.
- * A deployment whose default demo ships a scene for its first picture — settled positions, its own force settings —
- * names the scene's address here, so the first frame is the finished picture rather than a cloud pulling into shape.
- */
-const DEFAULT_DEMO_TAB: { path: string; title: string } | undefined = { path: '/unigraph/3d?scene=scene:aegraph-ui-system-map:whole&physics=1', title: 'Unigraph · 3D' }
+const DEFAULT_DEMO = EDITION.defaultDemo.id
+const DEFAULT_DEMO_TITLE = EDITION.defaultDemo.title
+const DEFAULT_DEMO_KEY = EDITION.defaultDemo.key
+const DEFAULT_DEMO_TAB: { path: string; title: string } | undefined = EDITION.defaultDemo.tab ?? undefined
 /** The explorer's `DETAIL_MIN_KEY` (GraphExplorer.tsx) — spelled here so the explorer stays a lazy chunk. */
 const EXPLORER_DETAIL_MIN_KEY = 'aegraph:explorer:detail-min'
 

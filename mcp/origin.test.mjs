@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process'
+import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import WebSocket from 'ws'
@@ -11,6 +12,13 @@ import WebSocket from 'ws'
  * for anything but this machine's dev servers and the deployed site.
  */
 const SERVER = fileURLToPath(new URL('./server.mjs', import.meta.url))
+/**
+ * The deployed site the bridge trusts by default is this edition's own (`site` in `src/app/edition.json`); the other
+ * edition's site is just another site. Written against the file, the test holds for either edition unchanged.
+ */
+const SITE = new URL(JSON.parse(readFileSync(new URL('../src/app/edition.json', import.meta.url), 'utf8')).site).origin
+const SITE_HOST = new URL(SITE).host
+const OTHER_SITES = ['https://aegraph.dev', 'https://aegraph.sh'].filter((o) => o !== SITE)
 
 /**
  * A bridge, with the environment a case needs. Resolves with the child and **the port it actually took**: asked for
@@ -61,7 +69,7 @@ beforeAll(async () => {
   PORT = open.port
   LIMITED = limited.port
   expect(PORT, 'the two bridges must be on different ports').not.toBe(LIMITED)
-  // No hosted site trusted, said explicitly; or a deployment of one's own.
+  // An organisation's machines: no hosted site trusted at all, or their own deployment instead of the edition's site.
   const [none, corp] = [await bridge({ AEGRAPH_BRIDGE_PORT: '8700', AEGRAPH_HOSTED_ORIGIN: '' }), await bridge({ AEGRAPH_BRIDGE_PORT: '8745', AEGRAPH_HOSTED_ORIGIN: 'https://graph.corp.example/' })]
   NO_HOSTED = none.port
   CORP = corp.port
@@ -71,21 +79,14 @@ afterAll(() => servers.forEach((s) => s.kill('SIGTERM')))
 
 describe('the bridge only takes connections from pages it should', () => {
   it('refuses a page on any other site, including one whose name contains an allowed one', async () => {
-    for (const origin of ['https://evil.example', 'http://evil.localhost.attacker.com', 'https://aegraph.dev.evil.com', 'https://notaegraph.dev', 'null']) {
+    for (const origin of ['https://evil.example', 'http://evil.localhost.attacker.com', `https://${SITE_HOST}.evil.com`, `https://not${SITE_HOST}`, `https://www.${SITE_HOST}`, `http://${SITE_HOST}`, ...OTHER_SITES, 'null']) {
       expect(await connect(PORT, origin), origin).toBe(403)
     }
   })
 
-  it('takes this machine’s dev servers and previews', async () => {
-    for (const origin of ['http://localhost:5173', 'http://localhost:5199', 'http://127.0.0.1:4173']) {
+  it('takes this machine’s dev servers and previews, and the edition’s deployed site', async () => {
+    for (const origin of ['http://localhost:5173', 'http://localhost:5199', 'http://127.0.0.1:4173', SITE]) {
       expect(await connect(PORT, origin), origin).toBe('open')
-    }
-  })
-
-  it('by default trusts aegraph.sh, this edition\'s own site, and no other: aegraph.dev or any other deployment is refused', async () => {
-    expect(await connect(PORT, 'https://aegraph.sh')).toBe('open')
-    for (const origin of ['https://aegraph.dev', 'https://www.aegraph.sh', 'http://aegraph.sh', 'https://aegraph.sh.evil.example', 'https://graph.corp.example']) {
-      expect(await connect(PORT, origin), origin).toBe(403)
     }
   })
 
@@ -95,18 +96,16 @@ describe('the bridge only takes connections from pages it should', () => {
 
   it('AEGRAPH_BRIDGE_ORIGINS replaces the list, so a deployment of one’s own is the only page that drives it', async () => {
     expect(await connect(LIMITED, 'https://only.example')).toBe('open')
-    for (const origin of ['http://localhost:5173', 'https://aegraph.dev', 'https://evil.example']) {
+    for (const origin of ['http://localhost:5173', SITE, 'https://evil.example']) {
       expect(await connect(LIMITED, origin), origin).toBe(403)
     }
   })
 
-  it('AEGRAPH_HOSTED_ORIGIN empty trusts no hosted site; set, it trusts that one and no other', async () => {
-    expect(await connect(NO_HOSTED, 'https://aegraph.sh')).toBe(403)
-    expect(await connect(NO_HOSTED, 'https://aegraph.dev')).toBe(403)
+  it('AEGRAPH_HOSTED_ORIGIN empty trusts no hosted site; set, it trusts that one instead of the edition’s site', async () => {
+    expect(await connect(NO_HOSTED, SITE)).toBe(403)
     expect(await connect(NO_HOSTED, 'http://localhost:5199')).toBe('open')
     expect(await connect(CORP, 'https://graph.corp.example')).toBe('open')
-    expect(await connect(CORP, 'https://aegraph.sh')).toBe(403)
-    expect(await connect(CORP, 'https://aegraph.dev')).toBe(403)
+    expect(await connect(CORP, SITE)).toBe(403)
     expect(await connect(CORP, 'https://evil.example')).toBe(403)
   })
 })

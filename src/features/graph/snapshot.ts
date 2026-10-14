@@ -1,3 +1,5 @@
+import { themeToken } from '../../app/theme'
+
 export interface SnapshotOptions {
   width?: number
   height?: number
@@ -9,8 +11,11 @@ export interface SnapshotOptions {
 export const PREVIEW_WIDTH = 320
 export const PREVIEW_HEIGHT = 200
 
-/** A PNG blob of any size drawn onto a canvas of the preview's size (cover, centred) over the page background, as a JPEG data: URL. */
-export async function previewDataUrl(blob: Blob, width = PREVIEW_WIDTH, height = PREVIEW_HEIGHT, background = '#faf9f6'): Promise<string> {
+/**
+ * A PNG blob of any size drawn onto a canvas of the preview's size (cover, centred) over the canvas colour of the theme
+ * on screen, as a JPEG data: URL. A preview is a picture of the view as it was drawn, so it keeps that theme's ground.
+ */
+export async function previewDataUrl(blob: Blob, width = PREVIEW_WIDTH, height = PREVIEW_HEIGHT, background = themeToken('--canvas', '#faf9f6')): Promise<string> {
   const bmp = await createImageBitmap(blob)
   const c = document.createElement('canvas')
   c.width = width

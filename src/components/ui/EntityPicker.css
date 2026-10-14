@@ -14,7 +14,7 @@
 .epick.is-open,
 .epick:focus-within {
   border-color: var(--text-faint);
-  box-shadow: 0 0 0 3px rgba(31, 30, 27, 0.06);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--text) 6%, transparent);
 }
 .epick--chosen {
   background: var(--surface-2);

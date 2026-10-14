@@ -44,7 +44,7 @@
   background: var(--surface-2);
 }
 .ai__spark {
-  color: #b45309;
+  color: var(--highlight-text);
 }
 .ai__title {
   font-weight: 600;
@@ -414,7 +414,7 @@
   color: var(--text-faint);
 }
 .ai__bridge-state--connecting {
-  color: #d97706;
+  color: var(--pending);
 }
 .ai__bridge-state--connected {
   color: var(--ok-text);
@@ -447,7 +447,7 @@
 }
 .ai__input:focus {
   border-color: var(--text-faint);
-  box-shadow: 0 0 0 3px rgba(31, 30, 27, 0.06);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--text) 6%, transparent);
 }
 .ai__input:disabled {
   opacity: 0.6;
@@ -493,7 +493,7 @@
   color: var(--text);
   font-size: 12.5px;
   font-weight: 500;
-  box-shadow: 0 1px 3px rgba(31, 30, 27, 0.08);
+  box-shadow: 0 1px 3px light-dark(color-mix(in srgb, var(--text) 8%, transparent), color-mix(in srgb, var(--shadow-color) 8%, transparent));
   cursor: pointer;
 }
 .ai-fab:hover {

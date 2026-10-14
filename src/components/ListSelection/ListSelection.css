@@ -1,8 +1,8 @@
 .lsel__marquee {
   position: fixed;
   pointer-events: none;
-  border: 1px solid #6f9ee0;
-  background: rgba(59, 125, 221, 0.12);
+  border: 1px solid var(--select-soft);
+  background: color-mix(in srgb, var(--select) 12%, transparent);
   border-radius: 2px;
   z-index: 30;
 }
@@ -32,9 +32,9 @@
 }
 /* Selected cards and rows */
 [data-sel-root] [data-id].is-selected {
-  outline: 2px solid #6f9ee0;
+  outline: 2px solid var(--select-soft);
   outline-offset: -2px;
-  background: #eef4fc;
+  background: color-mix(in srgb, var(--select-bg) 80%, var(--surface));
 }
 .is-marquee [data-sel-root],
 .is-marquee [data-sel-root] * {

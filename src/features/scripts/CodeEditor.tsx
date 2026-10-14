@@ -9,6 +9,7 @@ import { drawSelection, EditorView, highlightActiveLine, highlightActiveLineGutt
 import { useEffect, useImperativeHandle, useRef, type Ref } from 'react'
 import type { Language } from '../../scripting/types'
 import { helperTooltip } from '../expr/ExprEditor'
+import { themeInfo, useTheme } from '../../app/theme'
 import './codeEditor.css'
 
 interface Props {
@@ -64,6 +65,9 @@ export function CodeEditor({ value, language, onChange, onRun, onSave, placehold
   const host = useRef<HTMLDivElement>(null)
   const view = useRef<EditorView | null>(null)
   const lang = useRef(new Compartment())
+  /** Light or dark, as the page's theme is: CodeMirror's own caret, popups and completion list follow it. */
+  const scheme = useRef(new Compartment())
+  const dark = themeInfo(useTheme()).scheme === 'dark'
   const handlers = useRef({ onChange, onRun, onSave, completion, hover })
   handlers.current = { onChange, onRun, onSave, completion, hover }
   useImperativeHandle(handle, () => ({
@@ -92,6 +96,7 @@ export function CodeEditor({ value, language, onChange, onRun, onSave, placehold
         // Whatever the palette above does not name keeps CodeMirror's own colour rather than none.
         syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
         lang.current.of(language === 'python' ? python() : javascript({ typescript: false })),
+        scheme.current.of(EditorView.darkTheme.of(dark)),
         closeBrackets(),
         autocompletion({ override: [(ctx) => handlers.current.completion?.(ctx) ?? null], activateOnTyping: true, icons: false, maxRenderedOptions: 40 }),
         hoverTooltip((v, pos) => {
@@ -140,6 +145,10 @@ export function CodeEditor({ value, language, onChange, onRun, onSave, placehold
   useEffect(() => {
     view.current?.dispatch({ effects: lang.current.reconfigure(language === 'python' ? python() : javascript({ typescript: false })) })
   }, [language])
+
+  useEffect(() => {
+    view.current?.dispatch({ effects: scheme.current.reconfigure(EditorView.darkTheme.of(dark)) })
+  }, [dark])
 
   return <div ref={host} className={`ce ${className ?? ''}`} />
 }

@@ -683,7 +683,7 @@ export function ScenesView() {
                   <path d="M0 0L10 5L0 10z" fill="context-stroke" />
                 </marker>
                 <pattern id="pj-grid" width={50 * view.k} height={50 * view.k} patternUnits="userSpaceOnUse" x={view.x} y={view.y}>
-                  <path d={`M ${50 * view.k} 0 L 0 0 0 ${50 * view.k}`} fill="none" stroke="rgba(31,30,27,0.08)" strokeWidth="1" />
+                  <path d={`M ${50 * view.k} 0 L 0 0 0 ${50 * view.k}`} fill="none" stroke="color-mix(in srgb, var(--text) 8%, transparent)" strokeWidth="1" />
                 </pattern>
               </defs>
               {showGrid && <rect width="100%" height="100%" fill="url(#pj-grid)" />}

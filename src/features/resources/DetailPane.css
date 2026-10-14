@@ -20,7 +20,7 @@
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  border: 1px solid color-mix(in srgb, var(--shadow-color) 12%, transparent);
   flex-shrink: 0;
 }
 .dp-finder {

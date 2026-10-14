@@ -7,7 +7,7 @@
   align-items: flex-start;
   justify-content: center;
   padding-top: 12vh;
-  background: rgba(31, 30, 27, 0.28);
+  background: color-mix(in srgb, var(--overlay) 80%, transparent);
 }
 .cp__box {
   width: min(640px, calc(100% - 32px));
@@ -17,7 +17,7 @@
   border: 1px solid var(--border-strong);
   border-radius: 12px;
   background: var(--surface);
-  box-shadow: 0 16px 48px rgba(31, 30, 27, 0.22);
+  box-shadow: 0 16px 48px light-dark(color-mix(in srgb, var(--text) 22%, transparent), color-mix(in srgb, var(--shadow-color) 22%, transparent));
   overflow: hidden;
 }
 .cp__input {
@@ -81,7 +81,7 @@
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  border: 1px solid light-dark(color-mix(in srgb, var(--shadow-color) 12%, transparent), color-mix(in srgb, var(--text) 12%, transparent));
   flex-shrink: 0;
 }
 .cp__label {
@@ -122,7 +122,7 @@
 .cp__snippet mark {
   padding: 0 1px;
   border-radius: 2px;
-  background: rgba(250, 204, 21, 0.35);
+  background: color-mix(in srgb, var(--highlight-bg) 71%, transparent);
   color: inherit;
 }
 .cp__alt {

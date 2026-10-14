@@ -1,11 +1,16 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
+import './styles/themes.css'
 import App from './App.tsx'
 import { startMemoryWatch } from './app/memoryWatch'
+import { startTheme } from './features/account/settings'
 import { migrateHeldPositions, POSITIONS_KEY, prefetchHeldPositions, sessionsToRestore, sweepExplorerSessionData } from './features/graph/heldPositions'
 import { browserResetPending, finishBrowserReset } from './app/reset'
 import { finishStashRestore, stashRestorePending } from './app/stash'
+
+// The theme the settings name, kept from here on (`public/theme-boot.js` showed it before the first paint).
+startTheme()
 
 // Asked to clear this browser, or to restore a stash of it (the This browser page, the `account` tool): done before anything
 // opens a database or writes, then the front page loads. The app does not start on this load.

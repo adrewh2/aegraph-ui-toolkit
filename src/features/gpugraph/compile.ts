@@ -73,7 +73,7 @@ export function compileSlice(engine: GraphEngine, slice: GraphSlice, styles: { n
       const s = engine.nodeIndex(e.source.id), t = engine.nodeIndex(e.target.id)
       if (s < 0 || t < 0) continue
       const st = styles.edges.get(e.id)
-      engine.addEdge(e.id, s, t, { type: e.type, directed: e.directed && (st?.arrow ?? true), packed: packColor(st?.color ?? '#b5b2aa', st && st.opacity < 1 ? st.opacity : 1), width: st?.width ?? 1, curvature: parallel ? (curvatureFor(parallel.get(e.id)) ?? 0) : 0, label: e.label ?? e.type, visible: st?.visible ?? true })
+      engine.addEdge(e.id, s, t, { type: e.type, directed: e.directed && (st?.arrow ?? true), packed: packColor(st?.color ?? engine.colors.edge, st && st.opacity < 1 ? st.opacity : 1), width: st?.width ?? 1, curvature: parallel ? (curvatureFor(parallel.get(e.id)) ?? 0) : 0, label: e.label ?? e.type, visible: st?.visible ?? true })
     }
   }
   engine.graph.compact()

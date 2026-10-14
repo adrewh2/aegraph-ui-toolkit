@@ -111,7 +111,7 @@
 }
 .chats__row.is-active {
   background: var(--bg);
-  box-shadow: 0 0 0 1px var(--border), 0 1px 3px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 0 0 1px var(--border), 0 1px 3px color-mix(in srgb, var(--shadow-color) 6%, transparent);
 }
 .chats__row.is-active .chats__row-title {
   font-weight: 600;
@@ -406,7 +406,7 @@ body.is-resizing {
   padding: 0 5px;
   border-radius: 999px;
   background: var(--accent);
-  color: #fff;
+  color: var(--accent-text);
   font-size: 11px;
   font-weight: 600;
   line-height: 18px;
@@ -486,7 +486,7 @@ body.is-resizing {
   border: 1px solid var(--border);
   border-radius: 16px;
   background: var(--surface);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 28px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--shadow-color) 4%, transparent), 0 8px 28px color-mix(in srgb, var(--shadow-color) 6%, transparent);
   cursor: text;
   transition: border-color 120ms ease, box-shadow 120ms ease;
 }
@@ -495,11 +495,11 @@ body.is-resizing {
   border: 1px solid var(--border);
   border-radius: 16px;
   background: var(--surface);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 28px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--shadow-color) 4%, transparent), 0 8px 28px color-mix(in srgb, var(--shadow-color) 6%, transparent);
 }
 .chome__composer:focus-within {
   border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 10px 32px color-mix(in srgb, var(--accent) 14%, transparent);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--shadow-color) 4%, transparent), 0 10px 32px color-mix(in srgb, var(--accent) 14%, transparent);
 }
 .chome__input {
   border: 0;
@@ -605,7 +605,7 @@ body.is-resizing {
 }
 .chome__card:hover {
   border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--shadow-color) 6%, transparent);
   transform: translateY(-1px);
 }
 .chome__card-head {
@@ -722,7 +722,7 @@ body.is-resizing {
   border-top: 1px solid var(--border);
   border-radius: 16px;
   background: var(--surface);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--shadow-color) 4%, transparent), 0 8px 24px color-mix(in srgb, var(--shadow-color) 5%, transparent);
   width: calc(100% - 28px);
   transition: border-color 120ms ease, box-shadow 120ms ease;
 }

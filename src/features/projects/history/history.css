@@ -25,7 +25,7 @@
 .vh-tab.is-active {
   background: var(--surface);
   color: var(--text);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--shadow-color) 8%, transparent);
 }
 .vh-tab__n {
   min-width: 18px;

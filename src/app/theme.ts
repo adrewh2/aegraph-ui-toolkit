@@ -1,0 +1,128 @@
+import { useSyncExternalStore } from 'react'
+
+/**
+ * The app's themes. A theme is a set of values for the colour tokens in `src/index.css` (`--bg`, `--surface`,
+ * `--text`, …): Paper's are the defaults on `:root`, every other theme overrides them under
+ * `:root[data-theme='<id>']` in `src/styles/themes.css`. Everything drawn with CSS follows the tokens; what is drawn
+ * on a canvas (Unigraph's engine, charts, the slide layer) reads them through `themeTokens()` and redraws on
+ * `onThemeChange`.
+ *
+ * The choice is the user's setting (`UserSettings.theme`, the account menu at the foot of the sidebar), `system` by
+ * default to the light or dark theme the operating system asks for. `public/theme-boot.js` applies it before the
+ * first paint, so a dark theme never flashes light; `applyTheme` keeps it applied after that.
+ */
+export interface ThemeInfo {
+  id: ThemeId
+  label: string
+  /** The browser's own controls (scrollbars, form widgets, the date picker) are drawn light or dark to match. */
+  scheme: 'light' | 'dark'
+  description: string
+  /** Three swatches for the picker: background, surface, text. */
+  swatch: readonly [string, string, string]
+}
+
+export const THEMES = [
+  { id: 'paper', label: 'Paper', scheme: 'light', description: 'Warm off-white, the default.', swatch: ['#faf9f6', '#ffffff', '#1f1e1b'] },
+  { id: 'dark', label: 'Dark', scheme: 'dark', description: 'Paper’s warm greys, dark.', swatch: ['#1b1a18', '#24231f', '#ecebe6'] },
+  { id: 'midnight', label: 'Midnight', scheme: 'dark', description: 'Cool blue-black, blue accents.', swatch: ['#0e131b', '#151c27', '#e2e8f1'] },
+  { id: 'contrast', label: 'High contrast', scheme: 'light', description: 'Black on white, strong borders.', swatch: ['#ffffff', '#ffffff', '#000000'] },
+] as const satisfies readonly (Omit<ThemeInfo, 'id'> & { id: string })[]
+
+export type ThemeId = (typeof THEMES)[number]['id']
+/** What the user picks: a theme, or the operating system's light or dark. */
+export type ThemePreference = ThemeId | 'system'
+
+export const DEFAULT_THEME: ThemeId = 'paper'
+/** The theme `system` means when the operating system asks for a dark one. */
+export const SYSTEM_DARK: ThemeId = 'dark'
+
+export const isThemeId = (v: unknown): v is ThemeId => typeof v === 'string' && THEMES.some((t) => t.id === v)
+export const isThemePreference = (v: unknown): v is ThemePreference => v === 'system' || isThemeId(v)
+export const themeInfo = (id: ThemeId): ThemeInfo => THEMES.find((t) => t.id === id) as ThemeInfo
+
+const darkQuery = () => (typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : undefined)
+
+/** The theme a preference shows now. */
+export function resolveTheme(pref: ThemePreference, prefersDark = !!darkQuery()?.matches): ThemeId {
+  if (pref === 'system') return prefersDark ? SYSTEM_DARK : DEFAULT_THEME
+  return pref
+}
+
+let applied: ThemeId | undefined
+let preference: ThemePreference = 'system'
+const listeners = new Set<(id: ThemeId) => void>()
+let watching = false
+
+function set(id: ThemeId) {
+  if (typeof document === 'undefined') return
+  const root = document.documentElement
+  root.dataset.theme = id
+  // `[data-scheme='dark']` lets CSS ask for any dark theme without naming each one.
+  root.dataset.scheme = themeInfo(id).scheme
+  root.style.colorScheme = themeInfo(id).scheme
+  if (applied === id) return
+  applied = id
+  listeners.forEach((l) => l(id))
+}
+
+/** Show the theme a preference stands for, and keep following the operating system while it is `system`. */
+export function applyTheme(pref: ThemePreference) {
+  preference = isThemePreference(pref) ? pref : 'system'
+  set(resolveTheme(preference))
+  const q = darkQuery()
+  if (q && !watching) {
+    watching = true
+    q.addEventListener?.('change', () => {
+      if (preference === 'system') set(resolveTheme('system', q.matches))
+    })
+  }
+}
+
+/** The theme on screen now. */
+export function currentTheme(): ThemeId {
+  if (applied) return applied
+  const id = typeof document !== 'undefined' ? document.documentElement.dataset.theme : undefined
+  return isThemeId(id) ? id : DEFAULT_THEME
+}
+
+/** Called with the new theme whenever it changes. Returns the unsubscribe. */
+export function onThemeChange(fn: (id: ThemeId) => void): () => void {
+  listeners.add(fn)
+  return () => void listeners.delete(fn)
+}
+
+/** The theme on screen, as React state: a component that draws on a canvas re-renders, and re-reads its colours, when it changes. */
+export function useTheme(): ThemeId {
+  return useSyncExternalStore((cb) => onThemeChange(cb), currentTheme, () => DEFAULT_THEME)
+}
+
+/**
+ * A colour token's value as the page resolves it now (`--bg` → `#1b1a18` in Dark), for what is drawn outside CSS.
+ * `fallback` is Paper's value, used where there is no document (tests, the headless engine).
+ */
+export function themeToken(name: `--${string}`, fallback: string, el?: Element): string {
+  if (typeof document === 'undefined' || typeof getComputedStyle === 'undefined') return fallback
+  return getComputedStyle(el ?? document.documentElement).getPropertyValue(name).trim() || fallback
+}
+
+/** The tokens canvas drawing reads most, resolved now. */
+export function themeTokens(el?: Element) {
+  const t = (name: `--${string}`, fallback: string) => themeToken(name, fallback, el)
+  return {
+    bg: t('--bg', '#faf9f6'),
+    surface: t('--surface', '#ffffff'),
+    surface2: t('--surface-2', '#f5f4f0'),
+    border: t('--border', '#e6e4de'),
+    text: t('--text', '#1f1e1b'),
+    textMuted: t('--text-muted', '#6d6b66'),
+    textFaint: t('--text-faint', '#716f69'),
+    accent: t('--accent', '#1f1e1b'),
+    select: t('--select', '#3b7ddd'),
+    danger: t('--danger', '#b91c1c'),
+    canvas: t('--canvas', '#faf9f6'),
+    canvasHalo: t('--canvas-halo', 'rgba(250, 249, 246, 0.9)'),
+    canvasSelect: t('--canvas-select', '#1f1e1b'),
+    canvasEdge: t('--canvas-edge', '#b5b2aa'),
+  }
+}
+export type ThemeTokens = ReturnType<typeof themeTokens>

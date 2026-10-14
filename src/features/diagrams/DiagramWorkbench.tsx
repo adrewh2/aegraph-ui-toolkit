@@ -16,6 +16,7 @@ import { DiagramPicture } from './DiagramPicture'
 import { GRAPHVIZ_ENGINES, atIntrinsicSize, extractGeometry, layoutEngine, renderDiagram, svgToPng } from './render'
 import './diagrams.css'
 import { Select } from '../../components/ui/Select'
+import { themeInfo, useTheme } from '../../app/theme'
 
 const FORMAT_LABEL: Record<DiagramFormat, string> = { dot: 'Graphviz', mermaid: 'Mermaid', excalidraw: 'Excalidraw' }
 const FORMAT_TITLE: Record<DiagramFormat, string> = { dot: 'Graphviz DOT', mermaid: 'Mermaid', excalidraw: 'Excalidraw (JSON)' }
@@ -231,6 +232,9 @@ export function DiagramWorkbench({ diagram, editor, compact = false }: Workbench
   const [mode, setMode] = useState<'view' | 'edit' | 'draw'>(compact ? 'view' : format === 'excalidraw' ? 'draw' : 'edit')
   const [saveAs, setSaveAs] = useState<string | null>(null)
   const canvas = format === 'excalidraw'
+  // The canvas is drawn light or dark with the page: Excalidraw's own dark mode, which shows a drawing's colours inverted
+  // without changing them — the scene and its exports keep what was drawn.
+  const scheme = themeInfo(useTheme()).scheme
 
   /** Draw: on the canvas when the diagram is one, else converted into one first (the text formats survive as a format tab). */
   const draw = async () => {
@@ -420,7 +424,7 @@ export function DiagramWorkbench({ diagram, editor, compact = false }: Workbench
         <div className="dgp__canvas">
           <Suspense fallback={<div className="vp__loading muted">Loading the canvas…</div>}>
             {/* In development the canvas API is reachable from the console (`__aegraph.canvas`) for scripted checks. */}
-            <DiagramEditor ref={editor.canvasRef} source={source} onChange={editor.onSourceChange} onApi={import.meta.env.DEV ? (api) => ((window as unknown as { __aegraph?: Record<string, unknown> }).__aegraph ??= {}).canvas = api : undefined} />
+            <DiagramEditor ref={editor.canvasRef} source={source} theme={scheme} onChange={editor.onSourceChange} onApi={import.meta.env.DEV ? (api) => ((window as unknown as { __aegraph?: Record<string, unknown> }).__aegraph ??= {}).canvas = api : undefined} />
           </Suspense>
         </div>
       ) : (

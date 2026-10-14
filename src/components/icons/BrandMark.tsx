@@ -26,7 +26,7 @@ export function BrandMark({ brand, size = 18, ...rest }: { brand: BrandId; size?
 export function BrandTile({ brand, size = 18, className = 'ds__icon' }: { brand: BrandId; size?: number; className?: string }) {
   const b = BRANDS[brand]
   return (
-    <span className={className} style={{ background: b.hex, color: '#fff' }} title={b.label}>
+    <span className={className} style={{ background: b.hex, color: 'var(--on-media)' }} title={b.label}>
       <BrandMark brand={brand} size={size} />
     </span>
   )

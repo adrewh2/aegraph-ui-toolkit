@@ -69,7 +69,7 @@
 }
 .si__card:hover {
   border-color: var(--border-strong, var(--border));
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--shadow-color) 6%, transparent);
 }
 .si__thumb {
   display: flex;
@@ -79,7 +79,7 @@
   height: 56px;
   flex-shrink: 0;
   border-radius: 8px;
-  background: var(--surface-2, rgba(0, 0, 0, 0.04));
+  background: var(--surface-2);
   color: var(--text-muted, var(--muted));
   overflow: hidden;
 }
@@ -181,8 +181,8 @@
   opacity: 1;
 }
 .si__del:hover {
-  color: var(--danger, #b91c1c);
-  background: var(--surface-2, rgba(0, 0, 0, 0.05));
+  color: var(--danger);
+  background: var(--surface-2);
 }
 .si__empty {
   display: flex;

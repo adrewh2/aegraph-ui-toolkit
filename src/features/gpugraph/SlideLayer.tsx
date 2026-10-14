@@ -4,6 +4,7 @@ import { arrangeStack, BEAT_HEIGHT, beatWidth, leafBlocks, placementKey, slidesB
 import { Composition, Leaf } from './Composition'
 import { measureCard, type CardAnchors } from './cardAnchors'
 import { measure } from '../../lib/measure'
+import { themeTokens } from '../../app/theme'
 import { multiply, type Mat4 } from './engine/mat4'
 import type { EngineOverlay, GraphEngine } from './engine/engine'
 
@@ -628,8 +629,9 @@ export const SlideLayer = memo(function SlideLayer({ engine, decks, blocks, part
         g.save()
         g.drawImage(canvas, 0, 0, engine.camera3.width * dpr, engine.camera3.height * dpr)
         g.scale(dpr, dpr)
-        const css = getComputedStyle(root)
-        const colors = { surface: css.getPropertyValue('--surface').trim() || '#ffffff', text: css.getPropertyValue('--text').trim() || '#1f1e1b', muted: css.getPropertyValue('--text-muted').trim() || '#6d6b66' }
+        // The theme's colours as they are now: the cards in the picture are the cards on the screen.
+        const t = themeTokens(root)
+        const colors = { surface: t.surface, text: t.text, muted: t.textMuted }
         for (let k = quads.length - 1; k >= 0; k--) {
           const { id, q, back } = quads[k]
           const info = slides.get(id)

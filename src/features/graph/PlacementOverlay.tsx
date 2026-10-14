@@ -68,9 +68,9 @@ export const PlacementOverlay = memo(function PlacementOverlay({ camera, overlay
         {/* y is up in graph space and down in SVG; the matrix from the camera already flips, so draw in raw graph coordinates. */}
         {drawCells &&
           cells.map((c) => (
-            <rect key={`${c.x},${c.y}`} x={c.rect.minX} y={c.rect.minY} width={c.rect.maxX - c.rect.minX} height={c.rect.maxY - c.rect.minY} fill="none" stroke="rgba(31,30,27,0.18)" vectorEffect="non-scaling-stroke" />
+            <rect key={`${c.x},${c.y}`} x={c.rect.minX} y={c.rect.minY} width={c.rect.maxX - c.rect.minX} height={c.rect.maxY - c.rect.minY} fill="none" stroke="color-mix(in srgb, var(--text) 18%, transparent)" vectorEffect="non-scaling-stroke" />
           ))}
-        <rect x={region.minX} y={region.minY} width={region.maxX - region.minX} height={region.maxY - region.minY} fill="none" stroke="rgba(31,30,27,0.45)" strokeDasharray="6 4" vectorEffect="non-scaling-stroke" />
+        <rect x={region.minX} y={region.minY} width={region.maxX - region.minX} height={region.maxY - region.minY} fill="none" stroke="color-mix(in srgb, var(--text) 45%, transparent)" strokeDasharray="6 4" vectorEffect="non-scaling-stroke" />
       </g>
       <g ref={labelsRef} className="gx-overlay__labels">
         {axes.x?.ticks.slice(0, 24).map((t, i) => (

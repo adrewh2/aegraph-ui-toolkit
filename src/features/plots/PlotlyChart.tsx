@@ -5,6 +5,7 @@ import type { PlotlyTrace } from '../../core/graph/plot'
 import { observeSettledSize } from '../../lib/settledResize'
 import { sanitizeFigure } from '../../scripting/figure'
 import { useViewActive } from '../workstation/paneContext'
+import { themeToken, useTheme } from '../../app/theme'
 import './plots.css'
 
 /** What a click on a point tells the page: the entities behind it and where the pointer is. */
@@ -181,7 +182,7 @@ export async function panChart(el: HTMLElement, dx: number, dy: number) {
   await Plotly.relayout(el, update)
 }
 
-const cssVar = (name: string, fallback: string) => (typeof window === 'undefined' ? fallback : getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback)
+const cssVar = (name: `--${string}`, fallback: string) => themeToken(name, fallback)
 
 /** Draws with Plotly.react (diffs in place), themed from the app's CSS variables, resized with its container. */
 export function PlotlyChart({ data: rawData, layout: rawLayout, className, onReady, onPick, dragmode = 'pan' }: Props) {
@@ -200,6 +201,8 @@ export function PlotlyChart({ data: rawData, layout: rawLayout, className, onRea
   // A chart on a page or tab left behind is purged after a minute (Plotly holds its WebGL/SVG scene and
   // listeners per figure) and drawn again on return; `uirevision` brings the zoom back with it.
   const viewActive = useViewActive()
+  // The theme on screen: a change draws the figure again in its colours (the text, the grid), the data's own colours kept.
+  const theme = useTheme()
   const [dormant, setDormant] = useState(false)
   useEffect(() => {
     if (viewActive) {
@@ -222,7 +225,7 @@ export function PlotlyChart({ data: rawData, layout: rawLayout, className, onRea
       .then((Plotly) => {
         if (!live) return
         const font = cssVar('--text', '#1f1e1b')
-        const grid = cssVar('--border', '#e5e2da')
+        const grid = cssVar('--border', '#e6e4de')
         // A script may say `title: 'Text'`; this Plotly wants `{ text }` and would otherwise draw no title at all.
         const title = typeof layout.title === 'string' ? { text: layout.title } : (layout.title as { text?: string } | undefined)
         const themed = {
@@ -263,7 +266,7 @@ export function PlotlyChart({ data: rawData, layout: rawLayout, className, onRea
     return () => {
       live = false
     }
-  }, [data, layout, onReady, dragmode, dormant])
+  }, [data, layout, onReady, dragmode, dormant, theme])
 
   useEffect(() => {
     const el = ref.current

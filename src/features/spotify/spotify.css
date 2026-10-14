@@ -53,8 +53,8 @@
   margin: 0;
   font-size: 12px;
   line-height: 1.5;
-  color: #92400e;
-  background: #fef3c7;
+  color: var(--warn-text);
+  background: var(--warn-bg);
   border-radius: 6px;
   padding: 6px 8px;
 }

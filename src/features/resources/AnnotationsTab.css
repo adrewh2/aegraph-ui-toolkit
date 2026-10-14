@@ -39,6 +39,11 @@
   background: #fef9c3;
   color: #854d0e;
 }
+/* Paper's pale yellow has no token of its own; the dark themes take the highlight's. */
+:root[data-scheme='dark'] .antab__glyph--quote {
+  background: var(--highlight-bg);
+  color: var(--highlight-text);
+}
 .antab__thumb {
   position: relative;
   display: block;
@@ -57,8 +62,8 @@
 }
 .antab__frame {
   position: absolute;
-  border: 1.5px solid #f59e0b;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+  border: 1.5px solid var(--highlight);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--shadow-color) 40%, transparent);
 }
 .antab__main {
   flex: 1;

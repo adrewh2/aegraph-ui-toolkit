@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react'
+import { applyTheme, isThemePreference, type ThemePreference } from '../../app/theme'
 
 /**
  * The user's own settings — what the settings menu at the foot of the sidebar keeps, apart from the assistant's
@@ -12,10 +13,12 @@ export interface UserSettings {
    * Wikipedia, the embedding model, the media embeds. On — turning it off is offline mode.
    */
   externalServices: boolean
+  /** The colour theme (`src/app/theme.ts › THEMES`), or `system` — the operating system's light or dark. */
+  theme: ThemePreference
 }
 
 const KEY = 'aegraph:account:settings'
-const DEFAULTS: UserSettings = { developerTools: false, externalServices: true }
+const DEFAULTS: UserSettings = { developerTools: false, externalServices: true, theme: 'system' }
 
 let current: UserSettings = load()
 const listeners = new Set<() => void>()
@@ -26,7 +29,7 @@ function load(): UserSettings {
     if (!raw) return DEFAULTS
     const parsed = JSON.parse(raw) as Partial<UserSettings>
     // A setting this browser has never seen takes the default: a new switch does not silently turn something off.
-    return { developerTools: parsed.developerTools === true, externalServices: parsed.externalServices !== false }
+    return { developerTools: parsed.developerTools === true, externalServices: parsed.externalServices !== false, theme: isThemePreference(parsed.theme) ? parsed.theme : 'system' }
   } catch {
     return DEFAULTS
   }
@@ -35,15 +38,20 @@ function load(): UserSettings {
 export const getUserSettings = () => current
 
 export function setUserSettings(patch: Partial<UserSettings>): UserSettings {
-  current = { ...current, ...patch }
+  const theme = patch.theme !== undefined && !isThemePreference(patch.theme) ? current.theme : (patch.theme ?? current.theme)
+  current = { ...current, ...patch, theme }
   try {
     localStorage.setItem(KEY, JSON.stringify(current))
   } catch {
     /* ignore */
   }
   listeners.forEach((l) => l())
+  if (patch.theme !== undefined) applyTheme(current.theme)
   return current
 }
+
+/** Show the theme this browser's settings name (`public/theme-boot.js` did so before the first paint; this keeps it). */
+export const startTheme = () => applyTheme(current.theme)
 
 function subscribe(l: () => void) {
   listeners.add(l)

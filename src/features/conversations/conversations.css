@@ -80,8 +80,8 @@
   overflow-wrap: anywhere;
 }
 .cv__msg--user .cv__bubble {
-  background: #eaf1fb;
-  border-color: #d5e2f5;
+  background: var(--select-bg);
+  border-color: color-mix(in srgb, var(--info-bg) 83%, var(--select-border));
 }
 .cv__msg--other .cv__bubble {
   background: var(--surface);

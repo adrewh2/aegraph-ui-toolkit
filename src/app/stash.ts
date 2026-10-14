@@ -476,7 +476,7 @@ export async function finishStashRestore(id: string) {
   const say = (text: string, actions: { label: string; run: () => void }[] = [], home = false) => {
     if (!root) return
     const p = document.createElement('p')
-    p.style.cssText = 'font: 14px system-ui, sans-serif; padding: 48px 48px 12px; text-align: center; color: #666'
+    p.style.cssText = 'font: 14px system-ui, sans-serif; padding: 48px 48px 12px; text-align: center; color: light-dark(#666, var(--text-muted))'
     p.textContent = text
     if (home) {
       const a = document.createElement('a')

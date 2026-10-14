@@ -1,0 +1,16 @@
+{
+  "name": "aegraph-ui-toolkit",
+  "repo": "https://github.com/adrewh2/aegraph-ui-toolkit",
+  "site": "https://aegraph.sh",
+  "privateRepo": false,
+  "repoLinkInSidebar": true,
+  "defaultDemo": {
+    "id": "aegraph-ui-system-map",
+    "title": "aegraph-ui system map",
+    "key": "aegraph:default-project:aegraph-ui-system-map-toolkit-v2",
+    "tab": {
+      "path": "/unigraph/3d?scene=scene:aegraph-ui-system-map:whole&physics=1",
+      "title": "Unigraph · 3D"
+    }
+  }
+}

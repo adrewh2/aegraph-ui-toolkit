@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ChevronDown, HardDrive, Settings } from 'lucide-react'
 import { Popover } from '../../components/ui/Menu'
 import { setUserSettings, useUserSettings } from './settings'
+import { THEMES, type ThemePreference } from '../../app/theme'
 import './AccountMenu.css'
 
 /**
@@ -61,6 +62,7 @@ export function AccountPanel({ onNavigate }: { onNavigate?: () => void } = {}) {
       </Link>
       <div className="acct__sep" />
       <div className="acct__label">Settings</div>
+      <ThemePicker value={settings.theme} onChange={(theme) => setUserSettings({ theme })} />
       <label className="acct__toggle">
         <input type="checkbox" checked={settings.externalServices} onChange={(e) => setUserSettings({ externalServices: e.target.checked })} />
         <span className="acct__toggle-text">
@@ -80,6 +82,30 @@ export function AccountPanel({ onNavigate }: { onNavigate?: () => void } = {}) {
           <span className="muted">Tools for working on aegraph itself: the graph view's Benchmark menu.</span>
         </span>
       </label>
+    </div>
+  )
+}
+
+/** The theme choice: the operating system's light or dark, or one of the themes, each shown by its colours. */
+function ThemePicker({ value, onChange }: { value: ThemePreference; onChange: (t: ThemePreference) => void }) {
+  const options: { id: ThemePreference; label: string; title: string; swatch: readonly string[] }[] = [
+    { id: 'system', label: 'System', title: 'Light or dark, as your operating system is set', swatch: [THEMES[0].swatch[0], THEMES[1].swatch[0], THEMES[1].swatch[2]] },
+    ...THEMES.map((t) => ({ id: t.id, label: t.label, title: t.description, swatch: t.swatch })),
+  ]
+  return (
+    <div className="acct__theme">
+      <span className="acct__theme-label">Theme</span>
+      <div className="acct__themes" role="radiogroup" aria-label="Theme">
+        {options.map((o) => (
+          <button key={o.id} type="button" role="radio" aria-checked={value === o.id} className={`acct__theme-opt ${value === o.id ? 'is-on' : ''}`} title={o.title} onClick={() => onChange(o.id)}>
+            <span className="acct__swatch" aria-hidden style={{ background: o.swatch[0], borderColor: o.swatch[1] }}>
+              <span style={{ background: o.swatch[1] }} />
+              <span style={{ background: o.swatch[2] }} />
+            </span>
+            {o.label}
+          </button>
+        ))}
+      </div>
     </div>
   )
 }

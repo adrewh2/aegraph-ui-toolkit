@@ -157,7 +157,7 @@
   font-weight: 600;
 }
 .md .md-hl {
-  background: #fde68a;
+  background: var(--highlight-bg);
   color: inherit;
   border-radius: 2px;
   padding: 0 1px;

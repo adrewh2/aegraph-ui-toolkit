@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { generateGraph } from '../../../core/packed/generate'
 import { GraphEngine } from '../engine/engine'
+import { packColor } from '../../../core/packed/color'
 import { BitSet } from '../../../core/packed/bitset'
 import { N_AROUND, N_HIDDEN, N_HOVERED, N_LABEL, N_SELECTED } from '../engine/types'
 import { Camera } from '../engine/camera'
@@ -357,5 +358,38 @@ describe('anyInView: whether a changed picture can keep its camera', () => {
     expect(e.anyInView()).toBe(false)
     e.setFilter(null)
     expect(e.anyInView()).toBe(true)
+  })
+})
+
+describe('GraphEngine colours (themes)', () => {
+  const params = (e: GraphEngine) => (e as unknown as { frameParams(): { background: number; selectColor: number; hoverColor: number; pathColor: number } }).frameParams()
+  it("starts with Paper's colours, the ones it always drew with", () => {
+    const e = small()
+    const f = params(e)
+    expect(f.background).toBe(packColor('#faf9f6'))
+    expect(f.selectColor).toBe(packColor('#1f1e1b'))
+    expect(f.hoverColor).toBe(packColor('#9a3412'))
+    expect(f.pathColor).toBe(packColor('#9a3412'))
+    // A node given no colour takes the default.
+    expect(e.nodeColor[1]).toBe(packColor('#7c7a74'))
+    expect(e.edgeData[2]).toBe(packColor('#b5b2aa'))
+  })
+  it('takes a theme’s colours without touching the arrays: the next frame reads them', () => {
+    const e = small()
+    const before = e.nodeColor.slice()
+    e.setColors({ background: '#1b1a18', select: '#ecebe6', hover: '#f2a57c', path: '#f2a57c', node: '#888888', edge: '#5a5751' })
+    const f = params(e)
+    expect(f.background).toBe(packColor('#1b1a18'))
+    expect(f.selectColor).toBe(packColor('#ecebe6'))
+    expect(f.hoverColor).toBe(packColor('#f2a57c'))
+    expect(e.nodeColor).toEqual(before)
+    expect(e.colors.label).toBe('#1f1e1b')
+    // What arrives after takes the new defaults.
+    e.beginUpdate()
+    const i = e.setNode('z', { type: 'work', x: 5, y: 5, size: 5 })
+    e.addEdge('za', i, 0, { type: 'knows' })
+    e.endUpdate()
+    expect(e.nodeColor[i]).toBe(packColor('#888888'))
+    expect(e.edgeData[e.edgeIndex('za') * 4 + 2]).toBe(packColor('#5a5751'))
   })
 })

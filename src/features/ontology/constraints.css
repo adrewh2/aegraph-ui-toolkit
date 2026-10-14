@@ -236,7 +236,7 @@
 .cdlg__seg > button.is-active {
   background: var(--surface);
   color: var(--text);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--shadow-color) 8%, transparent);
 }
 .cdlg__badge {
   font-size: 10px;
@@ -291,7 +291,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--shadow-color) 12%, transparent);
 }
 .cdlg__typeopt {
   display: flex;
@@ -490,4 +490,40 @@
 }
 .cdlg__pred--param {
   grid-template-columns: 1fr 0.9fr 1fr 24px;
+}
+
+/*
+ * The status colours above are Paper's own greens, oranges and reds, which have no tokens of their own; the dark
+ * themes set them in the shared status tokens instead, so a pale pill does not sit on a dark page.
+ */
+:root[data-scheme='dark'] .cons__audit.is-ok {
+  background: var(--ok-bg);
+  color: var(--ok-text);
+  border-color: color-mix(in srgb, var(--ok-text) 35%, transparent);
+}
+:root[data-scheme='dark'] .cons__audit.is-bad {
+  background: var(--caution-bg);
+  color: var(--caution);
+  border-color: color-mix(in srgb, var(--caution) 35%, transparent);
+}
+:root[data-scheme='dark'] .cons__sev--reject {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border-color: color-mix(in srgb, var(--danger) 35%, transparent);
+}
+:root[data-scheme='dark'] .cons__sev--warn {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+  border-color: color-mix(in srgb, var(--warn-text) 35%, transparent);
+}
+:root[data-scheme='dark'] .cons__count.is-bad,
+:root[data-scheme='dark'] .cdlg__preview.is-bad {
+  color: var(--caution);
+}
+:root[data-scheme='dark'] .cons__count.is-ok {
+  color: var(--ok-text);
+}
+:root[data-scheme='dark'] .cdlg__tpl.is-on {
+  background: var(--select-bg);
+  color: var(--text);
 }

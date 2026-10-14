@@ -52,7 +52,7 @@
 .gx-tab.is-active {
   background: var(--surface);
   color: var(--text);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--shadow-color) 8%, transparent);
 }
 /* The GPU tab's own 2D / 3D switch, shown beside it while it is active. */
 .gx-tabs__sub {
@@ -157,7 +157,7 @@
   border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--surface);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 8px 28px color-mix(in srgb, var(--shadow-color) 14%, transparent);
 }
 .gx-scenes__search {
   display: flex;
@@ -289,7 +289,7 @@
   border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--surface);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 8px 28px color-mix(in srgb, var(--shadow-color) 14%, transparent);
   overflow: hidden;
 }
 .gx-scenecard__img {
@@ -611,7 +611,7 @@ body.gx-resizing canvas {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--swatch-ring);
   flex-shrink: 0;
 }
 .gx-dot--edge {
@@ -778,10 +778,10 @@ body.gx-resizing canvas {
   border-radius: 50%;
   animation: gx-spin 0.9s linear infinite;
 }
-/* On the dark Run button the ring is drawn in white. */
+/* On the Run button (the accent) the ring is drawn in the accent's text colour. */
 .gx-layout__bar .btn--primary .spinner {
-  border-color: rgba(255, 255, 255, 0.35);
-  border-top-color: #fff;
+  border-color: color-mix(in srgb, var(--accent-text) 35%, transparent);
+  border-top-color: var(--accent-text);
   margin-right: 4px;
 }
 @keyframes gx-spin {
@@ -923,7 +923,7 @@ body.gx-resizing canvas {
   border-radius: 4px;
   overflow: hidden;
   cursor: pointer;
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--swatch-ring);
 }
 .gx-swatch > span {
   width: 100%;
@@ -1006,7 +1006,7 @@ body.gx-resizing canvas {
 .gx-toggle button.is-active {
   background: var(--surface);
   color: var(--text);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--shadow-color) 8%, transparent);
 }
 
 /* ── Selection, marquee, lists ──────────────────────────────────────── */
@@ -1015,7 +1015,7 @@ body.gx-resizing canvas {
   top: 0;
   left: 0;
   border: 1px dashed var(--text-muted, #777);
-  background: rgba(31, 30, 27, 0.06);
+  background: color-mix(in srgb, var(--text) 6%, transparent);
   pointer-events: none;
   z-index: 3;
 }
@@ -1462,7 +1462,7 @@ body.gx-resizing canvas {
 .gx-seg button.is-active {
   background: var(--surface);
   color: var(--text);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--shadow-color) 8%, transparent);
 }
 .gx-inline {
   display: inline-flex;
@@ -1474,7 +1474,7 @@ body.gx-resizing canvas {
   border: 0;
   padding: 0;
   background: none;
-  color: #2a4f8a;
+  color: var(--info-text);
   font: inherit;
   text-decoration: underline;
   cursor: pointer;
@@ -1521,9 +1521,9 @@ body.gx-resizing canvas {
 }
 .gx-ap__fn.is-own {
   border-style: solid;
-  color: #2a4f8a;
-  border-color: #b9cdea;
-  background: #eef4fc;
+  color: var(--info-text);
+  border-color: var(--select-border);
+  background: color-mix(in srgb, var(--select-bg) 81%, var(--surface));
 }
 
 /* ── Placement overlay ─────────────────────────────────────────────── */
@@ -1538,14 +1538,14 @@ body.gx-resizing canvas {
 }
 .gx-overlay__labels text {
   font: 11px system-ui, sans-serif;
-  fill: #6b6a66;
+  fill: var(--text-muted);
   paint-order: stroke;
-  stroke: rgba(250, 249, 246, 0.85);
+  stroke: color-mix(in srgb, var(--canvas) 85%, transparent);
   stroke-width: 3px;
 }
 .gx-overlay__labels .gx-overlay__axis {
   font-weight: 600;
-  fill: #1f1e1b;
+  fill: var(--text);
 }
 
 /* ── Dataset chip ──────────────────────────────────────────────────── */

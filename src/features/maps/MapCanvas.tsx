@@ -11,6 +11,7 @@ import { MapPointLayer, type MapLink } from './pointLayer'
 import type { PinMode } from './maps'
 import './maps.css'
 import { cssColor } from '../../lib/cssColor'
+import { currentTheme, themeInfo, themeToken, useTheme } from '../../app/theme'
 
 /**
  * The Leaflet map: base layers (OpenStreetMap streets, Esri satellite,
@@ -87,10 +88,14 @@ const LAYERS: Record<BaseLayer, { url: string; attribution: string; maxZoom: num
 }
 
 // The type colours (maps.ts): coral, cerulean, plum, amber — saturated enough to read over pale tiles (a sage line
-// vanishes on a park), warm enough for the theme. Every line is drawn over a white casing so it reads on any tile.
+// vanishes on a park), warm enough for the theme. Every line is drawn over a casing in the page's surface (white on
+// Paper) so it reads on any tile; the selected one over a casing in ink — Paper's near-black, a dark theme's text.
 const { location: PLACE_COLOR, path: PATH_COLOR, area: AREA_COLOR, note: NOTE_COLOR } = GEO_COLORS
-const CASING = { color: '#ffffff', opacity: 0.9 }
-const SELECTED_CASING = { color: '#111111', opacity: 0.85 }
+type Casing = { color: string; opacity: number }
+const casings = (): { plain: Casing; selected: Casing } => ({
+  plain: { color: themeToken('--surface', '#ffffff'), opacity: 0.9 },
+  selected: { color: themeInfo(currentTheme()).scheme === 'dark' ? themeToken('--text', '#ecebe6') : '#111111', opacity: 0.85 },
+})
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] ?? c)
 /** A single pin's footprint on screen, for deciding whether two touch. */
 const PIN_PX = 26
@@ -115,13 +120,14 @@ const clusterIcon = (counts: Map<string, number>, n: number, sampled = n) => {
     iconAnchor: [size / 2, size / 2],
   })
 }
-const DRAW_STYLE = { color: '#1f1e1b', weight: 2, dashArray: '6 4', fillOpacity: 0.08 }
+/** A shape being drawn: dashed, in the page's ink. Read when a drawing starts, so it is the theme's at the time. */
+const drawStyle = () => ({ color: themeToken('--text', '#1f1e1b'), weight: 2, dashArray: '6 4', fillOpacity: 0.08 })
 
 /** A path's or an area's two layers: the casing under it and the shape itself, styled for selected / dimmed. */
-function shapeLayers(latlngs: [number, number][], kind: 'path' | 'area', color: string, sel: boolean, dimmed: boolean): [L.Layer, L.Layer] {
+function shapeLayers(latlngs: [number, number][], kind: 'path' | 'area', color: string, sel: boolean, dimmed: boolean, cs: { plain: Casing; selected: Casing }): [L.Layer, L.Layer] {
   const w = kind === 'path' ? (sel ? 7 : 3) : sel ? 4 : 2
   const opacity = dimmed ? 0.3 : 1
-  const casing = kind === 'path' ? L.polyline(latlngs, { ...(sel ? SELECTED_CASING : CASING), weight: w + 4, opacity: dimmed ? 0.25 : sel ? 0.85 : CASING.opacity, interactive: false }) : L.polygon(latlngs, { ...(sel ? SELECTED_CASING : CASING), weight: w + 3, fill: false, opacity: dimmed ? 0.25 : sel ? 0.85 : CASING.opacity, interactive: false })
+  const casing = kind === 'path' ? L.polyline(latlngs, { ...(sel ? cs.selected : cs.plain), weight: w + 4, opacity: dimmed ? 0.25 : sel ? 0.85 : cs.plain.opacity, interactive: false }) : L.polygon(latlngs, { ...(sel ? cs.selected : cs.plain), weight: w + 3, fill: false, opacity: dimmed ? 0.25 : sel ? 0.85 : cs.plain.opacity, interactive: false })
   const shape = kind === 'path' ? L.polyline(latlngs, { color, weight: w, opacity }) : L.polygon(latlngs, { color, weight: w, opacity, fillColor: color, fillOpacity: sel ? 0.35 : dimmed ? 0.08 : 0.2 })
   return [casing, shape]
 }
@@ -158,6 +164,8 @@ function featureMenuOn(e: L.LeafletMouseEvent, id: EntityId, open: ((id: EntityI
 
 export const MapCanvas = forwardRef<MapCanvasHandle, MapCanvasProps>(function MapCanvas({ center, zoom, layer, pins, links, features, notes, selectedId, tool, onSelect, onClick, onDraw, onMovePlace, onMoveNote, onView, colorOf, pending, cards = true, previewOf, loadMore, readMoreOf, onDrawProgress, onContextMenu, onFeatureMenu }, ref) {
   const host = useRef<HTMLDivElement>(null)
+  // Shapes' casings are drawn in the theme's colours: a theme change draws them again.
+  const theme = useTheme()
   /** Offline mode draws the places on plain ground: no tiles are fetched (`account/settings.ts`). */
   const external = useExternalServices()
   const map = useRef<L.Map | null>(null)
@@ -292,7 +300,7 @@ export const MapCanvas = forwardRef<MapCanvasHandle, MapCanvasProps>(function Ma
       if (cb.current.tool !== 'area') return
       L.DomEvent.stop(e)
       m.dragging.disable()
-      draw.current = { kind: 'area', points: [e.latlng], shape: L.polygon([e.latlng], DRAW_STYLE).addTo(m), vertices: L.layerGroup(), lassoing: true }
+      draw.current = { kind: 'area', points: [e.latlng], shape: L.polygon([e.latlng], drawStyle()).addTo(m), vertices: L.layerGroup(), lassoing: true }
     })
     m.on('mousemove', (e) => {
       const pl = points.current
@@ -363,7 +371,8 @@ export const MapCanvas = forwardRef<MapCanvasHandle, MapCanvasProps>(function Ma
     tiles.current = null
     if (!external) return
     const def = LAYERS[layer]
-    const t = L.tileLayer(def.url, { attribution: def.attribution, maxZoom: def.maxZoom }).addTo(m)
+    // Drawn maps take the theme's tile filter (maps.css › .geo-tiles); a photograph is shown as it was taken.
+    const t = L.tileLayer(def.url, { attribution: def.attribution, maxZoom: def.maxZoom, className: layer === 'satellite' ? '' : 'geo-tiles' }).addTo(m)
     // A zoom set at once (the wheel, a stage switch) goes through Leaflet's view reset, on which a tile layer
     // throws every tile away and makes them again, fading in from nothing — a white flash on every wheel tick,
     // even one that stays on the same tile level. Without that one listener the reset is handled as the end of a
@@ -400,9 +409,9 @@ export const MapCanvas = forwardRef<MapCanvasHandle, MapCanvasProps>(function Ma
     if (cur?.kind === 'path') {
       cur.points.push(at)
       ;(cur.shape as L.Polyline).setLatLngs(cur.points)
-    } else cur = draw.current = { kind: 'path', points: [at], shape: L.polyline([at], DRAW_STYLE).addTo(m), vertices: L.layerGroup().addTo(m), lassoing: false }
+    } else cur = draw.current = { kind: 'path', points: [at], shape: L.polyline([at], drawStyle()).addTo(m), vertices: L.layerGroup().addTo(m), lassoing: false }
     // Each vertex is marked, so the path reads as points joined rather than a stray line.
-    cur.vertices.addLayer(L.circleMarker(at, { radius: 5, color: '#ffffff', weight: 2, fillColor: DRAW_STYLE.color, fillOpacity: 1, interactive: false }))
+    cur.vertices.addLayer(L.circleMarker(at, { radius: 5, color: themeToken('--surface', '#ffffff'), weight: 2, fillColor: themeToken('--text', '#1f1e1b'), fillOpacity: 1, interactive: false }))
     cb.current.onDrawProgress?.(cur.points.length)
   }
   function cancelDrawing(m: L.Map) {
@@ -465,6 +474,7 @@ export const MapCanvas = forwardRef<MapCanvasHandle, MapCanvasProps>(function Ma
     type Group = { members: ArrayLike<number>; x: number; y: number; kind: 'location' | 'path' | 'area' }
     const groups: Group[] = []
     const selectedIdx = selectedId === null ? -1 : featureIndex(ix, features, selectedId)
+    const cs = casings()
 
     // Pass one: shapes. A path or an area is drawn as itself; one too small on screen to be seen joins the pins.
     for (let k = 0; k < ix.shapes.length; k++) {
@@ -489,12 +499,12 @@ export const MapCanvas = forwardRef<MapCanvasHandle, MapCanvasProps>(function Ma
         return shape
       }
       if (sel) {
-        const [casing, shape] = shapeLayers(latlngs, kind, color, true, false)
+        const [casing, shape] = shapeLayers(latlngs, kind, color, true, false, cs)
         selectedShapes.push(casing, wire(shape))
         continue
       }
-      keep(`s:${ix.shapes[k]}:${color}:${dimmed}`, () => {
-        const [casing, shape] = shapeLayers(latlngs, kind, color, false, dimmed)
+      keep(`s:${ix.shapes[k]}:${color}:${dimmed}:${theme}`, () => {
+        const [casing, shape] = shapeLayers(latlngs, kind, color, false, dimmed, cs)
         // A faded shape goes without its casing: thousands of pale casings would wash the map out.
         return dimmed ? [wire(shape)] : [casing, wire(shape)]
       })
@@ -693,7 +703,7 @@ export const MapCanvas = forwardRef<MapCanvasHandle, MapCanvasProps>(function Ma
         return layers
       })
     })
-  }, [features, notes, selectedId, colorOf, zoomTick, pins, links])
+  }, [features, notes, selectedId, colorOf, zoomTick, pins, links, theme])
 
   // Pending point while a dialog is open.
   useEffect(() => {

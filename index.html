@@ -4,13 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>aegraph</title>
+    <script src="/theme-boot.js"></script>
     <!-- The boot screen from the first paint: the React one below is the same markup, so the page never flashes between. -->
     <style>
-      .boot { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: #faf9f6; color: #6d6b66; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Helvetica, Arial, sans-serif; }
-      .boot__mark { font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif; font-size: 28px; font-weight: 600; letter-spacing: -0.01em; color: #1f1e1b; }
-      .boot__bar { width: 120px; height: 2px; border-radius: 1px; background: #e6e3dc; overflow: hidden; }
-      .boot__bar::after { content: ''; display: block; width: 40%; height: 100%; background: #1f1e1b; animation: boot-slide 1.1s ease-in-out infinite; }
+      .boot { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: var(--bg, #faf9f6); color: var(--text-muted, #6d6b66); font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Helvetica, Arial, sans-serif; }
+      .boot__mark { font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif; font-size: 28px; font-weight: 600; letter-spacing: -0.01em; color: var(--text, #1f1e1b); }
+      .boot__bar { width: 120px; height: 2px; border-radius: 1px; background: var(--border, #e6e3dc); overflow: hidden; }
+      .boot__bar::after { content: ''; display: block; width: 40%; height: 100%; background: var(--text, #1f1e1b); animation: boot-slide 1.1s ease-in-out infinite; }
       .boot__phase { font-size: 13px; min-height: 1.2em; }
+      /* Before the stylesheets load, the dark themes' boot screen: the values of their --bg, --text-muted, --text, --border. */
+      [data-theme='dark'] .boot { --bg: #1b1a18; --text-muted: #b3b0a8; --text: #ecebe6; --border: #3a3834; }
+      [data-theme='midnight'] .boot { --bg: #0e131b; --text-muted: #a3b2c6; --text: #e2e8f1; --border: #283445; }
+      html[data-theme='dark'] { background: #1b1a18; }
+      html[data-theme='midnight'] { background: #0e131b; }
       @keyframes boot-slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(260%); } }
     </style>
   </head>

@@ -109,7 +109,7 @@
   color: var(--text);
   font: 12.5px Inter, system-ui, -apple-system, sans-serif;
   outline: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--shadow-color) 12%, transparent);
 }
 .dg__input.is-num {
   text-align: right;

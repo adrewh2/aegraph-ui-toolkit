@@ -11,7 +11,7 @@
   flex-shrink: 0;
 }
 .bridge-item--connecting .bridge-item__dot {
-  background: #d97706;
+  background: var(--pending);
   animation: bridge-pulse 1.2s ease-in-out infinite;
 }
 .bridge-item--connected .bridge-item__dot {

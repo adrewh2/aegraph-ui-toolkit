@@ -193,3 +193,7 @@
 .ds__counts {
   font-size: 12px;
 }
+/* The pastel tiles are each kind's own colour (inline); on a dark theme they sit lower so they are not the brightest thing on screen. */
+:root[data-scheme='dark'] .ds__icon {
+  filter: brightness(0.78) saturate(0.85);
+}

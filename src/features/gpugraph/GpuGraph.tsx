@@ -2,7 +2,7 @@ import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useSta
 import type { EntityId } from '../../core/entity/types'
 import { bigViewLayout, DEFAULT_UNIGRAPH_FORCE, type LayoutAlgorithm, type LayoutParams, type Positions } from '../../core/graph/layouts'
 import { BitSet } from '../../core/packed/bitset'
-import { packColor } from '../../core/packed/color'
+import { onThemeChange } from '../../app/theme'
 import { cameraSaver, loadCamera } from '../graph/cameraMemory'
 import { getCameraControls, useCameraControls } from '../graph/cameraControls'
 import { useExplorer } from '../graph/explorerState'
@@ -22,6 +22,7 @@ import { BENCH_PRESETS } from '../../core/packed/generate'
 import { previewDataUrl, PREVIEW_HEIGHT, PREVIEW_WIDTH } from '../graph/snapshot'
 import { registerGpuGraph, type GpuGraphHandle } from './gpuGraphHandle'
 import { GpuHud } from './GpuHud'
+import { engineColors } from './engineTheme'
 import './GpuGraph.css'
 import { measure } from '../../lib/measure'
 
@@ -107,10 +108,7 @@ export const GpuGraph = forwardRef<GraphViewHandle, GraphViewProps & { dims: 2 |
     restoredFor.current = ''
     framedFor.current = ''
     revealedRef.current = false
-    const css = getComputedStyle(host)
-    engine.background = packColor(css.getPropertyValue('--bg').trim() || '#faf9f6')
-    engine.labelColor = css.getPropertyValue('--text').trim() || '#1f1e1b'
-    engine.labelHalo = css.getPropertyValue('--bg').trim() ? `${css.getPropertyValue('--bg').trim()}e6` : 'rgba(255,255,255,0.9)'
+    engine.setColors(engineColors(host))
     const params = new URLSearchParams(location.search)
     const want = params.get('gpu')
     engine.attach(host, { backend: want === 'webgl2' || want === 'webgpu' ? want : 'auto' })
@@ -119,6 +117,8 @@ export const GpuGraph = forwardRef<GraphViewHandle, GraphViewProps & { dims: 2 |
     interaction.tool = live.current.state.tool
     const saver = cameraSaver('gpu', () => ({ key: `${viewKeyRef.current}|${engine.dims}`, camera: cameraState(engine, engine.viewport()) }))
     const offs = [
+      // A theme change redraws the ground, the rings and the labels in its colours: one frame, no buffer.
+      onThemeChange(() => engine.setColors(engineColors(host))),
       engine.on('ready', (b) => {
         setBackend(b)
         setAttached(engine)

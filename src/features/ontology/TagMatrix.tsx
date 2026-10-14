@@ -7,6 +7,7 @@ import { formatNumber } from '../../lib/format'
 import { loadPlotly } from '../plots/PlotlyChart'
 import { tagMatrix, type MatrixType, type TagKey } from './tagStats'
 import { Select } from '../../components/ui/Select'
+import { themeToken, useTheme } from '../../app/theme'
 
 /**
  * The Ontology page's tag tab: types down the side, tags across, and in each
@@ -249,6 +250,8 @@ function Bars({ rows, columns, value, cell, fmt, measure }: { rows: RowT[]; colu
   const [error, setError] = useState<string | null>(null)
   /** Square-root heights keep the small bars visible next to a few huge ones (counts are usually that skewed). */
   const [sqrt, setSqrt] = useState(() => localStorage.getItem('aegraph:ontology:tags-sqrt') !== '0')
+  // The axes and their labels are drawn in the theme's ink, so the chart is drawn again when it changes.
+  const theme = useTheme()
   const pickSqrt = (v: boolean) => (setSqrt(v), localStorage.setItem('aegraph:ontology:tags-sqrt', v ? '1' : '0'))
   useEffect(() => {
     const el = ref.current
@@ -307,7 +310,8 @@ function Bars({ rows, columns, value, cell, fmt, measure }: { rows: RowT[]; colu
             }
           })
         })
-        const font = getComputedStyle(document.documentElement).getPropertyValue('--text').trim() || '#1f1e1b'
+        const font = themeToken('--text', '#1f1e1b')
+        const grid = themeToken('--border', '#e6e4de')
         // With square-root heights the z ticks still read in real values: nice values, placed at their roots.
         const top = Math.max(...z, measure === 'count' ? 1 : 0.01)
         const realTop = sqrt ? top * top : top
@@ -320,7 +324,7 @@ function Bars({ rows, columns, value, cell, fmt, measure }: { rows: RowT[]; colu
         const zvals: number[] = []
         for (let v = 0; v <= realTop * 1.0001; v += stepZ) zvals.push(v)
         const zTicks = sqrt ? { tickvals: zvals.map(Math.sqrt), ticktext: zvals.map((v) => (measure === 'count' ? formatNumber(v) : `${Math.round(v * 100)}%`)) } : measure === 'count' ? {} : { tickformat: '.0%' }
-        const axis = (vals: { label: string }[]) => ({ tickvals: vals.map((_, n) => n), ticktext: vals.map((v) => (v.label.length > 16 ? v.label.slice(0, 15) + '…' : v.label)), tickfont: { size: 10 }, gridcolor: '#e6e4de', zerolinecolor: '#e6e4de', backgroundcolor: 'transparent', showbackground: false })
+        const axis = (vals: { label: string }[]) => ({ tickvals: vals.map((_, n) => n), ticktext: vals.map((v) => (v.label.length > 16 ? v.label.slice(0, 15) + '…' : v.label)), tickfont: { size: 10 }, gridcolor: grid, zerolinecolor: grid, backgroundcolor: 'transparent', showbackground: false })
         return P.react(
           el,
           [{ type: 'mesh3d', x, y, z, i, j, k, facecolor, text, hoverinfo: 'text', flatshading: true, lighting: { ambient: 0.75, diffuse: 0.6, specular: 0.05, roughness: 0.9 }, lightposition: { x: 100, y: 200, z: 300 } } as never],
@@ -332,7 +336,7 @@ function Bars({ rows, columns, value, cell, fmt, measure }: { rows: RowT[]; colu
             scene: {
               xaxis: { title: { text: 'tag' }, ...axis(columns) },
               yaxis: { title: { text: rows[0]?.type ? 'type' : 'tag' }, ...axis(rows) },
-              zaxis: { title: { text: measure === 'count' ? 'entities' : 'share' }, gridcolor: '#e6e4de', backgroundcolor: 'transparent', showbackground: false, ...zTicks },
+              zaxis: { title: { text: measure === 'count' ? 'entities' : 'share' }, gridcolor: grid, backgroundcolor: 'transparent', showbackground: false, ...zTicks },
               aspectmode: 'manual',
               aspectratio: { x: Math.max(1, columns.length / Math.max(rows.length, 1)) * 1.2, y: 1.2, z: 0.9 },
               camera: { eye: { x: 1.7, y: -1.9, z: 1.1 } },
@@ -346,7 +350,7 @@ function Bars({ rows, columns, value, cell, fmt, measure }: { rows: RowT[]; colu
     return () => {
       live = false
     }
-  }, [rows, columns, value, cell, fmt, measure, sqrt])
+  }, [rows, columns, value, cell, fmt, measure, sqrt, theme])
   useEffect(() => {
     const el = ref.current
     return () => {

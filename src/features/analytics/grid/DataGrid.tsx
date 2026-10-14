@@ -2,6 +2,13 @@ import { forwardRef, useCallback, useEffect, useImperativeHandle, useLayoutEffec
 import { cellText, columnLabel, normalizeRange, type CellRange, type ColumnKind, type DatasetData } from '../../../core/datasets/dataset'
 import { measure } from '../../../lib/measure'
 import { editorArrow, MOVE_STEP, type EditorMove } from './keys'
+import { currentTheme, onThemeChange, themeInfo } from '../../../app/theme'
+
+/** The ink at an alpha, for the selection's wash: `#rrggbb` → `rgba(…)` (the canvas takes no `color-mix`). */
+const tint = (hex: string, a: number) => {
+  const m = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex)
+  return m ? `rgba(${parseInt(m[1], 16)}, ${parseInt(m[2], 16)}, ${parseInt(m[3], 16)}, ${a})` : `rgba(31, 30, 27, ${a})`
+}
 
 /**
  * The dataset grid, drawn on a canvas. The DOM holds a scroll box the size
@@ -148,6 +155,8 @@ export const DataGrid = forwardRef<GridHandle, DataGridProps>(function DataGrid(
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+  // A new theme: its colours are read afresh and the grid painted in them at once.
+  useEffect(() => onThemeChange(() => ((theme.current = null), schedule())), [schedule])
 
   // ── Painting ─────────────────────────────────────────────────────────
   const draw = () => {
@@ -173,7 +182,7 @@ export const DataGrid = forwardRef<GridHandle, DataGridProps>(function DataGrid(
     if (!theme.current || t0 - theme.current.at > 2000) {
       const css = getComputedStyle(box)
       const v = (name: string, fallback: string) => css.getPropertyValue(name).trim() || fallback
-      theme.current = { at: t0, c: { bg: v('--surface', '#fff'), head: v('--surface-2', '#f5f4f0'), line: v('--border', '#e5e3dd'), text: v('--text', '#1f1e1b'), muted: v('--text-muted', '#6b6963'), faint: v('--text-faint', '#9b9993'), accent: v('--accent', '#1f1e1b') } }
+      theme.current = { at: t0, c: { bg: v('--surface', '#fff'), head: v('--surface-2', '#f5f4f0'), line: v('--border', '#e5e3dd'), text: v('--text', '#1f1e1b'), muted: v('--text-muted', '#6b6963'), faint: v('--text-faint', '#9b9993'), accent: v('--accent', '#1f1e1b'), url: themeInfo(currentTheme()).scheme === 'dark' ? v('--select', '#6fa3ee') : '#1d4ed8' } }
     }
     const C = theme.current.c
     ctx.fillStyle = C.bg
@@ -206,10 +215,10 @@ export const DataGrid = forwardRef<GridHandle, DataGridProps>(function DataGrid(
         const inSel = sel && r >= sel.r0 && r <= sel.r1 && c >= sel.c0 && c <= sel.c1
         const inFill = fill && r >= fill.r0 && r <= fill.r1 && c >= fill.c0 && c <= fill.c1 && !inSel
         if (inSel && !(sel.r0 === sel.r1 && sel.c0 === sel.c1)) {
-          ctx.fillStyle = 'rgba(31, 30, 27, 0.07)'
+          ctx.fillStyle = tint(C.text, 0.07)
           ctx.fillRect(cx, y, w, ROW_H)
         } else if (inFill) {
-          ctx.fillStyle = 'rgba(31, 30, 27, 0.04)'
+          ctx.fillStyle = tint(C.text, 0.04)
           ctx.fillRect(cx, y, w, ROW_H)
         }
         if (ed && ed.r === r && ed.c === c) continue
@@ -222,7 +231,7 @@ export const DataGrid = forwardRef<GridHandle, DataGridProps>(function DataGrid(
         ctx.beginPath()
         ctx.rect(cx + 1, y, w - 2, ROW_H)
         ctx.clip()
-        ctx.fillStyle = kind === 'url' ? '#1d4ed8' : typeof v === 'boolean' ? C.muted : C.text
+        ctx.fillStyle = kind === 'url' ? C.url : typeof v === 'boolean' ? C.muted : C.text
         ctx.font = kind === 'json' ? MONO : FONT
         ctx.textAlign = numeric ? 'right' : 'left'
         ctx.fillText(fit(ctx, text, w - 16), numeric ? cx + w - 8 : cx + 8, y + ROW_H / 2 + 0.5)
@@ -341,7 +350,7 @@ export const DataGrid = forwardRef<GridHandle, DataGridProps>(function DataGrid(
       const y = HEADER_H + r * ROW_H - sy
       const on = sel && r >= sel.r0 && r <= sel.r1
       if (on) {
-        ctx.fillStyle = 'rgba(31, 30, 27, 0.12)'
+        ctx.fillStyle = tint(C.text, 0.12)
         ctx.fillRect(0, y, numW, ROW_H)
       }
       ctx.fillStyle = on ? C.text : C.muted
@@ -366,7 +375,7 @@ export const DataGrid = forwardRef<GridHandle, DataGridProps>(function DataGrid(
       const w = widths[c] ?? 120
       const on = sel && c >= sel.c0 && c <= sel.c1
       if (on) {
-        ctx.fillStyle = 'rgba(31, 30, 27, 0.12)'
+        ctx.fillStyle = tint(C.text, 0.12)
         ctx.fillRect(cx, 0, w, HEADER_H)
       }
       ctx.save()

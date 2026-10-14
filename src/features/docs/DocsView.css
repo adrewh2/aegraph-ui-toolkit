@@ -95,7 +95,7 @@
   background: var(--surface-hover);
 }
 .docs__link.is-active {
-  background: var(--sb-active, #e3e1db);
+  background: color-mix(in srgb, var(--scroll-thumb) 40%, var(--surface-hover));
   font-weight: 500;
 }
 .docs__nomatch {

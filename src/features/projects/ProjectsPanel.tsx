@@ -202,5 +202,5 @@ const initial = (label: string) => (label.trim()[0] ?? '·').toUpperCase()
 /** A soft wash of the project's own colour, for a card with no picture. */
 const tint = (id: string) => {
   const c = hashColor(id)
-  return `linear-gradient(135deg, color-mix(in srgb, ${c} 28%, white), color-mix(in srgb, ${c} 52%, white))`
+  return `linear-gradient(135deg, color-mix(in srgb, ${c} 28%, var(--surface)), color-mix(in srgb, ${c} 52%, var(--surface)))`
 }

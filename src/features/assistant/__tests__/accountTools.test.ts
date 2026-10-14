@@ -45,18 +45,28 @@ describe('account tool', () => {
     const tools = createAccountTools(host)
     expect(tools.map((t) => t.name)).toEqual(['account'])
     const account = run(tools, 'account')
-    expect(await account({})).toEqual({ settings: { developerTools: false, externalServices: true } })
-    expect(await account({ action: 'get' })).toEqual({ settings: { developerTools: false, externalServices: true } })
+    expect(await account({})).toEqual({ settings: { developerTools: false, externalServices: true, theme: 'system' }, themeShown: 'paper' })
+    expect(await account({ action: 'get' })).toEqual({ settings: { developerTools: false, externalServices: true, theme: 'system' }, themeShown: 'paper' })
     // Settings and the browser's actions are all it takes: nothing names an account.
-    expect(Object.keys((tools[0] as unknown as { input_schema: { properties: object } }).input_schema.properties)).toEqual(['action', 'developer_tools', 'external_services', 'name', 'id', 'stash_first'])
+    expect(Object.keys((tools[0] as unknown as { input_schema: { properties: object } }).input_schema.properties)).toEqual(['action', 'theme', 'developer_tools', 'external_services', 'name', 'id', 'stash_first'])
   })
 
   it('sets developer tools and remembers it', async () => {
     const account = run(createAccountTools(host), 'account')
-    expect((await account({ action: 'set', developer_tools: true })).settings).toEqual({ developerTools: true, externalServices: true })
-    expect(JSON.parse(mem['aegraph:account:settings'])).toEqual({ developerTools: true, externalServices: true })
-    expect((await account({ action: 'set', developer_tools: false })).settings).toEqual({ developerTools: false, externalServices: true })
+    expect((await account({ action: 'set', developer_tools: true })).settings).toEqual({ developerTools: true, externalServices: true, theme: 'system' })
+    expect(JSON.parse(mem['aegraph:account:settings'])).toEqual({ developerTools: true, externalServices: true, theme: 'system' })
+    expect((await account({ action: 'set', developer_tools: false })).settings).toEqual({ developerTools: false, externalServices: true, theme: 'system' })
     await expect(account({ action: 'set' })).rejects.toThrow(/needs a setting/)
+  })
+
+  it('sets the theme without asking, remembers it, and refuses one it does not know', async () => {
+    const account = run(createAccountTools(host), 'account')
+    const before = asked.length
+    expect((await account({ action: 'set', theme: 'dark' })).settings).toMatchObject({ theme: 'dark' })
+    expect(JSON.parse(mem['aegraph:account:settings']).theme).toBe('dark')
+    expect(asked.length).toBe(before)
+    await expect(account({ action: 'set', theme: 'neon' })).rejects.toThrow()
+    expect((await account({ action: 'set', theme: 'system' })).settings).toMatchObject({ theme: 'system' })
   })
 
   it('turns third-party services off and on — one switch over everything that leaves the machine', async () => {
@@ -64,8 +74,8 @@ describe('account tool', () => {
     expect((await account({ action: 'set', external_services: false })).settings).toMatchObject({ externalServices: false })
     expect(JSON.parse(mem['aegraph:account:settings']).externalServices).toBe(false)
     // One setting at a time: the other is left as it was.
-    expect((await account({ action: 'set', developer_tools: true })).settings).toEqual({ developerTools: true, externalServices: false })
-    expect((await account({ action: 'set', external_services: true })).settings).toEqual({ developerTools: true, externalServices: true })
+    expect((await account({ action: 'set', developer_tools: true })).settings).toEqual({ developerTools: true, externalServices: false, theme: 'system' })
+    expect((await account({ action: 'set', external_services: true })).settings).toEqual({ developerTools: true, externalServices: true, theme: 'system' })
     await account({ action: 'set', developer_tools: false })
   })
 

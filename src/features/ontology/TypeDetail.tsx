@@ -135,7 +135,7 @@ export function TypeDetail({ profile, onFocusType, onClose, colorOf, labelOf, pa
         <div className="onto__detail-head">
           <div className="onto__detail-title">
             <ColorPick value={colorOf(type)} chosen={!!def.color} label={def.label} onChange={(color) => setTypeColor(store, type, def, color)} />
-            <span className="chip" style={{ background: colorOf(type), color: '#fff' }}>
+            <span className="chip" style={{ background: colorOf(type), color: 'var(--on-media)' }}>
               {def.label}
             </span>
             <span className="mono muted">{type}</span>

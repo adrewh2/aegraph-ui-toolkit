@@ -1,0 +1,150 @@
+/*
+ * The themes other than Paper: each overrides the colour tokens `src/index.css` declares on :root (Paper's values).
+ * The picker lists them from `src/app/theme.ts › THEMES`; a theme added here is added there too. Every token in
+ * index.css's :root colour block is set in every theme below, so nothing falls back to Paper by accident — the theme
+ * test checks it. Text tokens keep 4.5:1 or better against --bg, --surface and --surface-2 (WCAG 2.1 AA).
+ */
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #1b1a18;
+  --surface: #24231f;
+  --surface-2: #2a2925;
+  --surface-hover: #33312d;
+  --border: #3a3834;
+  --border-strong: #4d4a45;
+  --scroll-thumb: #4d4a45;
+  --scroll-thumb-hover: #66635d;
+  --text: #ecebe6;
+  --text-muted: #b3b0a8;
+  --text-faint: #a29f97;
+  --accent: #ecebe6;
+  --accent-text: #1b1a18;
+  --link: #f2a57c;
+  --danger: #f28b82;
+  --danger-bg: #3d1f1c;
+  --info-bg: #1f2b3e;
+  --info-text: #a9c5f0;
+  --ok-bg: #18301f;
+  --ok-text: #8fd6a8;
+  --warn-bg: #3b2f14;
+  --warn-text: #f2ca73;
+  --caution: #f6a15b;
+  --caution-bg: #3c2814;
+  --pending: #eba54a;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.4);
+  --select: #6fa3ee;
+  --select-soft: #4f84d1;
+  --select-bg: #1f2b3e;
+  --select-border: #35517c;
+  --highlight: #f5b13d;
+  --highlight-bg: #5a4415;
+  --highlight-text: #f5cf83;
+  --shadow-color: #000000;
+  --overlay: rgba(0, 0, 0, 0.6);
+  --canvas: #1b1a18;
+  --canvas-halo: rgba(27, 26, 24, 0.9);
+  --canvas-select: #ecebe6;
+  --canvas-edge: #5a5751;
+  --canvas-path: #f2a57c;
+  --swatch-ring: rgba(255, 255, 255, 0.22);
+  --map-ground: #2a2925;
+  --map-tiles: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9) saturate(0.6);
+  --on-media: #ffffff;
+}
+
+:root[data-theme='midnight'] {
+  color-scheme: dark;
+  --bg: #0e131b;
+  --surface: #151c27;
+  --surface-2: #1a2330;
+  --surface-hover: #212c3b;
+  --border: #283445;
+  --border-strong: #364559;
+  --scroll-thumb: #364559;
+  --scroll-thumb-hover: #4b5d75;
+  --text: #e2e8f1;
+  --text-muted: #a3b2c6;
+  --text-faint: #92a2b8;
+  --accent: #8ab4ff;
+  --accent-text: #0e131b;
+  --link: #8ab4ff;
+  --danger: #ff8a8a;
+  --danger-bg: #3a1b22;
+  --info-bg: #182a44;
+  --info-text: #a5c8ff;
+  --ok-bg: #12301f;
+  --ok-text: #86dca6;
+  --warn-bg: #36301a;
+  --warn-text: #f0cf7a;
+  --caution: #ffa25e;
+  --caution-bg: #3a2716;
+  --pending: #ffb257;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.45);
+  --select: #7aa8ff;
+  --select-soft: #5384d8;
+  --select-bg: #182a44;
+  --select-border: #2f4c78;
+  --highlight: #ffc04d;
+  --highlight-bg: #4d3b12;
+  --highlight-text: #ffd889;
+  --shadow-color: #000000;
+  --overlay: rgba(2, 6, 12, 0.65);
+  --canvas: #0e131b;
+  --canvas-halo: rgba(14, 19, 27, 0.9);
+  --canvas-select: #8ab4ff;
+  --canvas-edge: #3b4a5e;
+  --canvas-path: #ffa25e;
+  --swatch-ring: rgba(255, 255, 255, 0.24);
+  --map-ground: #1a2330;
+  --map-tiles: invert(1) hue-rotate(190deg) brightness(0.85) contrast(0.9) saturate(0.5);
+  --on-media: #ffffff;
+}
+
+:root[data-theme='contrast'] {
+  color-scheme: light;
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f0f0f0;
+  --surface-hover: #e2e2e2;
+  --border: #6b6b6b;
+  --border-strong: #000000;
+  --scroll-thumb: #6b6b6b;
+  --scroll-thumb-hover: #000000;
+  --text: #000000;
+  --text-muted: #2b2b2b;
+  --text-faint: #3d3d3d;
+  --accent: #000000;
+  --accent-text: #ffffff;
+  --link: #0038b8;
+  --danger: #a00000;
+  --danger-bg: #ffe0e0;
+  --info-bg: #dce8ff;
+  --info-text: #002e8a;
+  --ok-bg: #d6f5df;
+  --ok-text: #00521f;
+  --warn-bg: #fff0b8;
+  --warn-text: #5c3700;
+  --caution: #8a2c00;
+  --caution-bg: #ffe3cc;
+  --pending: #8a4b00;
+  --shadow: 0 0 0 1px #000000, 0 6px 18px rgba(0, 0, 0, 0.25);
+  --select: #0050d8;
+  --select-soft: #2f6fe0;
+  --select-bg: #dce8ff;
+  --select-border: #0050d8;
+  --highlight: #b06000;
+  --highlight-bg: #ffe066;
+  --highlight-text: #5c3700;
+  --shadow-color: #000000;
+  --overlay: rgba(0, 0, 0, 0.5);
+  --canvas: #ffffff;
+  --canvas-halo: rgba(255, 255, 255, 0.95);
+  --canvas-select: #000000;
+  --canvas-edge: #8a8a8a;
+  --canvas-path: #9a3412;
+  --swatch-ring: rgba(0, 0, 0, 0.45);
+  --map-ground: #e6e6e6;
+  --map-tiles: none;
+  --on-media: #ffffff;
+}

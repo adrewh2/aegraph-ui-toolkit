@@ -32,13 +32,13 @@
   flex: 1;
   min-height: 0;
   width: 100%;
-  background: linear-gradient(0deg, rgba(31, 30, 27, 0.02), rgba(31, 30, 27, 0.02)), var(--surface);
+  background: linear-gradient(0deg, color-mix(in srgb, var(--text) 2%, transparent), color-mix(in srgb, var(--text) 2%, transparent)), var(--surface);
   user-select: none;
 }
 .onto__link line,
 .onto__link path,
 path.onto__link {
-  stroke: rgba(31, 30, 27, 0.28);
+  stroke: color-mix(in srgb, var(--text) 28%, transparent);
   stroke-linecap: round;
   transition: opacity 120ms ease;
 }
@@ -100,7 +100,7 @@ path.onto__link {
   pointer-events: none;
 }
 .onto__count {
-  fill: #fff;
+  fill: var(--on-media);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   pointer-events: none;
@@ -467,7 +467,7 @@ path.onto__link {
   cursor: pointer;
 }
 .tm__cell.is-strong {
-  color: #fff;
+  color: var(--on-media);
   font-weight: 500;
 }
 .tm__cell.has-value:hover {
@@ -548,7 +548,7 @@ path.onto__link {
   font-variant-numeric: tabular-nums;
 }
 .onto__warn {
-  color: #b45309;
+  color: var(--highlight-text);
 }
 .onto__lineage {
   display: flex;
@@ -625,7 +625,7 @@ path.onto__link {
   font-weight: 400;
   text-transform: none;
   letter-spacing: 0;
-  color: #b45309;
+  color: var(--highlight-text);
 }
 .onto__list {
   display: flex;
@@ -723,8 +723,11 @@ path.onto__link {
   font-size: 10px;
   padding: 0 5px;
   border-radius: 4px;
-  background: #fde68a;
+  background: var(--highlight-bg);
   color: #78350f;
+}
+:root[data-scheme='dark'] .onto__req {
+  color: var(--highlight-text);
 }
 .onto__pkind {
   display: flex;
@@ -963,7 +966,7 @@ path.onto__link {
   height: 16px;
   border-radius: 50%;
   flex-shrink: 0;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--shadow-color) 8%, transparent);
 }
 .onto__page-id {
   font-size: 13px;

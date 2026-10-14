@@ -45,7 +45,7 @@
   padding: 2px 7px;
   border-radius: 999px;
   background: rgba(31, 30, 27, 0.75);
-  color: #fff;
+  color: var(--on-media);
   font-size: 11px;
   font-weight: 500;
 }
@@ -55,7 +55,7 @@
   inset: -8px;
   border: 2px dashed var(--text-faint);
   border-radius: 14px;
-  background: rgba(31, 30, 27, 0.03);
+  background: color-mix(in srgb, var(--text) 3%, transparent);
   pointer-events: none;
 }
 .ig__drop {
@@ -142,8 +142,8 @@
   min-height: 0;
   overflow: auto;
   background:
-    linear-gradient(45deg, rgba(31, 30, 27, 0.035) 25%, transparent 25%, transparent 75%, rgba(31, 30, 27, 0.035) 75%),
-    linear-gradient(45deg, rgba(31, 30, 27, 0.035) 25%, transparent 25%, transparent 75%, rgba(31, 30, 27, 0.035) 75%);
+    linear-gradient(45deg, color-mix(in srgb, var(--text) 3.5%, transparent) 25%, transparent 25%, transparent 75%, color-mix(in srgb, var(--text) 3.5%, transparent) 75%),
+    linear-gradient(45deg, color-mix(in srgb, var(--text) 3.5%, transparent) 25%, transparent 25%, transparent 75%, color-mix(in srgb, var(--text) 3.5%, transparent) 75%);
   background-color: var(--bg);
   background-size: 20px 20px;
   background-position: 0 0, 10px 10px;
@@ -189,7 +189,7 @@
   cursor: nesw-resize;
 }
 .ia__box.is-selected rect:first-child {
-  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.35));
+  filter: drop-shadow(0 0 2px color-mix(in srgb, var(--shadow-color) 35%, transparent));
 }
 .ia__failed {
   padding: 40px;
@@ -217,7 +217,7 @@
   height: 20px;
   padding: 0 5px;
   border-radius: 4px;
-  color: #fff;
+  color: var(--on-media);
   font-size: 11px;
   font-weight: 600;
   flex-shrink: 0;

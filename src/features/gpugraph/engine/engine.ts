@@ -128,11 +128,33 @@ export interface EngineEvents {
   error: (message: string) => void
 }
 
-const SEL_COLOR = packColor('#1f1e1b')
-const HOV_COLOR = packColor('#9a3412')
-const PATH_COLOR = packColor('#9a3412')
-const DEFAULT_NODE_COLOR = packColor('#7c7a74')
-const DEFAULT_EDGE_COLOR = packColor('#b5b2aa')
+/**
+ * The colours the engine draws with that are not the data's: the ground, the labels and their halo, the rings of the
+ * selected, hovered and path nodes, and the colour of a node or edge given none. These are Paper's; a view sets its
+ * theme's with `setColors` (`engineTheme.ts › engineColors`) and again when the theme changes. CSS colour strings.
+ */
+export interface EngineColors {
+  background: string
+  label: string
+  labelHalo: string
+  edgeLabel: string
+  select: string
+  hover: string
+  path: string
+  node: string
+  edge: string
+}
+export const PAPER_ENGINE_COLORS: Readonly<EngineColors> = {
+  background: '#faf9f6',
+  label: '#1f1e1b',
+  labelHalo: 'rgba(255,255,255,0.9)',
+  edgeLabel: '#6b6a66',
+  select: '#1f1e1b',
+  hover: '#9a3412',
+  path: '#9a3412',
+  node: '#7c7a74',
+  edge: '#b5b2aa',
+}
 const AROUND_MAX_SELECTED = 20_000
 /**
  * Physics iterations per frame at most, however cheap they are. While the run is hot (alpha above
@@ -267,11 +289,16 @@ export class GraphEngine {
   labelMode: 'auto' | 'all' | 'none' = 'auto'
   showEdges = true
   nodeSizeFactor = 1
-  background = packColor('#faf9f6')
+  /** The colours in use (`setColors`); `background` and the rest below are the same, packed for the GPU. */
+  colors: EngineColors = { ...PAPER_ENGINE_COLORS }
+  background = packColor(PAPER_ENGINE_COLORS.background)
   /** Clear to nothing rather than the background: the picture composes over what is behind the canvas (a map). */
   private transparent = false
-  labelColor = '#1f1e1b'
-  labelHalo = 'rgba(255,255,255,0.9)'
+  private selectColor = packColor(PAPER_ENGINE_COLORS.select)
+  private hoverColor = packColor(PAPER_ENGINE_COLORS.hover)
+  private pathColor = packColor(PAPER_ENGINE_COLORS.path)
+  private defaultNodeColor = packColor(PAPER_ENGINE_COLORS.node)
+  private defaultEdgeColor = packColor(PAPER_ENGINE_COLORS.edge)
   private vp = { minX: 0, minY: 0, maxX: 0, maxY: 0 }
   private viewProj = new Float32Array(16)
   private ndc = new Float32Array(3)
@@ -316,12 +343,41 @@ export class GraphEngine {
     container.appendChild(labels)
     this.canvases = [canvas, labels]
     this.labelLayer = new LabelLayer(labels)
-    this.labelLayer.color = this.labelColor
-    this.labelLayer.halo = this.labelHalo
+    this.paintLabelsWith(this.colors)
     this.resizeObserver = new ResizeObserver(() => this.onResize())
     this.resizeObserver.observe(container)
     this.onResize()
     void this.createRenderer(canvas)
+  }
+
+  /**
+   * Draw with these colours from the next frame (a theme change). The ground, the rings and the labels are read per
+   * frame — no buffer is touched, the frame and the label pass are drawn once more. Nodes and edges already given the
+   * default colour keep it; the views give every node and edge its own (`compile.ts`), so the defaults are for what is
+   * added after.
+   */
+  setColors(c: Partial<EngineColors>) {
+    const next = { ...this.colors, ...c }
+    this.colors = next
+    this.background = packColor(next.background)
+    this.selectColor = packColor(next.select)
+    this.hoverColor = packColor(next.hover)
+    this.pathColor = packColor(next.path)
+    this.defaultNodeColor = packColor(next.node)
+    this.defaultEdgeColor = packColor(next.edge)
+    if (this.labelLayer) {
+      this.paintLabelsWith(next)
+      // The labels showing stay where they are and as they are faded: only their colour changes.
+      this.labelsDirty = true
+      this.labelsKeep = true
+    }
+    this.requestRender()
+  }
+  private paintLabelsWith(c: EngineColors) {
+    if (!this.labelLayer) return
+    this.labelLayer.color = c.label
+    this.labelLayer.halo = c.labelHalo
+    this.labelLayer.edgeColor = c.edgeLabel
   }
 
   private async createRenderer(canvas: HTMLCanvasElement) {
@@ -539,7 +595,7 @@ export class GraphEngine {
       this.posr[p + 1] = spec.y ?? 0
       this.posr[p + 2] = spec.z ?? 0
       this.posr[p + 3] = spec.size ?? 4
-      this.nodeColor[i] = spec.packed ?? (spec.color ? packColor(spec.color) : DEFAULT_NODE_COLOR)
+      this.nodeColor[i] = spec.packed ?? (spec.color ? packColor(spec.color) : this.defaultNodeColor)
       this.nodeFlags[i] = (spec.visible === false ? N_HIDDEN | N_FILTERED : 0) | (spec.labelOk === false ? 0 : N_LABEL) | ((SHAPE_CODES[spec.shape ?? 'circle'] ?? 0) << N_SHAPE_SHIFT)
       this.selected.clear(i)
       this.filtered.put(i, spec.visible !== false)
@@ -620,7 +676,7 @@ export class GraphEngine {
     const d = e * 4
     this.edgeData[d] = source
     this.edgeData[d + 1] = target
-    this.edgeData[d + 2] = spec.packed ?? (spec.color ? packColor(spec.color) : DEFAULT_EDGE_COLOR)
+    this.edgeData[d + 2] = spec.packed ?? (spec.color ? packColor(spec.color) : this.defaultEdgeColor)
     this.edgeData[d + 3] = ((spec.directed ? E_DIRECTED : 0) | (spec.visible === false ? E_HIDDEN | E_FILTERED : 0) | packEdgeWidth(spec.width ?? 1) | packEdgeCurvature(spec.curvature ?? 0)) >>> 0
     mark(this.dirtyEdges, e)
   }
@@ -726,7 +782,7 @@ export class GraphEngine {
       this.posr[p + 1] = g.positions[i * 3 + 1]
       this.posr[p + 2] = g.positions[i * 3 + 2]
       this.posr[p + 3] = style.size ? style.size(i, degree[i]) : 2 + Math.min(10, Math.sqrt(degree[i]))
-      this.nodeColor[i] = colors ? colors[g.nodeType[i] % colors.length] : DEFAULT_NODE_COLOR
+      this.nodeColor[i] = colors ? colors[g.nodeType[i] % colors.length] : this.defaultNodeColor
       this.nodeFlags[i] = N_LABEL
       this.filtered.set(i)
     }
@@ -737,7 +793,7 @@ export class GraphEngine {
       const d = e * 4
       this.edgeData[d] = g.edgeSource[e]
       this.edgeData[d + 1] = g.edgeTarget[e]
-      this.edgeData[d + 2] = ecolors ? ecolors[g.edgeType[e] % ecolors.length] : DEFAULT_EDGE_COLOR
+      this.edgeData[d + 2] = ecolors ? ecolors[g.edgeType[e] % ecolors.length] : this.defaultEdgeColor
       this.edgeData[d + 3] = (dirFlag | w) >>> 0
     }
     this.hovered = -1
@@ -1334,9 +1390,9 @@ export class GraphEngine {
       edgeFadeAlpha: 0.12,
       arrows: this.lod.arrows,
       background: this.background,
-      selectColor: SEL_COLOR,
-      hoverColor: HOV_COLOR,
-      pathColor: PATH_COLOR,
+      selectColor: this.selectColor,
+      hoverColor: this.hoverColor,
+      pathColor: this.pathColor,
       nodeCount: this.graph.nodeCount,
       edgeCount: this.showEdges ? this.graph.edgeCount : 0,
     }
