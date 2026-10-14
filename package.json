@@ -17,6 +17,7 @@
     "prebuild": "node scripts/pyodide/fetch.mjs --quiet && node scripts/vendor.mjs --quiet && node scripts/demos/fetch.mjs --quiet",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
+    "themes": "node scripts/themes/generate.mjs",
     "test": "vitest run",
     "test:unit": "vitest run --exclude 'mcp/**'",
     "test:bridge": "vitest run mcp/ --no-file-parallelism",

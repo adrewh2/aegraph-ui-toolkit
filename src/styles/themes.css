@@ -5,7 +5,8 @@
  * test checks it. Text tokens keep 4.5:1 or better against --bg, --surface and --surface-2 (WCAG 2.1 AA).
  */
 
-:root[data-theme='dark'] {
+:root[data-theme='dark'],
+[data-theme-preview='dark'] {
   color-scheme: dark;
   --bg: #1b1a18;
   --surface: #24231f;
@@ -53,7 +54,8 @@
   --on-media: #ffffff;
 }
 
-:root[data-theme='midnight'] {
+:root[data-theme='midnight'],
+[data-theme-preview='midnight'] {
   color-scheme: dark;
   --bg: #0e131b;
   --surface: #151c27;
@@ -101,7 +103,8 @@
   --on-media: #ffffff;
 }
 
-:root[data-theme='contrast'] {
+:root[data-theme='contrast'],
+[data-theme-preview='contrast'] {
   color-scheme: light;
   --bg: #ffffff;
   --surface: #ffffff;

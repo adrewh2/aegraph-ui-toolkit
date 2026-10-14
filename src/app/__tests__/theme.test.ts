@@ -10,7 +10,7 @@ import { isThemePreference, resolveTheme, THEMES } from '../theme'
 const read = (p: string) => readFileSync(new URL(p, import.meta.url), 'utf8')
 const noComments = (css: string) => css.replace(/\/\*[\s\S]*?\*\//g, '')
 const index = noComments(read('../../index.css'))
-const themesCss = noComments(read('../../styles/themes.css'))
+const themesCss = noComments(read('../../styles/themes.css')) + noComments(read('../../styles/themes-unigraph.css'))
 const boot = read('../../../public/theme-boot.js')
 
 /** The custom properties a block declares, by name. */
@@ -19,11 +19,12 @@ function props(block: string): Map<string, string> {
   for (const m of block.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) out.set(m[1], m[2].trim())
   return out
 }
-const rootBlock = index.slice(index.indexOf(':root {'), index.indexOf('}', index.indexOf(':root {')))
+const rootStart = index.indexOf(":root,\n[data-theme-preview='paper'] {")
+const rootBlock = index.slice(rootStart, index.indexOf('}', rootStart))
 /** Paper's colour tokens: every :root token but the fonts and radii. */
 const paper = new Map([...props(rootBlock)].filter(([k]) => !/^--(font|radius)/.test(k)))
 const blockOf = (id: string) => {
-  const start = themesCss.indexOf(`:root[data-theme='${id}'] {`)
+  const start = themesCss.indexOf(`:root[data-theme='${id}'],\n[data-theme-preview='${id}'] {`)
   if (start < 0) return undefined
   return props(themesCss.slice(start, themesCss.indexOf('}', start)))
 }
@@ -68,9 +69,10 @@ describe('the themes', () => {
   })
 
   it('are the same list in the picker and in the boot script, which knows which are dark', () => {
-    for (const t of THEMES) expect(boot, t.id).toContain(`'${t.id}'`)
+    for (const t of THEMES) expect(boot, t.id).toContain(`"${t.id}"`)
     const darkIds = THEMES.filter((t) => t.scheme === 'dark').map((t) => t.id)
-    for (const id of darkIds) expect(boot).toMatch(new RegExp(`\\b${id}: 1`))
+    const darkInBoot = JSON.parse(/var dark = (\{.*\})/.exec(boot)![1]) as Record<string, number>
+    expect(Object.keys(darkInBoot).sort()).toEqual([...darkIds].sort())
     // The swatches show the theme's own background and text.
     for (const t of THEMES) {
       expect(t.swatch[0].toLowerCase(), t.id).toBe(tokensOf(t.id).get('--bg')!.toLowerCase())
@@ -84,5 +86,13 @@ describe('the themes', () => {
     expect(resolveTheme('midnight', false)).toBe('midnight')
     expect(isThemePreference('neon')).toBe(false)
     expect(isThemePreference('system')).toBe(true)
+  })
+})
+
+describe('Unigraph’s themes', () => {
+  it('are all here, each with a preview block, and the generator’s output is what is committed', async () => {
+    const ids = THEMES.filter((t) => t.group === 'unigraph').map((t) => t.id)
+    expect(ids).toEqual(['unigraph-light', 'unigraph-dark', 'dracula', 'one-dark', 'solarized', 'monokai', 'nord', 'gruvbox', 'tokyo-night', 'catppuccin', 'unigraph-neon', 'unigraph-warm'])
+    for (const id of ids) expect(themesCss, id).toContain(`[data-theme-preview='${id}']`)
   })
 })

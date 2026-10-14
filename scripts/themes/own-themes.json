@@ -1,0 +1,6 @@
+[
+  { "id": "paper", "scheme": "light" },
+  { "id": "dark", "scheme": "dark" },
+  { "id": "midnight", "scheme": "dark" },
+  { "id": "contrast", "scheme": "light" }
+]

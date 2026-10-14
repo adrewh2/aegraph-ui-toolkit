@@ -1,0 +1,250 @@
+/* The theme gallery (ThemeGallery.tsx). Each card's inside is `[data-theme-preview]`, so every var() below it reads
+   that theme's tokens; the card's own frame and ring read the page's. */
+.tgal.dialog--wide {
+  max-width: 980px;
+}
+.tgal__system {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin: 8px 0 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.tgal__system:hover {
+  background: var(--surface-hover);
+}
+.tgal__system.is-on {
+  border-color: var(--select);
+  box-shadow: 0 0 0 1px var(--select);
+}
+.tgal__check {
+  margin-left: auto;
+  color: var(--select);
+}
+.tgal__group {
+  margin: 16px 0 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.tgal__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 12px;
+}
+
+.tcard {
+  display: block;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: none;
+  overflow: hidden;
+  cursor: pointer;
+  text-align: left;
+  transition: box-shadow 120ms ease, transform 120ms ease;
+}
+.tcard:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+.tcard:focus-visible,
+.tcard.is-on {
+  outline: none;
+  border-color: var(--select);
+  box-shadow: 0 0 0 2px var(--select);
+}
+.tcard__in {
+  display: block;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+}
+.tcard__win {
+  display: flex;
+  height: 132px;
+  border-bottom: 1px solid var(--border);
+}
+.tcard__side {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 38px;
+  padding: 8px 6px;
+  background: var(--surface-2);
+  border-right: 1px solid var(--border);
+}
+.tcard__logo {
+  width: 18px;
+  height: 5px;
+  margin-bottom: 3px;
+  border-radius: 2px;
+  background: var(--text);
+}
+.tcard__nav {
+  height: 5px;
+  border-radius: 2px;
+  background: var(--text-faint);
+  opacity: 0.55;
+}
+.tcard__nav.is-active {
+  opacity: 1;
+  background: var(--text);
+  box-shadow: 0 0 0 2px var(--surface-hover);
+}
+.tcard__main {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  padding: 7px 8px;
+}
+.tcard__h {
+  font-family: var(--font-serif);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+}
+.tcard__sub {
+  font-size: 7.5px;
+  color: var(--text-muted);
+}
+.tcard__card {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 64%;
+  margin-top: 2px;
+  padding: 5px 6px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--surface);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--shadow-color) 8%, transparent);
+}
+.tcard__title {
+  font-size: 8px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tcard__muted {
+  font-size: 6.5px;
+  color: var(--text-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tcard__row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.tcard__chip {
+  padding: 0 3px;
+  border-radius: 3px;
+  font-size: 6px;
+  line-height: 9px;
+  font-weight: 600;
+}
+.tcard__chip--ok {
+  background: var(--ok-bg);
+  color: var(--ok-text);
+}
+.tcard__chip--warn {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+}
+.tcard__chip--bad {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+.tcard__chip--info {
+  background: var(--info-bg);
+  color: var(--info-text);
+}
+.tcard__btn {
+  padding: 1px 5px;
+  border: 1px solid var(--border-strong);
+  border-radius: 3px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 6.5px;
+  line-height: 9px;
+}
+.tcard__btn--primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
+}
+.tcard__link {
+  font-size: 6.5px;
+  color: var(--link);
+  text-decoration: underline;
+}
+.tcard__sel {
+  width: 64%;
+  margin-top: 3px;
+  padding: 1px 5px;
+  border: 1px solid var(--select-border);
+  border-radius: 3px;
+  background: var(--select-bg);
+  color: var(--text);
+  font-size: 6.5px;
+  line-height: 9px;
+}
+.tcard__graph {
+  position: absolute;
+  right: 4px;
+  bottom: 6px;
+  width: 34%;
+  height: 62%;
+  border-radius: 5px;
+  background: var(--canvas);
+  border: 1px solid var(--border);
+}
+.tcard__edge {
+  stroke: var(--canvas-edge);
+  stroke-width: 1.2;
+}
+.tcard__ring {
+  fill: none;
+  stroke: var(--canvas-select);
+  stroke-width: 1.4;
+}
+.tcard__ring--path {
+  stroke: var(--canvas-path);
+}
+.tcard__foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  background: var(--surface);
+}
+.tcard__name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+.tcard__scheme {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+.tcard__check {
+  margin-left: auto;
+  color: var(--select);
+}
