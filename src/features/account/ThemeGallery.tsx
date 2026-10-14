@@ -25,9 +25,10 @@ function ThemeGallery({ onClose }: { onClose: () => void }) {
   const { theme: pref } = useUserSettings()
   const shown = useTheme()
   const pick = (t: ThemePreference) => setUserSettings({ theme: t })
-  const group = (g: 'aegraph' | 'unigraph') => THEMES.filter((t) => t.group === g)
+  // Light themes first in each group, then dark: a dark card between two light ones breaks the row.
+  const group = (g: 'aegraph' | 'unigraph') => THEMES.filter((t) => t.group === g && t.scheme === 'light').concat(THEMES.filter((t) => t.group === g && t.scheme === 'dark'))
   return (
-    <Dialog open title="Themes" description="Pick how aegraph looks. Each card is the theme itself; a click applies it." onClose={onClose} wide className="tgal" footer={<button className="btn btn--sm btn--primary" onClick={onClose}>Done</button>}>
+    <Dialog open title="Themes" description="Pick how aegraph looks. Each card is the theme itself; a click applies it." onClose={onClose} wide closable className="tgal">
       <button type="button" className={`tgal__system ${pref === 'system' ? 'is-on' : ''}`} aria-pressed={pref === 'system'} onClick={() => pick('system')}>
         <Monitor size={16} aria-hidden />
         <span>

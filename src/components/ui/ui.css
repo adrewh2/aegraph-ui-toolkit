@@ -322,6 +322,7 @@ select.input {
   background: var(--overlay);
 }
 .dialog {
+  position: relative;
   width: 100%;
   max-width: 480px;
   max-height: calc(100vh - 32px);
@@ -334,6 +335,26 @@ select.input {
 }
 .dialog--wide {
   max-width: 720px;
+}
+.dialog__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.dialog__close:hover {
+  background: var(--surface-hover);
+  color: var(--text);
 }
 .dialog__title {
   margin: 0 0 4px;

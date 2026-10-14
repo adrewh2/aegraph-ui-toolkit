@@ -1,3 +1,4 @@
+import { X } from 'lucide-react'
 import { useId, useRef, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { useArmed } from './useArmed'
@@ -17,12 +18,14 @@ interface DialogProps {
   className?: string
   /** The id of an element in the body that describes the dialog, when there is no `description` (a confirmation's message). */
   describedBy?: string
+  /** A close button (×) in the top-right corner, for a dialog that is looked at more than answered. */
+  closable?: boolean
 }
 
 /**
  * The app's modal dialog, announced by its title and its description (`aria-labelledby`, `aria-describedby`).
  */
-export function Dialog({ open, title, description, onClose, children, footer, wide, className, describedBy }: DialogProps) {
+export function Dialog({ open, title, description, onClose, children, footer, wide, className, describedBy, closable }: DialogProps) {
   const box = useRef<HTMLDivElement>(null)
   const id = useId()
   // A layer for Escape, which closes only the topmost thing — a dropdown open in the dialog first. A press outside is
@@ -59,6 +62,12 @@ export function Dialog({ open, title, description, onClose, children, footer, wi
         )}
         <div className="dialog__body">{children}</div>
         {footer && <div className="dialog__footer">{footer}</div>}
+        {/* Last in the markup, drawn in the corner: the focus starts on the dialog's first choice, not on its way out. */}
+        {closable && (
+          <button type="button" className="dialog__close" aria-label="Close" title="Close (Esc)" onClick={onClose}>
+            <X size={16} aria-hidden />
+          </button>
+        )}
       </div>
     </div>,
     document.body,

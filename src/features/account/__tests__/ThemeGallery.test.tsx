@@ -29,6 +29,14 @@ describe('the theme gallery', () => {
     }
     expect(html.indexOf('System')).toBeLessThan(html.indexOf('data-theme-preview'))
     expect(html.indexOf('>aegraph<')).toBeLessThan(html.indexOf('>From Unigraph<'))
+    // Light before dark in each group: a dark card between two light ones breaks the row.
+    const order = [...html.matchAll(/data-theme-preview="([\w-]+)"/g)].map((m) => m[1])
+    for (const g of ['aegraph', 'unigraph'] as const) {
+      const schemes = order.filter((id) => THEMES.find((t) => t.id === id)!.group === g).map((id) => THEMES.find((t) => t.id === id)!.scheme)
+      expect(schemes.indexOf('dark') === -1 || schemes.lastIndexOf('light') < schemes.indexOf('dark'), g).toBe(true)
+    }
+    // A way out in the corner.
+    expect(html).toContain('class="dialog__close"')
     // The default is System, so no theme card is the chosen one yet.
     expect(html).not.toMatch(/role="radio" aria-checked="true"/)
     closeThemeGallery()

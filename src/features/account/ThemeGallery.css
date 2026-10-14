@@ -1,15 +1,20 @@
 /* The theme gallery (ThemeGallery.tsx). Each card's inside is `[data-theme-preview]`, so every var() below it reads
    that theme's tokens; the card's own frame and ring read the page's. */
+/* Every theme on one screen, no scrolling: four columns of small cards on a laptop, two on a narrow window. */
 .tgal.dialog--wide {
-  max-width: 980px;
+  max-width: 1000px;
+  padding: 18px 20px 20px;
+}
+.tgal .dialog__desc {
+  margin-bottom: 10px;
 }
 .tgal__system {
   display: flex;
   align-items: center;
   gap: 10px;
   width: 100%;
-  margin: 8px 0 4px;
-  padding: 10px 12px;
+  margin: 0 0 2px;
+  padding: 7px 12px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
@@ -30,7 +35,7 @@
   color: var(--select);
 }
 .tgal__group {
-  margin: 16px 0 8px;
+  margin: 12px 0 6px;
   font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -39,8 +44,13 @@
 }
 .tgal__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+@media (max-width: 760px) {
+  .tgal__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .tcard {
@@ -70,10 +80,12 @@
   color: var(--text);
   font-family: var(--font-sans);
 }
+/* The window is drawn at full size and scaled as a whole, so the picture keeps its proportions at any card size. */
 .tcard__win {
   display: flex;
   height: 132px;
   border-bottom: 1px solid var(--border);
+  zoom: 0.68;
 }
 .tcard__side {
   display: flex;
@@ -232,11 +244,11 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 10px;
+  padding: 5px 9px;
   background: var(--surface);
 }
 .tcard__name {
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text);
 }
@@ -247,4 +259,15 @@
 .tcard__check {
   margin-left: auto;
   color: var(--select);
+}
+/* Shorter windows draw the pictures smaller, so the whole gallery still fits without scrolling. */
+@media (max-height: 820px) {
+  .tcard__win {
+    zoom: 0.58;
+  }
+}
+@media (max-height: 680px) {
+  .tcard__win {
+    zoom: 0.5;
+  }
 }
