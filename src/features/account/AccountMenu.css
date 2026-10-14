@@ -124,3 +124,7 @@
 .acct__features-pending .muted {
   color: var(--info-text);
 }
+.acct__browser {
+  align-self: flex-start;
+  text-decoration: none;
+}

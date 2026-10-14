@@ -12,6 +12,7 @@
  *
  * Stashes (`stash.ts`, the `aegraph-stash` database) are never cleared: they are how the state cleared here comes back.
  */
+import { EDITION } from './edition'
 
 const NOTE = 'aegraph:reset-browser'
 
@@ -31,6 +32,11 @@ export interface ResetOptions {
    * must not lay the stash over what was left. By default a reset reports it and carries on.
    */
   strict?: boolean
+  /**
+   * After clearing, load with an empty Library: the edition's default demo, which a first visit opens, is marked as
+   * already opened (`EDITION.defaultDemo.key`), so the front page starts with nothing in it.
+   */
+  startEmpty?: boolean
 }
 
 /** Clear this browser on the next load, and reload now. */
@@ -118,5 +124,12 @@ export async function finishBrowserReset(options: ResetOptions) {
   }
   say('Clearing this browser…')
   await clearBrowser(options, () => say('Clearing this browser… another aegraph tab is still open — close it (or reload it) to finish.'))
+  if (options.startEmpty) {
+    try {
+      localStorage.setItem(EDITION.defaultDemo.key, '1')
+    } catch {
+      /* no storage: the demo opens, as on any first visit */
+    }
+  }
   location.replace('/')
 }

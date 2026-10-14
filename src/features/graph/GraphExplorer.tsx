@@ -300,7 +300,7 @@ function ExplorerShell({ session }: { session?: string }) {
     })
     if (detailTabs.tabs.active === `view:${key}`) detailTabs.set({ ...detailTabs.tabs, active: 'lead' })
   }
-  // The pane folds to a strip rather than closing: it only goes away when it has no tabs. A new selection unfolds it.
+  // The pane folds to a strip rather than closing: it only goes away when it has no tabs. Only the user unfolds it.
   const [detailMin, setDetailMin] = useState(() => localStorage.getItem(DETAIL_MIN_KEY) === '1')
   // Maximized, the panel has the row to itself and the stage waits behind it (it re-measures when it comes back).
   const [detailMax, setDetailMax] = useState(false)
@@ -622,15 +622,15 @@ function ExplorerShell({ session }: { session?: string }) {
   }, [onlyParam])
 
   const selected = state.selectedEdgeId ? store.get(state.selectedEdgeId) : primary ? store.get(primary) : undefined
-  // Picking something new is a reason to see it: the folded pane opens again, and the selection tab comes to the
-  // front — unless the pick was made in one of the pane's own tables, which stays where the pointer is. With nothing
+  // Picking something new brings the selection tab to the front of the pane — unless the pick was made in one of the
+  // pane's own tables, which stays where the pointer is. A folded pane stays folded: the user opens it (its strip
+  // counts what it holds), so selecting on the picture never pushes it aside. With nothing
   // selected the pane shows the Nodes table under the name of the selection tab, so a pick made there names the
   // table it was made in, or the selection would cover it.
   const lastSelected = useRef(selected?.id)
   const pickedInTable = useRef<'lead:nodes' | 'lead:edges' | null>(null)
   useEffect(() => {
     if (selected?.id && selected.id !== lastSelected.current) {
-      setDetailMinimized(false)
       const table = pickedInTable.current
       const onLead = detailTabs.tabs.active === 'lead' || detailTabs.tabs.active.startsWith('lead:')
       if (!table && onLead) detailTabs.set({ ...detailTabs.tabs, active: 'selection' })

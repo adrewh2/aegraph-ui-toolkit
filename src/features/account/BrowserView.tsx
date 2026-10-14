@@ -30,6 +30,8 @@ export function BrowserView() {
 export function BrowserCard({ reload }: { reload?: () => void } = {}) {
   const toast = useToast()
   const [stashFirst, setStashFirst] = useState(true)
+  // A clear loads the front page as a first visit, which opens the edition's default demo; this starts with nothing.
+  const [startEmpty, setStartEmpty] = useState(false)
   // Keys stay out of a stash unless asked for: a stash is a plain copy that clearing never deletes.
   const [includeKeys, setIncludeKeys] = useState(false)
   const [asking, setAsking] = useState<null | { kind: 'clear' } | { kind: 'restore'; stash: Stash } | { kind: 'delete'; stash: Stash }>(null)
@@ -69,7 +71,7 @@ export function BrowserCard({ reload }: { reload?: () => void } = {}) {
       })
     run(async () => {
       if (stashFirst) await stashNow(a.kind === 'clear' ? 'Before clearing' : `Before restoring “${a.stash.name}”`)
-      if (a.kind === 'clear') requestBrowserReset({}, reload)
+      if (a.kind === 'clear') requestBrowserReset({ startEmpty }, reload)
       else requestStashRestore(a.stash.id, reload)
     })
   }
@@ -79,7 +81,7 @@ export function BrowserCard({ reload }: { reload?: () => void } = {}) {
   const keysOnClear = stashFirst && includeKeys ? `The stash holds ${KEYS} too.` : `${KEYS[0].toUpperCase()}${KEYS.slice(1)} are deleted and are not in any stash taken without “Include keys” — you enter them again.`
   const dialog =
     asking?.kind === 'clear'
-      ? { title: 'Clear everything in this browser?', message: `The Library and every project, chats, history and settings kept in this browser are deleted. ${lost} ${keysOnClear} Stashes are kept. The page reloads as a first visit.`, label: stashFirst ? 'Stash, clear and reload' : 'Clear and reload' }
+      ? { title: 'Clear everything in this browser?', message: `The Library and every project, chats, history and settings kept in this browser are deleted. ${lost} ${keysOnClear} Stashes are kept. The page reloads as a first visit${startEmpty ? ', with an empty Library' : ''}.`, label: stashFirst ? 'Stash, clear and reload' : 'Clear and reload' }
       : asking?.kind === 'restore'
         ? { title: 'Restore this stash?', message: `This browser goes back to “${asking.stash.name}” (${formatDate(asking.stash.createdAt)}): the Library, projects, chats, history and settings as they were then replace what is here. ${asking.stash.keys ? `The keys stashed with it replace ${KEYS}.` : `It holds no keys: ${KEYS} stay as they are.`} ${lost} The page reloads.`, label: stashFirst ? 'Stash, restore and reload' : 'Restore and reload' }
         : asking?.kind === 'delete'
@@ -141,6 +143,10 @@ export function BrowserCard({ reload }: { reload?: () => void } = {}) {
         <label className="browser__switch" title="A stash leaves out the Claude and OpenAI keys, the Spotify sign-in and the bridge address unless this is ticked; it is a plain copy kept in this browser, which clearing never deletes.">
           <input type="checkbox" checked={includeKeys} onChange={(e) => setIncludeKeys(e.target.checked)} />
           Include keys in stashes
+        </label>
+        <label className="browser__switch" title="A first visit opens the site's demo project; ticked, the cleared browser starts with nothing in it.">
+          <input type="checkbox" checked={startEmpty} onChange={(e) => setStartEmpty(e.target.checked)} />
+          Start empty (no demo)
         </label>
       </div>
       <p className="muted browser__hint">

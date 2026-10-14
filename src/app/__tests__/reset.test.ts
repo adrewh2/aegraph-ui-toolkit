@@ -81,4 +81,20 @@ describe('clearing this browser', () => {
     await clearBrowser({ keepKeys: ['aegraph:restoring-stash'] })
     expect([...local.m.entries()]).toEqual([['aegraph:restoring-stash', '{"id":"s"}']])
   })
+
+  it('clears to an empty Library when asked: the default demo a first visit opens is marked as opened', async () => {
+    const { finishBrowserReset } = await import('../reset')
+    const { EDITION } = await import('../edition')
+    const replaced: string[] = []
+    vi.stubGlobal('document', { getElementById: () => null })
+    vi.stubGlobal('location', { replace: (u: string) => void replaced.push(u) })
+    local.setItem('aegraph:ai:chats', '{}')
+    await finishBrowserReset({ startEmpty: true })
+    expect([...local.m.entries()]).toEqual([[EDITION.defaultDemo.key, '1']])
+    expect(replaced).toEqual(['/'])
+    // Without it, a clear is a plain first visit: the demo opens.
+    local.setItem(EDITION.defaultDemo.key, '1')
+    await finishBrowserReset({})
+    expect(local.m.size).toBe(0)
+  })
 })
