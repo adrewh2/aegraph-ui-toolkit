@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import { applyTheme, isThemePreference, type ThemePreference } from '../../app/theme'
+import { ACCOUNT_SETTINGS_KEY, deploymentOff, FEATURE_NAMES, type FeatureName } from '../../app/features'
 
 /**
  * The user's own settings — what the settings menu at the foot of the sidebar keeps, apart from the assistant's
@@ -15,10 +16,15 @@ export interface UserSettings {
   externalServices: boolean
   /** The colour theme (`src/app/theme.ts › THEMES`), or `system` — the operating system's light or dark. */
   theme: ThemePreference
+  /**
+   * Features this user has turned off for themselves (`app/features.ts`): gone from the sidebar, the routes, the tools
+   * and the docs, their data kept. Read when the page loads, so a change applies on the next load.
+   */
+  featuresOff: FeatureName[]
 }
 
-const KEY = 'aegraph:account:settings'
-const DEFAULTS: UserSettings = { developerTools: false, externalServices: true, theme: 'system' }
+const KEY = ACCOUNT_SETTINGS_KEY
+const DEFAULTS: UserSettings = { developerTools: false, externalServices: true, theme: 'system', featuresOff: [] }
 
 let current: UserSettings = load()
 const listeners = new Set<() => void>()
@@ -29,17 +35,22 @@ function load(): UserSettings {
     if (!raw) return DEFAULTS
     const parsed = JSON.parse(raw) as Partial<UserSettings>
     // A setting this browser has never seen takes the default: a new switch does not silently turn something off.
-    return { developerTools: parsed.developerTools === true, externalServices: parsed.externalServices !== false, theme: isThemePreference(parsed.theme) ? parsed.theme : 'system' }
+    return { developerTools: parsed.developerTools === true, externalServices: parsed.externalServices !== false, theme: isThemePreference(parsed.theme) ? parsed.theme : 'system', featuresOff: cleanFeatures(parsed.featuresOff) }
   } catch {
     return DEFAULTS
   }
+}
+
+/** Known feature names only, in the registry's order; not one the deployment already turned off (nothing to switch). */
+function cleanFeatures(v: unknown): FeatureName[] {
+  return Array.isArray(v) ? FEATURE_NAMES.filter((n) => v.includes(n) && !deploymentOff(n)) : []
 }
 
 export const getUserSettings = () => current
 
 export function setUserSettings(patch: Partial<UserSettings>): UserSettings {
   const theme = patch.theme !== undefined && !isThemePreference(patch.theme) ? current.theme : (patch.theme ?? current.theme)
-  current = { ...current, ...patch, theme }
+  current = { ...current, ...patch, theme, featuresOff: patch.featuresOff !== undefined ? cleanFeatures(patch.featuresOff) : current.featuresOff }
   try {
     localStorage.setItem(KEY, JSON.stringify(current))
   } catch {

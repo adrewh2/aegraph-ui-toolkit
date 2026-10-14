@@ -8,9 +8,9 @@ const { getUserSettings, setUserSettings, externalServicesAllowed, requireExtern
 
 describe('user settings', () => {
   it('start at their defaults, patch, and are remembered', () => {
-    expect(getUserSettings()).toEqual({ developerTools: false, externalServices: true, theme: 'system' })
-    expect(setUserSettings({ developerTools: true })).toEqual({ developerTools: true, externalServices: true, theme: 'system' })
-    expect(JSON.parse(mem['aegraph:account:settings'])).toEqual({ developerTools: true, externalServices: true, theme: 'system' })
+    expect(getUserSettings()).toEqual({ developerTools: false, externalServices: true, theme: 'system', featuresOff: [] })
+    expect(setUserSettings({ developerTools: true })).toEqual({ developerTools: true, externalServices: true, theme: 'system', featuresOff: [] })
+    expect(JSON.parse(mem['aegraph:account:settings'])).toEqual({ developerTools: true, externalServices: true, theme: 'system', featuresOff: [] })
     setUserSettings({ developerTools: false })
     expect(getUserSettings().developerTools).toBe(false)
   })
@@ -37,7 +37,7 @@ describe('the switch a browser has not seen', () => {
     mem['aegraph:account:settings'] = JSON.stringify({ developerTools: true })
     vi.resetModules()
     const fresh = await import('../settings')
-    expect(fresh.getUserSettings()).toEqual({ developerTools: true, externalServices: true, theme: 'system' })
+    expect(fresh.getUserSettings()).toEqual({ developerTools: true, externalServices: true, theme: 'system', featuresOff: [] })
   })
 
   it('keeps an explicit off through a reload', async () => {

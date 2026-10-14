@@ -7,6 +7,11 @@
  * such constant and the same variable is read from the environment when this module loads. Unset means everything
  * on, as it always was.
  *
+ * A user can turn a feature off too, for themselves, in the account menu's settings (`UserSettings.featuresOff`). That
+ * layer is read from this browser's settings when this module loads — every surface below asks `featureOn` while it
+ * builds its lists, so a change applies on the next load (the menu offers *Reload to apply*). A feature the deployment
+ * turned off cannot be turned back on by a user.
+ *
  * A feature that is off is gone from the build's surface: its sidebar rows and counts, its routes (they show
  * `FeatureOff` instead of loading the feature's code), its tools (`assistant/toolFeatures.ts`), its docs page, and
  * every link into its views. Its data stays data — the entities remain in the Library and the tables, and bundles
@@ -58,18 +63,52 @@ function configured(): string | undefined {
 
 const OFF: ReadonlySet<FeatureName> = new Set(parseFeaturesOff(configured()).off)
 
-/** Whether this deployment has the feature: not turned off, and neither is the feature it lives in. */
+/** Where the account menu keeps this browser's settings (`features/account/settings.ts`); read here without React. */
+export const ACCOUNT_SETTINGS_KEY = 'aegraph:account:settings'
+
+/** The features a stored settings value turns off: known names only, whatever else it holds. */
+export function userFeaturesOff(raw: string | null | undefined): FeatureName[] {
+  try {
+    const list = (JSON.parse(raw ?? '{}') as { featuresOff?: unknown }).featuresOff
+    return Array.isArray(list) ? FEATURE_NAMES.filter((n) => list.includes(n)) : []
+  } catch {
+    return []
+  }
+}
+
+function storedUserOff(): string | null {
+  try {
+    return (globalThis as { localStorage?: Storage }).localStorage?.getItem(ACCOUNT_SETTINGS_KEY) ?? null
+  } catch {
+    return null
+  }
+}
+
+/** The user's own switches, as this page loaded them: a change to the setting applies on the next load. */
+const USER_OFF: ReadonlySet<FeatureName> = new Set(userFeaturesOff(storedUserOff()))
+
+/** Whether the deployment itself turned the feature off (or the feature it lives in): no setting brings it back. */
+export function deploymentOff(name: FeatureName): boolean {
+  if (OFF.has(name)) return true
+  const def: FeatureDef = FEATURES[name]
+  return !!def.needs && isFeature(def.needs) && deploymentOff(def.needs)
+}
+
+/** Whether this page has the feature: neither the deployment nor the user turned it off, nor the feature it lives in. */
 export function featureOn(name: FeatureName): boolean {
-  if (OFF.has(name)) return false
+  if (OFF.has(name) || USER_OFF.has(name)) return false
   const def: FeatureDef = FEATURES[name]
   return !def.needs || !isFeature(def.needs) || featureOn(def.needs)
 }
 
+/** The user's switches this page loaded with — what the settings must differ from for a reload to change anything. */
+export const loadedUserFeaturesOff = (): FeatureName[] => FEATURE_NAMES.filter((n) => USER_OFF.has(n))
+
 /** The features this deployment has turned off (those that follow from another included), in `FEATURES` order. */
 export const featuresOff = (): FeatureName[] => FEATURE_NAMES.filter((n) => !featureOn(n))
 
-/** The sentence every surface uses for a feature that is off. */
-export const turnedOff = (name: FeatureName) => `${FEATURES[name].label} is turned off on this deployment.`
+/** The sentence every surface uses for a feature that is off: on this deployment, or in the user's settings. */
+export const turnedOff = (name: FeatureName) => (deploymentOff(name) ? `${FEATURES[name].label} is turned off on this deployment.` : `${FEATURES[name].label} is turned off in your settings.`)
 
 const under = (path: string, route: string) => path === route || (path.startsWith(route) && /^[/?#]/.test(path.slice(route.length)))
 

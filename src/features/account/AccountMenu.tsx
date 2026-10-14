@@ -1,9 +1,10 @@
 import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronDown, HardDrive, Settings } from 'lucide-react'
+import { ChevronDown, HardDrive, RotateCw, Settings } from 'lucide-react'
 import { Popover } from '../../components/ui/Menu'
 import { setUserSettings, useUserSettings } from './settings'
 import { themeInfo, useTheme, type ThemePreference } from '../../app/theme'
+import { deploymentOff, FEATURES, loadedUserFeaturesOff, type FeatureName } from '../../app/features'
 import { ThemeGalleryHost } from './ThemeGallery'
 import { openThemeGallery, themeLabel } from './themeGalleryStore'
 import './AccountMenu.css'
@@ -85,6 +86,7 @@ export function AccountPanel({ onNavigate }: { onNavigate?: () => void } = {}) {
           </span>
         </span>
       </label>
+      <FeatureSwitches off={settings.featuresOff} onChange={(featuresOff) => setUserSettings({ featuresOff })} />
       <label className="acct__toggle">
         <input type="checkbox" checked={settings.developerTools} onChange={(e) => setUserSettings({ developerTools: e.target.checked })} />
         <span className="acct__toggle-text">
@@ -113,6 +115,49 @@ function ThemeRow({ value, onOpen }: { value: ThemePreference; onOpen: () => voi
       <button type="button" className="btn btn--sm" onClick={onOpen}>
         Change…
       </button>
+    </div>
+  )
+}
+
+/**
+ * The features a user can do without — Maps (and the globe in it), Videos, Audio — each a switch. They are read when
+ * the page loads (`app/features.ts`), so a change waits for *Reload now*; a feature the deployment turned off shows
+ * as off and cannot be switched on.
+ */
+function FeatureSwitches({ off, onChange }: { off: FeatureName[]; onChange: (off: FeatureName[]) => void }) {
+  const loaded = loadedUserFeaturesOff()
+  const pending = off.length !== loaded.length || off.some((n) => !loaded.includes(n))
+  const set = (name: FeatureName, on: boolean) => onChange(on ? off.filter((n) => n !== name) : [...off, name])
+  const row = (name: FeatureName, sub?: boolean) => {
+    const fixed = deploymentOff(name)
+    const parentOff = name === 'globe' && off.includes('maps')
+    const on = !fixed && !off.includes(name) && !parentOff
+    return (
+      <label key={name} className={`acct__feature ${sub ? 'acct__feature--sub' : ''}`} title={fixed ? 'Turned off on this deployment' : parentOff ? 'The globe is part of Maps' : undefined}>
+        <input type="checkbox" checked={on} disabled={fixed || parentOff} onChange={(e) => set(name, e.target.checked)} />
+        <span>{FEATURES[name].label}</span>
+        {fixed && <span className="muted acct__feature-note">off on this deployment</span>}
+      </label>
+    )
+  }
+  return (
+    <div className="acct__features">
+      <span className="acct__features-label">Features</span>
+      <span className="muted acct__features-hint">Turn off what you don’t use: it leaves the sidebar, the pages and the assistant’s tools; its data stays in the Library.</span>
+      <div className="acct__features-list">
+        {row('maps')}
+        {row('globe', true)}
+        {row('videos')}
+        {row('audio')}
+      </div>
+      {pending && (
+        <div className="acct__features-pending">
+          <span className="muted">Applies after a reload.</span>
+          <button type="button" className="btn btn--sm" onClick={() => location.reload()}>
+            <RotateCw size={12} aria-hidden /> Reload now
+          </button>
+        </div>
+      )}
     </div>
   )
 }

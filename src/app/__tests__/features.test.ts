@@ -100,3 +100,24 @@ describe('a deployment with maps, globe, videos and audio turned off', () => {
   })
 
 })
+
+describe('a user’s own switches', () => {
+  it('turn a feature off for this browser on the next load, say so, and never turn on what the deployment turned off', async () => {
+    const mem: Record<string, string> = { 'aegraph:account:settings': JSON.stringify({ featuresOff: ['videos', 'maps', 'nonsense'] }) }
+    vi.stubGlobal('localStorage', { getItem: (k: string) => mem[k] ?? null, setItem: (k: string, v: string) => (mem[k] = v), removeItem: (k: string) => delete mem[k] })
+    vi.resetModules()
+    const f = await import('../features')
+    expect(f.featureOn('videos')).toBe(false)
+    expect(f.featureOn('maps')).toBe(false)
+    // The globe lives in Maps: off with it, though the user never named it.
+    expect(f.featureOn('globe')).toBe(false)
+    expect(f.featureOn('audio')).toBe(true)
+    expect(f.deploymentOff('videos')).toBe(false)
+    expect(f.loadedUserFeaturesOff()).toEqual(['maps', 'videos'])
+    expect(f.turnedOff('videos')).toMatch(/in your settings/)
+    expect(f.pathOff('/videos/abc')).toBe('videos')
+    expect(f.userFeaturesOff('not json')).toEqual([])
+    vi.unstubAllGlobals()
+    vi.resetModules()
+  })
+})

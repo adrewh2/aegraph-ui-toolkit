@@ -22,3 +22,9 @@
   margin: 0;
   max-width: 48ch;
 }
+.feature-off__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
