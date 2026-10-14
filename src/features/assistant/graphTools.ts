@@ -1544,7 +1544,8 @@ export function createGraphTools(host: AppHost) {
         h.select(undefined)
         return json({ selected: null })
       }
-      h.setTool('select')
+      // Selecting by id leaves the path tool: what is asked for is a selection.
+      if (h.getState().tool === 'path') h.setTool('pan')
       const e = requireEntity(store, id)
       if (isRelationship(e)) throw new Error('Relationships are edges, not selectable nodes.')
       let filter = h.getState().filter

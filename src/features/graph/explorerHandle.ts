@@ -52,7 +52,7 @@ export interface ExplorerHandle {
     selectedIds: EntityId[]
     selectedEdgeId?: EntityId
     pinned: EntityId[]
-    tool: 'select' | 'path'
+    tool: 'pan' | 'box' | 'path'
     pathOptions: PathOptions
     path?: PathState
     hops: number
@@ -162,7 +162,7 @@ export interface ExplorerHandle {
   selectOp: (op: SelectionOp) => EntityId[]
   selectEdge: (id?: EntityId) => void
   setPinned: (ids: EntityId[]) => void
-  setTool: (tool: 'select' | 'path') => void
+  setTool: (tool: 'pan' | 'box' | 'path') => void
   setPathOptions: (patch: Partial<PathOptions>) => void
   computePath: (from: EntityId, to: EntityId) => PathState | null
   clearPath: () => void

@@ -158,7 +158,7 @@ describe('explorer reducer edges', () => {
     expect(reducer(s, { type: 'select', ids: ['a', 'b'] })).toBe(s)
     expect(reducer(s, { type: 'select', ids: ['b', 'a'] })).not.toBe(s) // order is the selection's: the last is primary
     expect(reducer(s, { type: 'hover', id: undefined })).toBe(s)
-    expect(reducer(s, { type: 'setTool', tool: 'select' })).toBe(s)
+    expect(reducer(s, { type: 'setTool', tool: 'pan' })).toBe(s)
     expect(reducer(s, { type: 'setLegend', on: s.showLegend })).toBe(s)
     expect(reducer(s, { type: 'showPlacementOverlay', on: s.showPlacementOverlay })).toBe(s)
     s = reducer(s, { type: 'selectEdge', id: 'e' })
@@ -219,5 +219,18 @@ describe('a restore', () => {
     // Nothing to restore: the view just stops waiting.
     expect(reducer(s, { type: 'restored' }).restoring).toBeUndefined()
     expect(reducer(s, { type: 'restored' }).positions.size).toBe(0)
+  })
+})
+
+describe('the pointer tools', () => {
+  it('read a saved tool as the hand, the box or the path — an old `select`, from before the box tool, is the hand', async () => {
+    const { explorerTool } = await import('../explorerTool')
+    expect(explorerTool('select')).toBe('pan')
+    expect(explorerTool(undefined)).toBe('pan')
+    expect(explorerTool('box')).toBe('box')
+    expect(explorerTool('path')).toBe('path')
+    const s = s0()
+    expect(reducer(s, { type: 'setTool', tool: 'box' }).tool).toBe('box')
+    expect(reducer({ ...s, tool: 'path', pathFrom: 'a' }, { type: 'setTool', tool: 'box' })).toMatchObject({ tool: 'box', pathFrom: undefined })
   })
 })

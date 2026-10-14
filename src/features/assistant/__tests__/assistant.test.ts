@@ -445,7 +445,7 @@ describe('app tools', () => {
         renderingDirty: false,
         selectedIds: [],
         pinned: [],
-        tool: 'select',
+        tool: 'pan',
         pathOptions: { directed: false, weighted: false },
         hops: 0,
         labels: 'auto',

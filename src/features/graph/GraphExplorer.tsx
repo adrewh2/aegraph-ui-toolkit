@@ -69,6 +69,7 @@ const EDGE_ROW_FIELDS: FieldDef[] = [
 ]
 import type { PathOptions } from '../../core/graph/paths'
 import { ExplorerProvider, defaultState, reducer, useExplorer, type ExplorerState } from './explorerState'
+import { explorerTool } from './explorerTool'
 import { registerExplorerHandle, touchExplorerHandle, type ExplorerHandle, type ExplorerSidePanel } from './explorerHandle'
 import { usePaneHost, useViewActive } from '../workstation/paneContext'
 import { FilterPanel } from './FilterPanel'
@@ -1016,7 +1017,7 @@ function ExplorerShell({ session }: { session?: string }) {
       dispatch({ type: 'setSlides', patch: slides ? { show: slides.show, decks: slides.decks, focus: slides.focus, parts: slides.parts ?? true, story: slides.story, spatial: slides.spatial, final: slides.final } : { show: true, decks: undefined, focus: undefined, parts: true, story: undefined, spatial: undefined, final: undefined } })
       if (typeof v.hops === 'number') dispatch({ type: 'setHops', hops: v.hops })
       if (v.pathOptions) dispatch({ type: 'setPathOptions', patch: v.pathOptions as Partial<PathOptions> })
-      dispatch({ type: 'setTool', tool: v.tool ?? 'select' })
+      dispatch({ type: 'setTool', tool: explorerTool(v.tool) })
       dispatch({ type: 'select', ids: (v.selectedIds ?? []).filter((id) => store.has(id)), mode: 'replace' })
       dispatch({ type: 'selectEdge', id: v.selectedEdgeId && store.has(v.selectedEdgeId) ? v.selectedEdgeId : undefined })
       if (v.panel !== undefined) openPanel(v.panel)

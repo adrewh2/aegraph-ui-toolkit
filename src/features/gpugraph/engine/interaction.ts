@@ -1,11 +1,15 @@
 import type { GraphEngine } from './engine'
 
+/** The explorer's pointer tools: the hand (drag moves the camera), the box (drag selects), the path. */
+export type ExplorerTool = 'pan' | 'box' | 'path'
+
 /**
  * Pointer and wheel handling for the engine: hover (picked once per frame,
  * not per event), click to select (shift/⌘ toggles), drag a node or the
  * selection it belongs to, pan on empty space (orbit in 3D; the right
  * button, ⌥-drag or the middle button pans — so 3D translates with a drag
- * the way 2D does), shift+drag a marquee, wheel and pinch to zoom about
+ * the way 2D does), shift+drag a marquee — and with the box tool a plain drag on empty space is a marquee, Space
+ * held (or the right or middle button) moving the camera instead — wheel and pinch to zoom about
  * the pointer (dolly in 3D), right-click for the menu (a right button
  * that moved was a pan, not a click: the menu waits for the release and
  * opens only when the pointer stayed put). Nothing here
@@ -13,7 +17,12 @@ import type { GraphEngine } from './engine'
  * positions are read from the engine's arrays.
  */
 export class Interaction {
-  tool: 'select' | 'path' = 'select'
+  /** `pan` (the hand): a drag on empty space moves the camera. `box` (select): it draws a marquee. `path`: clicks pick a path's ends. */
+  tool: ExplorerTool = 'pan'
+  /** Space held: with the box tool, a drag moves the camera instead (the hand, while it is held). */
+  private space = false
+  /** The marquee adds to the selection (⇧) rather than replacing it. */
+  private marqueeAdd = true
   private mode: 'none' | 'pan' | 'orbit' | 'drag' | 'marquee' | 'pinch' | 'pending' = 'none'
   /** A press waiting for the positions to be read back before it picks (see `onDown`), and a release that came first. */
   private pendingKeys = { shift: false, alt: false }
@@ -62,6 +71,26 @@ export class Interaction {
     on('contextmenu', this.onContext)
     on('dblclick', this.onDouble)
     el.style.touchAction = 'none'
+    // Space as the hand while the box tool is on, as in drawing tools. Not while typing in a field.
+    const key = (down: boolean) => (e: KeyboardEvent) => {
+      if (e.code !== 'Space' || isField(e.target)) return
+      if (down && this.tool === 'box' && this.mode === 'none' && el.matches(':hover')) e.preventDefault()
+      this.space = down
+      this.updateCursor()
+    }
+    const kd = key(true)
+    const ku = key(false)
+    const blur = () => ((this.space = false), this.updateCursor())
+    window.addEventListener('keydown', kd)
+    window.addEventListener('keyup', ku)
+    window.addEventListener('blur', blur)
+    this.unbind.push(() => window.removeEventListener('keydown', kd), () => window.removeEventListener('keyup', ku), () => window.removeEventListener('blur', blur))
+  }
+
+  /** The resting cursor: crosshair for the path tool, the hand while Space is held over the box tool, else the default. */
+  updateCursor() {
+    if (this.mode !== 'none') return
+    this.el.style.cursor = this.tool === 'path' ? 'crosshair' : this.tool === 'box' && this.space ? 'grab' : ''
   }
 
   destroy() {
@@ -124,7 +153,7 @@ export class Interaction {
   /** The press decided: a drag of the node (or of the selection it is part of), a marquee, or the camera. */
   private begin(node: number, shiftKey: boolean, altKey: boolean) {
     const engine = this.engine
-    if (node >= 0 && !shiftKey && this.tool === 'select') {
+    if (node >= 0 && !shiftKey && this.tool !== 'path') {
       // The grabbed node, or the whole selection when it is part of it.
       const sel = engine.selected
       let n = 0
@@ -139,8 +168,11 @@ export class Interaction {
       this.el.style.cursor = 'grabbing'
       return
     }
-    if (shiftKey && node < 0) {
+    // A marquee: ⇧-drag with any tool adds to the selection; a plain drag on empty space with the box tool replaces
+    // it (⌥, or Space held, moves the camera instead).
+    if (node < 0 && (shiftKey || (this.tool === 'box' && !this.space && !altKey))) {
       this.mode = 'marquee'
+      this.marqueeAdd = shiftKey
       return
     }
     this.mode = engine.dims === 3 && !altKey ? 'orbit' : 'pan'
@@ -299,6 +331,7 @@ export class Interaction {
     const mode = this.mode
     this.mode = 'none'
     this.el.style.cursor = ''
+    this.updateCursor()
     if (mode === 'drag') {
       if (this.moved) {
         engine.dragging = null
@@ -320,8 +353,8 @@ export class Interaction {
           }
           hits[n++] = i
         })
-        if (n) engine.setSelection(hits.subarray(0, n), 'add', 'marquee')
-      }
+        if (n || !this.marqueeAdd) engine.setSelection(hits.subarray(0, n), this.marqueeAdd ? 'add' : 'replace', 'marquee')
+      } else if (!this.marqueeAdd) this.click(-1, x, y, e)
       return
     }
     if ((mode === 'pan' || mode === 'orbit') && !this.moved && this.button === 0) this.click(-1, x, y, e)
@@ -408,3 +441,6 @@ export class Interaction {
     if (node >= 0) this.engine.fitTo([node], { ms: 300 })
   }
 }
+
+/** A keystroke meant for a field, not for the picture. */
+const isField = (t: EventTarget | null) => t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))

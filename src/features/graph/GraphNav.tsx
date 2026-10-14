@@ -1,5 +1,5 @@
 import { KeysHint } from '../../components/KeysHint/KeysHint'
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Maximize2, Minimize2, MousePointer2, Route, Scan, X, ZoomIn, ZoomOut } from 'lucide-react'
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Hand, Maximize2, Minimize2, MousePointer2, Route, Scan, X, ZoomIn, ZoomOut } from 'lucide-react'
 import type { RefObject } from 'react'
 import { displayLabel } from '../../core/entity/entity'
 import { useEntityStore } from '../../core/entity/hooks'
@@ -19,12 +19,20 @@ import './GraphNav.css'
  */
 export function GraphNav({ viewRef, fullView, onFullView }: { viewRef: RefObject<GraphViewHandle | null>; fullView: boolean; onFullView: (on: boolean) => void }) {
   const { state, dispatch } = useExplorer()
-  const path = state.tool === 'path'
+  // The pointer tools, one at a time: the hand moves the picture, Select draws a box round what it selects, Path finds
+  // the shortest path between two clicked nodes. Dragging a node moves it with either of the first two.
+  const tools = [
+    { id: 'pan', icon: <Hand size={14} />, title: 'Hand: drag to move the picture (⇧-drag still draws a selection box)' },
+    { id: 'box', icon: <MousePointer2 size={14} />, title: 'Select: drag a box round nodes to select them — ⇧ adds to the selection; hold Space (or use the right button) to move the picture (V)' },
+    { id: 'path', icon: <Route size={14} />, title: 'Path: click two nodes to find the shortest path between them' },
+  ] as const
   return (
     <div className="gx-nav" role="toolbar" aria-label="View">
-      <button className={`gx-nav__btn ${path ? 'is-on' : ''}`} title={path ? 'Path tool: click two nodes to find the shortest path between them (click to go back to selecting)' : 'Path tool: highlight the shortest path between two nodes'} aria-pressed={path} onClick={() => dispatch({ type: 'setTool', tool: path ? 'select' : 'path' })}>
-        {path ? <Route size={14} /> : <MousePointer2 size={14} />}
-      </button>
+      {tools.map((t) => (
+        <button key={t.id} className={`gx-nav__btn ${state.tool === t.id ? 'is-on' : ''}`} title={t.title} aria-label={t.title.split(':')[0]} aria-pressed={state.tool === t.id} onClick={() => dispatch({ type: 'setTool', tool: t.id })}>
+          {t.icon}
+        </button>
+      ))}
       <span className="gx-nav__sep" />
       <button className="gx-nav__btn" title="Zoom in" onClick={() => viewRef.current?.zoomIn()}>
         <ZoomIn size={14} />

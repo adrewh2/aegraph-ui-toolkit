@@ -9,6 +9,7 @@ import type { AnyEntity, EntityId } from '../../core/entity/types'
 import { applyFilter, emptyFilter, filterComputedRefs, type FilterContext, type FilterSpec, type GraphSlice, DEFAULT_MAX_NODES } from '../../core/graph/filter'
 import { canRunLive, computeLayout, DEFAULT_LAYOUT_PARAMS, isHeavyLayout, layoutTooBig, removeOverlap as removeOverlapLayout, resolvePositions, type Dimensions, type LayoutAlgorithm, type LayoutParams, type Positions } from '../../core/graph/layouts'
 import { type LayoutJob, runLayoutInWorker } from '../../core/graph/runLayoutInWorker'
+import { explorerTool } from './explorerTool'
 import { DEFAULT_VIEW_BUDGET, memoryBudget, memoryGates, readHeap, shouldGate, viewLoad, type GateReason, type HeapReading, type ViewBudget, type ViewLoad } from '../../core/graph/budget'
 import { DEFAULT_METRICS, indexOf as metricIndexOf, serializeSlice, sliceKey as sliceKeyOf, type MetricsOptions, type MetricsResult } from '../../core/graph/metrics'
 import { runMetricsInWorker } from '../../core/graph/metrics/runInWorker'
@@ -66,7 +67,7 @@ export interface ExplorerState {
   hoveredId?: EntityId
   /** Nodes held in place by force layouts / live physics. */
   pinned: EntityId[]
-  tool: 'select' | 'path'
+  tool: 'pan' | 'box' | 'path'
   pathOptions: PathOptions
   /** First endpoint clicked in path mode. */
   pathFrom?: EntityId
@@ -155,7 +156,7 @@ type Action =
   | { type: 'hover'; id?: EntityId }
   | { type: 'setPinned'; ids: EntityId[] }
   | { type: 'pin'; ids: EntityId[]; on: boolean }
-  | { type: 'setTool'; tool: 'select' | 'path' }
+  | { type: 'setTool'; tool: 'pan' | 'box' | 'path' }
   | { type: 'setPathOptions'; patch: Partial<PathOptions> }
   | { type: 'setPathFrom'; id?: EntityId }
   | { type: 'setPath'; path?: PathState }
@@ -236,7 +237,7 @@ export function defaultState(): ExplorerState {
     renderingDirty: false,
     selectedIds: [],
     pinned: [],
-    tool: 'select',
+    tool: 'pan',
     pathOptions: { directed: false, weighted: false },
     hops: 0,
     labels: 'auto',
@@ -285,6 +286,7 @@ export function initialState(session?: string): ExplorerState {
         selectedEdgeId: undefined,
         pinned: Array.isArray(saved.pinned) ? saved.pinned : [],
         pathOptions: { ...base.pathOptions, ...(saved.pathOptions ?? {}) },
+        tool: explorerTool(saved.tool),
         path: undefined,
         pathFrom: undefined,
         ...restoreHeldPositions(rest.layoutId, rest.layoutDirty, session),
@@ -384,7 +386,7 @@ export function reducer(s: ExplorerState, a: Action): ExplorerState {
       return { ...s, pinned: [...set] }
     }
     case 'setTool':
-      return s.tool === a.tool ? s : { ...s, tool: a.tool, pathFrom: undefined }
+      return s.tool === explorerTool(a.tool) ? s : { ...s, tool: explorerTool(a.tool), pathFrom: undefined }
     case 'setPathOptions':
       return { ...s, pathOptions: { ...s.pathOptions, ...a.patch } }
     case 'setPathFrom':

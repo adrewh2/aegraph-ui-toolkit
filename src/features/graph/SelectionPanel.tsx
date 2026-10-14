@@ -1,4 +1,4 @@
-import { Minus, MousePointer2, PinOff, Plus, Route, X } from 'lucide-react'
+import { Minus, Hand, MousePointer2, PinOff, Plus, Route, X } from 'lucide-react'
 import { useMemo } from 'react'
 import { displayLabel } from '../../core/entity/entity'
 import { useEntityStore, useTypeRegistry } from '../../core/entity/hooks'
@@ -106,11 +106,14 @@ export function SelectionPanel() {
 
       <section>
         <h4>
-          Clicking
-          <span className="gx-panel__hint">{state.tool === 'path' ? 'finds a path' : 'selects'}</span>
+          Pointer
+          <span className="gx-panel__hint">{state.tool === 'path' ? 'finds a path' : state.tool === 'box' ? 'draws a selection box' : 'moves the picture'}</span>
         </h4>
-        <div className="gx-seg" role="radiogroup" aria-label="What a click does">
-          <button role="radio" aria-checked={state.tool === 'select'} className={state.tool === 'select' ? 'is-active' : ''} onClick={() => dispatch({ type: 'setTool', tool: 'select' })}>
+        <div className="gx-seg" role="radiogroup" aria-label="What the pointer does">
+          <button role="radio" aria-checked={state.tool === 'pan'} className={state.tool === 'pan' ? 'is-active' : ''} onClick={() => dispatch({ type: 'setTool', tool: 'pan' })} title="Drag to move the picture; ⇧-drag draws a selection box">
+            <Hand size={12} /> Hand
+          </button>
+          <button role="radio" aria-checked={state.tool === 'box'} className={state.tool === 'box' ? 'is-active' : ''} onClick={() => dispatch({ type: 'setTool', tool: 'box' })} title="Drag a box round nodes to select them (⇧ adds); hold Space to move the picture (V)">
             <MousePointer2 size={12} /> Select
           </button>
           <button role="radio" aria-checked={state.tool === 'path'} className={state.tool === 'path' ? 'is-active' : ''} onClick={() => dispatch({ type: 'setTool', tool: 'path' })}>

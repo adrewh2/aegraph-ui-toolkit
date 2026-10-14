@@ -9,7 +9,7 @@ import { getCameraControls } from './cameraControls'
 /**
  * The explorer's keyboard: Esc clears (the path, then the armed path, then
  * the selection), F fits, ⌘A selects all, I inverts, N adds neighbours, P
- * pins, H hides, ⌫ asks to delete. Only while this explorer is the one in
+ * pins, H hides, V switches between the select tool (drag a box) and the hand, ⌫ asks to delete. Only while this explorer is the one in
  * front, and never from a field or a dialog. The same actions the right-click
  * menu offers, so nothing is reachable by key alone.
  *
@@ -83,6 +83,12 @@ export function useExplorerShortcuts(viewRef: RefObject<GraphViewHandle | null>,
           if (meta || !a.count) return
           a.hide(a.ids)
           break
+        case 'v':
+        case 'V':
+          // The select tool and back to the hand (H is Hide; Space held is the hand for as long as it is held).
+          if (meta) return
+          dispatch({ type: 'setTool', tool: state.tool === 'box' ? 'pan' : 'box' })
+          break
         case 'Delete':
         case 'Backspace':
           if (!a.count) return
@@ -95,7 +101,7 @@ export function useExplorerShortcuts(viewRef: RefObject<GraphViewHandle | null>,
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [a, state.path, state.pathFrom, state.selectedIds.length, state.selectedEdgeId, dispatch, viewRef, viewActive, requestDelete])
+  }, [a, state.path, state.pathFrom, state.selectedIds.length, state.selectedEdgeId, state.tool, dispatch, viewRef, viewActive, requestDelete])
 }
 
 /**

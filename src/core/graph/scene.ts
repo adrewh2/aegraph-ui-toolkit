@@ -75,7 +75,7 @@ export interface SceneView {
   physics?: boolean
   /** Neighbourhood hops for selections and focus. */
   hops?: number
-  tool?: 'select' | 'path'
+  tool?: 'pan' | 'box' | 'path'
   pathOptions?: Record<string, unknown>
   selectedIds?: EntityId[]
   selectedEdgeId?: EntityId
